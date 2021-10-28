@@ -1,3 +1,0 @@
-[submodule "lib/dagre"]
-	path = lib/dagre
-	url = https://github.com/cytoscape/cytoscape.js-dagre.git
