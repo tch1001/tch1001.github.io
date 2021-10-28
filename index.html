@@ -38,15 +38,8 @@
     </style>
 
     <script>
-      function load(url) {
-        fetch(url).then(res => {
-          return res;
-        });
-      }
-      window.addEventListener('DOMContentLoaded', function(){
-        var data = load("./qft.tree")
-        console.log(data)
-
+      function drawGraph(data){
+        console.log(data);
         var cy = window.cy = cytoscape({
           container: document.getElementById('cy'),
 
@@ -113,7 +106,17 @@
             ]
           }
         });
+      }
 
+      function load(url) {
+        fetch(url).then(res => {
+          return res.text();
+        }).then(function(data){
+          drawGraph(data);
+        });
+      }
+      window.addEventListener('DOMContentLoaded', function(){
+        load("http://raw.githubusercontent.com/tch1001/twig/main/qft.tree")
       });
     </script>
   </head>
