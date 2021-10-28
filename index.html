@@ -16,11 +16,111 @@
         opacity: 0.5;
         font-size: 1em;
       }
+      .link {
+        fill: none;
+        stroke: #000;
+        stroke-opacity: .2;
+      }
+      .link:hover {
+        stroke-opacity: .5;
+      }
     </style>
+    <script src="https://unpkg.com/d3-array@1"></script>
+    <script src="https://unpkg.com/d3-collection@1"></script>
+    <script src="https://unpkg.com/d3-path@1"></script>
+    <script src="https://unpkg.com/d3-shape@1"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3"></script>
+    <script src="https://unpkg.com/d3-selection@3"></script>
+    <script src="https://unpkg.com/d3-request@1.0.6"></script>
+    <script src="https://unpkg.com/d3-dispatch@3.0.1"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script>
+      function onload(){
+        var margin = { top: 10, right: 10, bottom: 10, left: 10 };
+        var width = 1450 - margin.left - margin.right;
+        var height = 480 - margin.top - margin.bottom;
+        var svg = d3.selectAll("div").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        console.log(svg)
+        var sankey = d3.sankey()
+          .nodeWidth(36)
+          .nodePadding(290)
+          .size([width, height]);
+        d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_sankey.json", function (error, graph) {
 
+          // Constructs a new Sankey generator with the default settings.
+          sankey({ nodes: graph.nodes, links: graph.links });
+
+          // add in the links
+          console.log(sankey)
+          var link = svg.append("g")
+            .selectAll(".link")
+            .data(graph.links)
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("d", d3.sankeyLinkHorizontal())
+            .style("stroke-width", function (d) { return Math.max(1, d.dy); })
+            .sort(function (a, b) { return b.dy - a.dy; });
+
+          // add in the nodes
+          var node = svg.append("g")
+            .selectAll(".node")
+            .data(graph.nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function (d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
+              .call(d3.drag()
+                .subject(function(d) { return d; })
+                .on("start", function() { this.parentNode.appendChild(this); })
+                .on("drag", dragmove));
+
+          // add the rectangles for the nodes
+          node
+            .append("rect")
+            .attr("height", function (d) { return d.y1-d.y0; })
+            .attr("width", sankey.nodeWidth())
+//            .style("fill", function (d) { return d.color = color(d.name.replace(/ .*/, "")); })
+//            .style("stroke", function (d) { return d3.rgb(d.color).darker(2); })
+            // Add hover text
+            .append("title")
+            .text(function (d) { return d.name + "\n" + "There is " + d.value + " stuff in this node"; });
+
+          // add in the title for the nodes
+          node
+            .append("text")
+            .attr("x", -6)
+            .attr("y", function (d) { return (d.y1-d.y0) / 2; })
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .attr("transform", null)
+            .text(function (d) { return d.name; })
+            .filter(function (d) { return d.x0 < width / 2; })
+            .attr("x", 6 + sankey.nodeWidth())
+            .attr("text-anchor", "start");
+
+          // the function for moving the nodes
+          function dragmove(d) {
+            var rectY = d3.select(this).select("rect").attr("y");
+            var rectX = d3.select(this).select("rect").attr("X");
+            d.y0 = d.y0 + d3.event.dy;
+            d.x1 = d.x1 + d3.event.dx;
+            d.x0 = d.x0 + d3.event.dx;
+            var yTranslate = d.y0 - rectY;
+            var xTranslate = d.x0 - rectX;
+            d3.select(this).attr('transform', "translate(" + (xTranslate) + "," + (yTranslate) + ")");
+            sankey.update(graph);
+            link.attr('d', d3.sankeyLinkHorizontal());
+          }
+
+        });
+      }
+    </script>
     <script>
       function drawGraph(data){
-        console.log(data);
       }
 
       function load(url) {
@@ -36,9 +136,9 @@
     </script>
   </head>
 
-  <body>
+  <body onload="onload()">
     <h1 id="name">The Web is Great (TWIG)</h1>
-
+    <div id="graph"></div>
   </body>
 
 </html>
