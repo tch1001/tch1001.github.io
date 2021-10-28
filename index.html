@@ -118,7 +118,11 @@
             .attr("class", "link")
             .attr("d", d3.sankeyLinkHorizontal())
             .style("stroke-width", function (d) { return 10 })
-            .sort(function (a, b) { return Math.abs(b.y1-b.y0) - Math.abs(a.y1-a.y0); });
+            .sort(function (a, b) { return Math.abs(b.y1-b.y0) - Math.abs(a.y1-a.y0); })
+            .on("click", function(d){
+              if(d3.event.defaultPrevented) console.log('huh');
+              console.log('clicked', d.value);
+            })
 
           // add in the nodes
           var node = svg.append("g")
@@ -127,10 +131,11 @@
             .enter().append("g")
             .attr("class", "node")
             .attr("transform", function (d) { return "translate(" + (d.x0) + "," + (d.y0) + ")"; })
-              .call(d3.drag()
-                .subject(function(d) { return d; })
-                .on("start", function() { this.parentNode.appendChild(this); })
-                .on("drag", dragmove));
+//            .call(d3.drag()
+//              .subject(function(d) { return d; })
+//              .clickDistance(10)
+//              .on("start", function() { this.parentNode.appendChild(this); })
+//              .on("drag", dragmove))
 
           // add the rectangles for the nodes
           node
@@ -182,6 +187,10 @@
             rects[i].addEventListener('mouseout', e => {
               console.log(e.target.id, "out");
               modal.style.display = "none";
+            });
+            rects[i].addEventListener('click', e => {
+              console.log(e.target.id, "click");
+              location.href = "item.html?title=" + e.target.id
             });
           }
       }
