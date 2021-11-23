@@ -78,7 +78,7 @@
           .attr("height", height + margin.top + margin.bottom)
           .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        console.log(svg)
+//        console.log(svg)
         var sankey = d3.sankey()
           .nodeWidth(36)
           .nodePadding(290)
@@ -104,12 +104,12 @@
               { "source": 4, "target": 5, "value": 4 },
             ]
           };
-          console.log(graph)
+//          console.log(graph)
           // Constructs a new Sankey generator with the default settings.
           sankey({ nodes: graph.nodes, links: graph.links });
 
           // add in the links
-          console.log(sankey)
+//          console.log(sankey)
           var link = svg.append("g")
             .selectAll(".link")
             .data(graph.links)
@@ -177,33 +177,74 @@
           }
           var rects = document.getElementsByClassName('meow');
           var modal = document.getElementById("myModal");
-          console.log(rects);
+//          console.log(rects);
           for(var i=0; i<rects.length; i++){
-            console.log(rects[i]);
+//           console.log(rects[i]);
             rects[i].addEventListener('mouseover', e => {
-              console.log(e.target.id, "over");
+//              console.log(e.target.id, "over");
               modal.style.display = "block";
             });
             rects[i].addEventListener('mouseout', e => {
-              console.log(e.target.id, "out");
+//              console.log(e.target.id, "out");
               modal.style.display = "none";
             });
             rects[i].addEventListener('click', e => {
-              console.log(e.target.id, "click");
+//              console.log(e.target.id, "click");
               location.href = "item.html?title=" + e.target.id
             });
           }
       }
     </script>
+    <script src="tree.js"></script>
     <script>
-      function drawGraph(data){
+      class Concept{
+        constructor(title, guid){
+          this.title = title
+          this.guid = guid
+        }
+      }
+      var concepts = {} // map from guid to Concept object
+      var nameOfMindmap = ''
+      var curTitle = ''
+      var curGuid = ''
+      function process(data){
+        data = data.split(/\r\n|\r|\n/)
+        data.forEach((line) => {
+          line = line.split('//')[0];
+          console.log(line)
+          if(line.toLowerCase().search('name') != -1){
+            var idx = line.search(':')
+            nameOfMindmap = line.substr(idx+1, line.length-1)
+            nameOfMindmap = nameOfMindmap.trimLeft()
+            console.log(nameOfMindmap)
+          }else if(line.toLowerCase().search('title') != -1){
+            console.log('title')
+            var idx = line.search(':')
+            if(curTitle != '' && curGuid != ''){ curTitle = curGuid = '' }
+            curTitle = line.substr(idx+1, line.length-1)
+            curTitle = curTitle.trimLeft()
+            if(curTitle != '' && curGuid != ''){ concepts[curGuid] = new Concept(curTitle,curGuid); }
+            console.log(concepts)
+          }else if(line.toLowerCase().search('guid') != -1){
+            var idx = line.search(':')
+            if(curTitle != '' && curGuid != ''){ curTitle = curGuid = '' }
+            curGuid = line.substr(idx+1, line.length-1)
+            curGuid = curGuid.trim()
+            console.log(curGuid)
+            if(curTitle != '' && curGuid != ''){ concepts[curGuid] = new Concept(curTitle,curGuid); }
+            console.log(concepts)
+          }else if(line.toLowerCase().search('summary') != -1){
+          }else if(line.toLowerCase().search('prereq') != -1){
+          }
+        })
+        document.getElementById('name').innerHTML = nameOfMindmap;
       }
 
       function load(url) {
         fetch(url).then(res => {
           return res.text();
         }).then(function(data){
-          drawGraph(data);
+          process(data);
         });
       }
       window.addEventListener('DOMContentLoaded', function(){
