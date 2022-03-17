@@ -25,147 +25,21 @@
     <script src="./graphonline_files/BFS.js"></script><script src="./graphonline_files/Coloring.js"></script><script src="./graphonline_files/ConnectedComponent.js"></script><script src="./graphonline_files/DFS.js"></script><script src="./graphonline_files/EulerianLoop.js"></script><script src="./graphonline_files/EulerianPath.js"></script><script src="./graphonline_files/FindAllPatches.js"></script><script src="./graphonline_files/FindShortPatchsFromOne.js"></script><script src="./graphonline_files/Floid.js"></script><script src="./graphonline_files/GraphReorder.js"></script><script src="./graphonline_files/HamiltonianLoop.js"></script><script src="./graphonline_files/HamiltonianPath.js"></script><script src="./graphonline_files/IsomorphismCheck.js"></script><script src="./graphonline_files/MaxFlow.js"></script><script src="./graphonline_files/MinimumSpanningTree.js"></script><script src="./graphonline_files/ModernGraphStyle.js"></script><script src="./graphonline_files/RadiusAndDiameter.js"></script><script src="./graphonline_files/ShortestPath.js"></script><script src="./graphonline_files/VerticesDegree.js"></script></head>
     <body>
         <div class="container page-wrap" id="mainContainer">
-<!--            <div class="header"> -->
-<nav class="navbar navbar-default" id="navigation">
+  <nav class="navbar navbar-default" id="navigation">
     <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="https://graphonline.ru/en/"><span class="fa fa-sitemap fa-fw"></span> Graph Online</a>
     </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-<ul class="nav navbar-nav navbar-right">
-<li class="active"><a href="https://graphonline.ru/en/">Home</a></li>
-<li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" href="https://graphonline.ru/en/?q=en#" role="button" aria-expanded="false"> Create Graph <span class="caret"></span></a>
-<ul class="dropdown-menu">
-<li><a href="https://graphonline.ru/en/create_graph_by_matrix">Using adjacency matrix</a></li>
-<li><a href="https://graphonline.ru/en/create_graph_by_incidence_matrix">Using incidence matrix</a></li>
-<li><a href="https://graphonline.ru/en/graphs_examples">Using graph example</a></li>
-</ul>
-</li>
-<li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" href="https://graphonline.ru/en/?q=en#" role="button" aria-expanded="false"> Help <span class="caret"></span></a>
-<ul class="dropdown-menu">
-<li><a href="https://graphonline.ru/en/help">Quick Start</a></li>
-<li><a href="https://graphonline.ru/en/wiki">Wiki</a></li>
-<li><a href="https://graphonline.ru/en/opensource">Open source</a></li>
-</ul>
-</li>
-<li class=""><a href="https://graphonline.ru/en/news">News</a></li>
-<li class=""><a href="https://graphonline.ru/en/contacts">Contacts</a></li>
-<li class="dropdown">
-<a href="https://graphonline.ru/en/?q=en#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="./graphonline_files/enru.png" alt="Language icon"> Language <span class="caret"></span></a>
-<ul class="dropdown-menu">
-<li><a href="https://graphonline.ru/en/" title="English" class="selected"><img src="./graphonline_files/en.png" alt="English"> English</a></li>
-<li><a href="https://graphonline.ru/" title="Русский" class=""><img src="./graphonline_files/ru.png" alt="Русский"> Русский</a></li>
-<li><a href="https://graphonline.ru/fr/" title="Français" class=""><img src="./graphonline_files/fr.png" alt="Français"> Français</a></li>
-<li><a href="https://graphonline.ru/el/" title="Greek" class=""><img src="./graphonline_files/el.png" alt="Greek"> Greek</a></li>
-<li><a href="https://graphonline.ru/es/" title="Spanish" class=""><img src="./graphonline_files/es.png" alt="Spanish"> Spanish</a></li>
-<li><a href="https://graphonline.ru/nl/" title="Dutch" class=""><img src="./graphonline_files/nl.png" alt="Dutch"> Dutch</a></li>
-<li><a href="https://graphonline.ru/sv/" title="Swedish" class=""><img src="./graphonline_files/sv.png" alt="Swedish"> Swedish</a></li>
-<li><a href="https://graphonline.ru/de/" title="German" class=""><img src="./graphonline_files/de.png" alt="German"> German</a></li>
-<li><a href="https://graphonline.ru/pt/" title="Portuguese" class=""><img src="./graphonline_files/pt.png" alt="Portuguese"> Portuguese</a></li>
-<li><a href="https://graphonline.ru/bg/" title="Български" class=""><img src="./graphonline_files/bg.png" alt="Български"> Български</a></li>
-<li><a href="https://graphonline.ru/ch/" title="漢語" class=""><img src="./graphonline_files/ch.png" alt="漢語"> 漢語</a></li>
-</ul>
-</li>
-</ul>
 
 
         </div>
     </div>
-</nav>
-            <div class="content">
-                
-    
-<!--
-<div class="pull-right">
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<ins class="adsbygoogle"
-     style="display:inline-block;width:240px;height:100px"
-     style="display:inline-block;width:240px;height:100px"
-     data-ad-client="ca-pub-6777969915840976"
-     data-ad-slot="6397293847"></ins>
-</div>
--->
-
-    <h1 style="display:inline;" id="h1Header">Find shortest path</h1>
-
-    <span class="hidden-xs" id="h1Text"><p>Create graph and find the shortest path. On the Help page you <a href="https://graphonline.ru/en/help">will find tutorial video</a>.</p>
-</span>
 
 	<section>
-		<ul class="nav nav-pills">
-
-			<div class="btn-group" role="group">
-    			<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-			<span class="glyphicon glyphicon-cog fa-fw"></span><span class="hidden-phone"> Graph </span><span class="caret"></span></button>
-    			<ul class="dropdown-menu" role="menu">
-      				<li>
-                        <button type="button" class="btn btn-default btn-sm btn-submenu" id="NewGraph"><span class="glyphicon glyphicon-plus fa-fw"></span> Create graph </button>
-				</li>
-				<li class="divider"></li>
-      				<li>
-				  <button type="button" class="btn btn-default btn-sm btn-submenu" id="SaveGraph"><span class="glyphicon glyphicon-floppy-disk fa-fw"></span> Save</button>
-				</li>
-                <li class="divider"></li>
-                <li>
-                    <button type="button" class="btn btn-default btn-sm btn-submenu" id="SaveFullGraphImage"><span class="glyphicon glyphicon-floppy-disk fa-fw"></span> Save graph image</button>
-                </li>
-                <li>
-                    <button type="button" class="btn btn-default btn-sm btn-submenu" id="SaveGraphImage"><span class="glyphicon glyphicon-camera fa-fw"></span> Workspace screenshot</button>
-                </li>
-                <li>
-                    <button type="button" class="btn btn-default btn-sm btn-submenu" id="SavePrintGraphImage"><span class="glyphicon glyphicon-print fa-fw"></span> Printed image of graph (black&amp;white)</button>
-                </li>
-                <li class="divider hidden-phone"></li>
-                <li class="hidden-phone">
-				  <button type="button" class="btn btn-default btn-sm btn-submenu" id="ExportGraph"><span class="glyphicon glyphicon-download fa-fw"></span> Export to file</button>
-				</li>
-                    
-                <li class="hidden-phone">
-                  <input type="file" id="ImportGraphFiles" accept=".graphml" style="display:none" onchange="handelImportGraph(this.files)">
-				  <button type="button" class="btn btn-default btn-sm btn-submenu" id="ImportGraph"><span class="glyphicon glyphicon-upload fa-fw"></span> Import from file</button>
-				</li>
-                    
-				<li class="divider"></li>
-      				<li>
-				  <button type="button" class="btn btn-default btn-sm btn-submenu" id="ShowAdjacencyMatrix"><span class="glyphicon glyphicon-th fa-fw"></span> Adjacency Matrix</button>
-				</li>
-      				<li>
-		  		  <button type="button" class="btn btn-default btn-sm btn-submenu" id="ShowIncidenceMatrix"><span class="glyphicon glyphicon-th fa-fw"></span> Incidence matrix </button>
-				</li>
-                <li>
-		  		  <button type="button" class="btn btn-default btn-sm btn-submenu" id="ShowDistanceMatrix"><span class="glyphicon glyphicon-th fa-fw"></span> Distance matrix </button>
-				</li>
-                <li>
-		  		  <button type="button" class="btn btn-default btn-sm btn-submenu" id="GroupRename"><span class="glyphicon glyphicon-pencil fa-fw"></span> Group rename </button>
-				</li>
-				<li class="divider"></li>
-      				<li>
-				  <button type="button" class="btn btn-default btn-sm btn-submenu" id="DeleteAll"><span class="glyphicon glyphicon-remove fa-fw"></span> Remove all</button>
-				</li>
-    			</ul>
-  			</div>
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-zoom-in fa-fw"></span><span class="hidden-phone"> View </span><span class="caret hidden-phone"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="Zoom100"><span class="glyphicon glyphicon-zoom-in fa-fw"></span> 100% </button> </li>
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="Zoom50"><span class="glyphicon glyphicon-zoom-in fa-fw"></span> 50% </button> </li>
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="Zoom25"><span class="glyphicon glyphicon-zoom-in fa-fw"></span> 25% </button> </li>
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="ZoomFit"><span class="glyphicon glyphicon-zoom-in fa-fw"></span> Zoom fit</button> </li>
-                <li class="divider"></li>
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="ZoomIn"><span class="glyphicon glyphicon-zoom-in fa-fw"></span> Zoom in <span style="float:right">+</span></button></li>
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="ZoomOut"><span class="glyphicon glyphicon-zoom-in fa-fw"></span> Zoom out <span style="float:right">-</span></button></li>
-                <li class="divider"></li>
-                <li> <button type="button" class="btn btn-default btn-sm btn-submenu" id="MoveWorspace"><span class="glyphicon glyphicon-fullscreen fa-fw"></span> Move workspace </button> </li>
-            </ul>
-          </div>
 		  <button type="button" class="btn btn-default btn-sm" id="Default"><span class="glyphicon glyphicon-fullscreen fa-fw"></span><span class="hidden-phone"> Default <sub style="color:#AAAAAA">m</sub></span></button>
           <button type="button" class="btn btn-primary btn-sm" id="AddGraph"><span class="glyphicon glyphicon-plus fa-fw"></span><span class="hidden-phone"> Add vertex <sub style="color:#AAAAAA">v</sub></span></button>
 		  <button type="button" class="btn btn-default btn-sm" id="ConnectGraphs"><span class="glyphicon glyphicon-road fa-fw"></span><span class="hidden-phone"> Connect vertices <sub style="color:#AAAAAA">e</sub></span></button>
@@ -197,8 +71,6 @@
 
 </div>
   </div>
-
-
         <button type="button" class="btn btn-default btn-sm" id="DeleteObject"><span class="glyphicon glyphicon-remove fa-fw"></span><span class="hidden-phone"> Remove object <sub style="color:#AAAAAA">r</sub></span></button>
             
             
@@ -218,13 +90,6 @@
         </div>
 
         <button type="button" class="btn btn-default btn-sm" id="GraphUndo" style="display: none;"><span class="glyphicon glyphicon-arrow-left fa-fw"></span><span class="hidden-phone"> Undo <sub style="color:#AAAAAA">crtl+z</sub></span></button>
-
-<!--
-                <button type="button" class="btn btn-success" id="VoteButton"><span class="glyphicon glyphicon-thumbs-up"></span> Vote</button>
-        -->
-<!--
-		  <button type="button" class="btn btn-default" id="Test"><span class="glyphicon glyphicon-remove"></span> Test repos</button>
--->
 		</ul>
 	</section>		
 
@@ -235,7 +100,7 @@
     <section id="canvasSection">
     <span id="CanvasMessage"></span>    
     <button type="button" class="btn btn-default btn-sm hidden-phone" id="Fullscreen"><span class="glyphicon glyphicon-resize-full fa-fw" id="FullscreenIcon"></span></button>
-	<canvas id="canvas" width="1120" height="386">Your browser is not supported</canvas>
+	  <canvas id="canvas" width="1120" height="386">Your browser is not supported</canvas>
     <div id="developerTools" class="well well-sm" style="left: 0px;">
         <h4>Create algorithm</h4> <span class="glyphicon glyphicon-resize-full fa-fw leftTopPosition" id="devToolsZoom"></span>
         <span>Paste your algorith below and press Run</span>
@@ -373,106 +238,6 @@
 		</fieldset>
 		</form>
     </div>
-
-	<div id="saveDialog">
-		<form>
-		<fieldset>
-				<p>Graph was saved. Follow this link to see it. <br>
-				<input type="text" name="graphName" id="GraphName" onclick="this.select();">
-				</p>
-				<p>Share link in social networks:</p>
-<ul class="share-buttons" id="ShareSavedGraph">
-	<li><a href="http://vkontakte.ru/share.php?url=http://graphonline.ru/en/?graph=XXXX&amp;text=Graph%20Online:%20Saved%20Graph" target="_blank" title="Share on Vkontate"><i class="fa fa-vk fa-2x"></i></a></li>
-	<li><a href="https://www.facebook.com/sharer/sharer.php?u=http://graphonline.ru/en/?graph=XXXX&amp;t=Graph%20Online:%20Saved%20Graph" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square fa-2x"></i></a></li>
-	<li><a href="https://twitter.com/intent/tweet?source=http://graphonline.ru/en/?graph=XXXX&amp;text=Graph%20Online:%20Saved%20Graph%20http://graphonline.ru/en/?graph=XXXX" target="_blank" title="Tweet"><i class="fa fa-twitter-square fa-2x"></i></a></li>
-	<li><a href="https://plus.google.com/share?url=http://graphonline.ru/en/?graph=XXXX" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square fa-2x"></i></a></li>
-	<li><a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http://graphonline.ru/en/?graph=XXXX&amp;title=Graph%20Online:%20Saved%20Graph&amp;summary=Graph%20Online:%20Saved%20Graph%20&amp;source=http://graphonline.ru/en/?graph=XXXX" target="_blank" title="Share on LinkedIn"><i class="fa fa-linkedin-square fa-2x"></i></a></li>
-	<li><a href="mailto:?subject=Graph%20Online:%20Saved%20Graph&amp;body=http://graphonline.ru/en/?graph=XXXX" target="_blank" title="Email"><i class="fa fa-envelope fa-2x"></i></a></li>
-</ul>
-
-		</fieldset>
-		</form>
-       </div>
-
-<div id="saveImageDialog">
-<form>
-<fieldset>
-<p id="SaveImageLinks"><a href="./graphonline_files/XXXXX.png" target="_blank">Open image in browser</a> or <a href="./graphonline_files/XXXXX.png" download="">Download saved image</a>
-</p>
-<p class="hidden-phone">
-<a href="./graphonline_files/XXXXX.png" target="_blank" class="hidden-phone showShareImage" id="showSavedImageGraphRef"><img src="./graphonline_files/XXXXX.png" id="showSavedImageGraph" class="showShareImage"></a>
-</p>
-<p>Share link in social networks:</p>
-<ul class="share-buttons" id="ShareSavedImageGraph">
-<li><a href="http://vkontakte.ru/share.php?url=https://graphonline.ru/tmp/saved/XX/XXXXX.png&amp;text=Graph%20Online:%20Saved%20Graph" target="_blank" title="Share on Vkontate"><i class="fa fa-vk fa-2x"></i></a></li>
-<li><a href="https://www.facebook.com/sharer/sharer.php?u=https://graphonline.ru/tmp/saved/XX/XXXXX.png&amp;t=Graph%20Online:%20Saved%20Graph" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square fa-2x"></i></a></li>
-<li><a href="https://twitter.com/intent/tweet?source=https://graphonline.ru/tmp/saved/XX/XXXXX.png&amp;text=Graph%20Online:%20Saved%20Graph%20https://graphonline.ru/en/tmp/saved/XX/XXXXX.png" target="_blank" title="Tweet"><i class="fa fa-twitter-square fa-2x"></i></a></li>
-<li><a href="https://plus.google.com/share?url=https://graphonline.ru/tmp/saved/XX/XXXXX.png" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square fa-2x"></i></a></li>
-<li><a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://graphonline.ru/tmp/saved/XX/XXXXX.png&amp;title=Graph%20Online:%20Saved%20Graph&amp;summary=Graph%20Online:%20Saved%20Graph%20&amp;source=https://graphonline.ru/tmp/saved/XX/XXXXX.png" target="_blank" title="Share on LinkedIn"><i class="fa fa-linkedin-square fa-2x"></i></a></li>
-<li><a href="mailto:?subject=Graph%20Online:%20Saved%20Graph&amp;body=https://graphonline.ru/tmp/saved/XX/XXXXX.png" target="_blank" title="Email"><i class="fa fa-envelope fa-2x"></i></a></li>
-</ul>
-
-</fieldset>
-</form>
-</div>
-
-	<div id="sentAlgorithm" title="Algorithm was sent">
-		  <p>Your algorithm was sent to check and in success case it will be add to site.</p>
-    </div>
-
-
-       <div id="matrixError" class="translation">
-	<div><span class="glyphicon glyphicon-remove-sign text-danger"></span> Cannot create graph. Adjacency Matrix has wrong format. Click "fix matrix" button to fix matrix or "help" button to open help about Adjacency Matrix format</div>
-       </div>
-
-       <div id="matrixErrorInc" class="translation">
-	<div><span class="glyphicon glyphicon-remove-sign text-danger"></span> Cannot create graph. Incidence Matrix has wrong format. Click "fix matrix" button to fix matrix or "help" button to open help about Incidence Matrix format</div>
-       </div>
-        
-	<div id="voteDialog">
-		<form>
-		<fieldset>
-				<p>What functions should we add firstly?</p>	
-                            <div class="list-group">
-                  <button type="button" class="list-group-item" id="vote3">
-                    <h4 class="list-group-item-heading">Search strongly connected component</h4>
-                    <p class="list-group-item-text"></p>
-                  </button>
-                </div>
-                            <div class="list-group">
-                  <button type="button" class="list-group-item" id="vote1">
-                    <h4 class="list-group-item-heading">Depth-first search and breadth-first search</h4>
-                    <p class="list-group-item-text"></p>
-                  </button>
-                </div>
-                            <div class="list-group">
-                  <button type="button" class="list-group-item" id="vote0">
-                    <h4 class="list-group-item-heading">Search Hamiltonian path and cycle</h4>
-                    <p class="list-group-item-text"></p>
-                  </button>
-                </div>
-                            <div class="list-group">
-                  <button type="button" class="list-group-item" id="vote2">
-                    <h4 class="list-group-item-heading">Search all paths from vertex A to vertex B</h4>
-                    <p class="list-group-item-text"></p>
-                  </button>
-                </div>
-                            <div class="list-group">
-                  <button type="button" class="list-group-item" id="vote5">
-                    <h4 class="list-group-item-heading">Bellman–Ford algorithm</h4>
-                    <p class="list-group-item-text"></p>
-                  </button>
-                </div>
-                            <div class="list-group">
-                  <button type="button" class="list-group-item" id="vote4">
-                    <h4 class="list-group-item-heading">Search longest path on graph</h4>
-                    <p class="list-group-item-text"></p>
-                  </button>
-                </div>
-            		</fieldset>
-		</form>
-    </div>
-        
         
 	<div id="NeedAlgorithm">
 		<form>
