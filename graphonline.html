@@ -26,20 +26,63 @@
   <script src="./graphonline_files/context.js" async=""></script>
 
   <script src="./graphonline_files/RadiusAndDiameter.js"></script>
+  <style>
+    .collapsible {
+      background-color: #777;
+      color: white;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .active,
+    .collapsible:hover {
+      background-color: #555;
+    }
+
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #f1f1f1;
+    }
+  </style>
+
 </head>
 
 <body>
-  <div class="container page-wrap" id="mainContainer">
+  <div class="container page-wrap" id="mainContainer" style="margin-left: 0px; width:100%; height:100%; display:table;">
     <nav class="navbar navbar-default" id="navigation">
       <section id="canvasSection">
         <span id="CanvasMessage"></span>
-        <button type="button" class="btn btn-default btn-sm hidden-phone" id="Fullscreen"><span
-            class="glyphicon glyphicon-resize-full fa-fw" id="FullscreenIcon"></span></button>
-        <canvas id="canvas" width="1120" height="386">Your browser is not supported</canvas>
+        <!-- <button type="button" class="btn btn-default btn-sm hidden-phone" id="Fullscreen"><span
+            class="glyphicon glyphicon-resize-full fa-fw" id="FullscreenIcon"></span></button> -->
+        <h1>Twig</h1>
+        <div style="width:50%;">
+          <button type="button" class="collapsible">Instructions</button>
+          <div class="content">
+            <ul>
+              <li>(m)ove</li>
+              <li>(v)ertex</li>
+              <li>(e)dge</li>
+              <li>scroll to zoom, drag to pan</li>
+            </ul>
+          </div>
+        </div>
+        <!-- <div style="display: table-row;"> -->
+        <div style="width:50%;">
+          <canvas id="canvas">Your browser is not supported</canvas>
+        </div>
+          <h3 id='vertex-title'>Title</h3>
+        <!-- </div> -->
         <div id="developerTools" class="well well-sm" style="left: 0px;">
           <h4>Create algorithm</h4> <span class="glyphicon glyphicon-resize-full fa-fw leftTopPosition"
             id="devToolsZoom"></span>
-          <span>Paste your algorith below and press Run</span>
+          <span>Paste your algorithm below and press Run</span>
           <textarea id="userScript">        </textarea>
           <input type="button" value="Run" id="runUserScript" class="btn btn-success btn-sm">
           <input type="button" value="Submit to site" id="submitUserScript" class="btn btn-default btn-sm"
@@ -49,6 +92,25 @@
   </div>
 
 
+  <script>
+
+    var coll = document.getElementsByClassName("collapsible");
+    console.log(coll)
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function () {
+        console.log('clicked toggle')
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+  </script>
 
   <section class="translation">
     <div id="addEdge">
@@ -261,7 +323,7 @@
         </fieldset>
       </form>
 
-      <canvas id="VertexPreview" width="300" height="150"></canvas>
+      <!-- <canvas id="VertexPreview" width="300" height="150"></canvas> -->
     </div>
 
     <div id="SetupEdgeStyleDialog">
@@ -343,7 +405,7 @@
         </fieldset>
       </form>
 
-      <canvas id="EdgePreview" width="300" height="150"></canvas>
+      <!-- <canvas id="EdgePreview" width="300" height="150"></canvas> -->
     </div>
 
     <div id="SetupBackgroundStyleDialog">
@@ -364,7 +426,7 @@
         </fieldset>
       </form>
 
-      <canvas id="BackgroundPreview" width="300" height="150"></canvas>
+      <!-- <canvas id="BackgroundPreview" width="300" height="150"></canvas> -->
     </div>
 
     <p id="SelectAndMoveObject" class="translation">Select and move objects by mouse or move workspace.</p>

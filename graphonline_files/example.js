@@ -2601,9 +2601,18 @@ BaseHandler.prototype.GetMessage = function()
 {
 	return this.message;
 }
-
-
 BaseHandler.prototype.MouseMove = function(pos) {}
+
+AddGraphHandler.prototype.MouseMove = function(pos) { // TODO doesnt work
+    var mouseoverObject = this.GetSelectedObject(pos);
+
+    var vertexTitle = document.getElementById('vertex-title')
+    if(mouseoverObject){
+        vertexTitle.innerHTML = mouseoverObject.mainText;
+    }else{
+        vertexTitle.innerHTML = 'Hover over a vertex';
+    }
+}
 
 BaseHandler.prototype.MouseDown = function(pos) {}
 
@@ -8201,10 +8210,17 @@ function handelImportGraph(files) {
 
     fileReader.readAsText(graphFileToLoad, "UTF-8");
 }
+function animationLoop(){
+    // console.log(application.graph)
+}
 
 function postLoadPage()
 {
     application.userAction = userAction;
+    setInterval(function(){
+        animationLoop(application);
+    }, 100)
+
     
 	application.canvas.onmousemove = function (e)
 		{
