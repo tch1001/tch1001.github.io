@@ -2613,26 +2613,29 @@ BaseHandler.prototype.GetMessage = function()
 	return this.message;
 }
 
-BaseHandler.prototype.MouseMove = function(pos) { // TODO doesnt work
+BaseHandler.prototype.MouseMove = function(pos) { 
     console.log(this.globalHoverVertex)
     var mouseoverObject = this.GetSelectedObject(pos);
 
     var vertexTitle = document.getElementById('vertex-title')
-    if(mouseoverObject){
+    
+    if(mouseoverObject instanceof BaseVertex){
+
         vertexTitle.innerHTML = mouseoverObject.mainText;
-        // change style
+
+        // change node style
+        if(this.globalHoverVertex){
+            this.globalHoverVertex.currentStyle = new CommonVertexStyle();
+        }
         this.globalHoverVertex = mouseoverObject;
         this.globalHoverVertex.currentStyle = new HoverVertexStyle();
         this.needRedraw = true;
-    }else{
-        vertexTitle.innerHTML = 'Hover over a vertex';
+    }else if(mouseoverObject instanceof BaseEdge){
+        vertexTitle.innerHTML = 'connecting'
     }
 }
 
-BaseHandler.prototype.MouseDown = function(pos) {
-    var mouseoverObject = this.GetSelectedObject(pos);
-
-}
+BaseHandler.prototype.MouseDown = function(pos) {}
 
 BaseHandler.prototype.MouseUp   = function(pos) {}
 
@@ -6619,7 +6622,7 @@ Application.prototype.UpdateNodesCurrentStyle = function(ForceCommonStyle, Force
         if (selectedGroup > 0)
         {
             selectedGroup = (selectedGroup - 1) % selectedStyle.length;
-            selected = true;            
+            selected = true;
         }
 
         var currentStyle = null;
@@ -6628,12 +6631,17 @@ Application.prototype.UpdateNodesCurrentStyle = function(ForceCommonStyle, Force
         else
             currentStyle = selected ? selectedStyle[selectedGroup] : commonStyle;
 
-        this.graph.vertices[i].currentStyle = currentStyle;
         console.log(this.handler.globalHoverVertex)
         if(this.handler.globalHoverVertex){
-            this.handler.globalHoverVertex.currentStyle = new HoverVertexStyle();
+          this.handler.globalHoverVertex.currentStyle = new HoverVertexStyle();
+          // TODO find out of this is the best practice
         }
-    }	
+
+        if(this.graph.vertices[i].currentStyle){
+        }else{
+            this.graph.vertices[i].currentStyle = currentStyle;
+        } 
+    }
 }
 
 Application.prototype.RedrawSelectionRect = function(context)
