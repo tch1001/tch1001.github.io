@@ -1399,6 +1399,16 @@ function CommonPrintVertexStyle()
   this.baseStyles.push("common");
 }
 
+function HoverVertexStyle(){
+    BaseVertexStyle.apply(this, arguments);
+    this.strokeStyle = '#f0d543';
+	this.mainTextColor  = '#f0d543';
+	this.fillStyle = '#0000FF';
+
+    this.baseStyles.push("common");
+}
+HoverVertexStyle.prototype = Object.create(BaseVertexStyle.prototype)
+
 CommonPrintVertexStyle.prototype = Object.create(BaseVertexStyle.prototype);
 
 // Selected style of Graphs.
@@ -2519,6 +2529,7 @@ function BaseHandler(app)
     this.contextMenuObject = null;
     this.contextMenuPoint = null;
     //this.app.ClearUndoStack();
+    this.globalHoverVertex = null;
 }
 
 // Need redraw or nor.
@@ -2601,20 +2612,27 @@ BaseHandler.prototype.GetMessage = function()
 {
 	return this.message;
 }
-BaseHandler.prototype.MouseMove = function(pos) {}
 
-AddGraphHandler.prototype.MouseMove = function(pos) { // TODO doesnt work
+BaseHandler.prototype.MouseMove = function(pos) { // TODO doesnt work
+    console.log(this.globalHoverVertex)
     var mouseoverObject = this.GetSelectedObject(pos);
 
     var vertexTitle = document.getElementById('vertex-title')
     if(mouseoverObject){
         vertexTitle.innerHTML = mouseoverObject.mainText;
+        // change style
+        this.globalHoverVertex = mouseoverObject;
+        this.globalHoverVertex.currentStyle = new HoverVertexStyle();
+        this.needRedraw = true;
     }else{
         vertexTitle.innerHTML = 'Hover over a vertex';
     }
 }
 
-BaseHandler.prototype.MouseDown = function(pos) {}
+BaseHandler.prototype.MouseDown = function(pos) {
+    var mouseoverObject = this.GetSelectedObject(pos);
+
+}
 
 BaseHandler.prototype.MouseUp   = function(pos) {}
 
@@ -3360,12 +3378,12 @@ DefaultHandler.prototype.SelectObjectInRect = function (rect)
 
 /**
  * Add Graph handler.
- *
+ * This adds a node
  */
 function AddGraphHandler(app)
 {
   this.removeStack = true;
-  BaseHandler.apply(this, arguments);
+  BaseHandler.apply(this, arguments); // extends BaseHandler
   this.message = g_clickToAddVertex;	
   this.addContextMenu();
 }
@@ -6611,6 +6629,10 @@ Application.prototype.UpdateNodesCurrentStyle = function(ForceCommonStyle, Force
             currentStyle = selected ? selectedStyle[selectedGroup] : commonStyle;
 
         this.graph.vertices[i].currentStyle = currentStyle;
+        console.log(this.handler.globalHoverVertex)
+        if(this.handler.globalHoverVertex){
+            this.handler.globalHoverVertex.currentStyle = new HoverVertexStyle();
+        }
     }	
 }
 
@@ -8368,194 +8390,194 @@ function postLoadPage()
       g_ctrlPressed = false;
     });
 
-	document.getElementById('ShowAdjacencyMatrix').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("showAdjacencyMatrix");
-		}		
-	document.getElementById('ShowIncidenceMatrix').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("showIncidenceMatrix");
-		}
-	document.getElementById('ShowDistanceMatrix').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("showDistanceMatrix");
-		}
+	// document.getElementById('ShowAdjacencyMatrix').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("showAdjacencyMatrix");
+	// 	}		
+	// document.getElementById('ShowIncidenceMatrix').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("showIncidenceMatrix");
+	// 	}
+	// document.getElementById('ShowDistanceMatrix').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("showDistanceMatrix");
+	// 	}
     
-	document.getElementById('GroupRename').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("GroupRename");
-		}
-	document.getElementById('groupRenameButton').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("GroupRename");
-		}
+	// document.getElementById('GroupRename').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("GroupRename");
+	// 	}
+	// document.getElementById('groupRenameButton').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("GroupRename");
+	// 	}
     
 		
-	document.getElementById('Default').onclick = function ()
-		{
-            userAction(this.id);
-			restButtons ('Default');
-			application.SetHandlerMode("default");
-			document.getElementById('Default').className = "btn btn-primary btn-sm";			
-		}		
+	// document.getElementById('Default').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		restButtons ('Default');
+	// 		application.SetHandlerMode("default");
+	// 		document.getElementById('Default').className = "btn btn-primary btn-sm";			
+	// 	}		
 		
-	document.getElementById('AddGraph').onclick = function ()
-		{
-            userAction(this.id);
-			restButtons ('AddGraph');
-			application.SetHandlerMode(document.getElementById('AddGraph').className != "" ? "addGraph" : "default");
-		}
+	// document.getElementById('AddGraph').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		restButtons ('AddGraph');
+	// 		application.SetHandlerMode(document.getElementById('AddGraph').className != "" ? "addGraph" : "default");
+	// 	}
 	
-	document.getElementById('ConnectGraphs').onclick = function ()
-		{
-            userAction(this.id);
-			restButtons ('ConnectGraphs');
-			application.SetHandlerMode(document.getElementById('ConnectGraphs').className != "" ? "addArc" : "default");
-		}	
+	// document.getElementById('ConnectGraphs').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		restButtons ('ConnectGraphs');
+	// 		application.SetHandlerMode(document.getElementById('ConnectGraphs').className != "" ? "addArc" : "default");
+	// 	}	
 	
-	document.getElementById('DeleteObject').onclick = function ()
-		{
-            userAction(this.id);
-			restButtons ('DeleteObject');
-			application.SetHandlerMode(document.getElementById('DeleteObject').className != "" ? "delete" : "default");
-		}
+	// document.getElementById('DeleteObject').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		restButtons ('DeleteObject');
+	// 		application.SetHandlerMode(document.getElementById('DeleteObject').className != "" ? "delete" : "default");
+	// 	}
 
-	document.getElementById('DeleteAll').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("deleteAll");
-		}
+	// document.getElementById('DeleteAll').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("deleteAll");
+	// 	}
 
 
-	document.getElementById('SaveGraph').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("saveDialog");
-		}
+	// document.getElementById('SaveGraph').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("saveDialog");
+	// 	}
 
-	document.getElementById('NewGraph').onclick = function ()
-		{
-            userAction(this.id);
-			application.SetHandlerMode("deleteAll");
-            application.SetDefaultTransformations();
-		}
+	// document.getElementById('NewGraph').onclick = function ()
+	// 	{
+    //         userAction(this.id);
+	// 		application.SetHandlerMode("deleteAll");
+    //         application.SetDefaultTransformations();
+	// 	}
     
-    document.getElementById('SaveGraphImage').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("saveDialogImage");
-    }
+    // document.getElementById('SaveGraphImage').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("saveDialogImage");
+    // }
     
-    document.getElementById('SaveFullGraphImage').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("saveDialogFullImage");
-    }
+    // document.getElementById('SaveFullGraphImage').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("saveDialogFullImage");
+    // }
 
-    document.getElementById('SavePrintGraphImage').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("savePrintGraphImage");
-    }
+    // document.getElementById('SavePrintGraphImage').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("savePrintGraphImage");
+    // }
     
-    document.getElementById('Zoom100').onclick = function ()
-    {
-        userAction(this.id);
-        application.setCanvasScale(1.0);
-    }
+    // document.getElementById('Zoom100').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.setCanvasScale(1.0);
+    // }
     
-    document.getElementById('Zoom50').onclick = function ()
-    {
-        userAction(this.id);
-        application.setCanvasScale(50 / 100);
-    }
+    // document.getElementById('Zoom50').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.setCanvasScale(50 / 100);
+    // }
     
-    document.getElementById('Zoom25').onclick = function ()
-    {
-        userAction(this.id);
-        application.setCanvasScale(25 / 100);
-    }
+    // document.getElementById('Zoom25').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.setCanvasScale(25 / 100);
+    // }
   
-    document.getElementById('ZoomFit').onclick = function ()
-    {
-        userAction(this.id);
-        application.OnAutoAdjustViewport();
-    }
+    // document.getElementById('ZoomFit').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.OnAutoAdjustViewport();
+    // }
     
-    document.getElementById('ZoomIn').onclick = function ()
-    {
-        userAction(this.id);
-        application.multCanvasScale(1.5);
-    }
+    // document.getElementById('ZoomIn').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.multCanvasScale(1.5);
+    // }
     
-    document.getElementById('ZoomOut').onclick = function ()
-    {
-        userAction(this.id);
-        application.multCanvasScale(1.0 / 1.5);
-    }
+    // document.getElementById('ZoomOut').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.multCanvasScale(1.0 / 1.5);
+    // }
     
-    document.getElementById('MoveWorspace').onclick = function ()
-    {
-        userAction(this.id);
-        restButtons ('Default');
-        application.SetHandlerMode("default");
-        document.getElementById('Default').className = "btn btn-primary btn-sm";
-    }
-    document.getElementById('SetupVertexStyle').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("setupVertexStyle");
-    }
-    document.getElementById('SetupVertexStyleSelected').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("setupVertexStyleSelected");
-    }
-    document.getElementById('SetupEdgeStyle').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("setupEdgeStyle");
-    }
-    document.getElementById('SetupEdgeStyleSelected').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("setupEdgeStyleSelected");
-    }
-    document.getElementById('SetupBackgroundStyle').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("setupBackgroundStyle");
-    }
+    // document.getElementById('MoveWorspace').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     restButtons ('Default');
+    //     application.SetHandlerMode("default");
+    //     document.getElementById('Default').className = "btn btn-primary btn-sm";
+    // }
+    // document.getElementById('SetupVertexStyle').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("setupVertexStyle");
+    // }
+    // document.getElementById('SetupVertexStyleSelected').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("setupVertexStyleSelected");
+    // }
+    // document.getElementById('SetupEdgeStyle').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("setupEdgeStyle");
+    // }
+    // document.getElementById('SetupEdgeStyleSelected').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("setupEdgeStyleSelected");
+    // }
+    // document.getElementById('SetupBackgroundStyle').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("setupBackgroundStyle");
+    // }
 
-    document.getElementById('GraphUndo').onclick = function ()
-    {
-        userAction(this.id);
-        application.SetHandlerMode("graphUndo");
-    }    
+    // document.getElementById('GraphUndo').onclick = function ()
+    // {
+    //     userAction(this.id);
+    //     application.SetHandlerMode("graphUndo");
+    // }    
     
-    document.getElementById('runUserScript').onclick = function ()
-    {
-        var el = document.getElementById('userScript');
+    // document.getElementById('runUserScript').onclick = function ()
+    // {
+    //     var el = document.getElementById('userScript');
         
-        var oldScript = document.getElementById("userScriptSource");
-        if (oldScript)
-        {
-            document.head.removeChild(oldScript);
-        }
+    //     var oldScript = document.getElementById("userScriptSource");
+    //     if (oldScript)
+    //     {
+    //         document.head.removeChild(oldScript);
+    //     }
         
-        var script = document.createElement('script');
-        script.type = "text/javascript";
-        script.innerHTML = el.value;
-        script.id = "userScriptSource";
-        document.head.appendChild(script);
+    //     var script = document.createElement('script');
+    //     script.type = "text/javascript";
+    //     script.innerHTML = el.value;
+    //     script.id = "userScriptSource";
+    //     document.head.appendChild(script);
         
-        application.SetHandlerMode("user.algorithm");
-    }
+    //     application.SetHandlerMode("user.algorithm");
+    // }
     
     document.getElementById('submitUserScript').onclick = function ()
     {
@@ -8640,16 +8662,16 @@ function postLoadPage()
         userAction("algCategory_" + elementsListName);
     }
 
-    $(document.getElementById("algorithmCategoryBtn1").querySelector('span[name="hideMark"]')).hide();
-    $(document.getElementById("algorithmCategoryBtn0").querySelector('span[name="hideMark"]')).hide();
+    // $(document.getElementById("algorithmCategoryBtn1").querySelector('span[name="hideMark"]')).hide();
+    // $(document.getElementById("algorithmCategoryBtn0").querySelector('span[name="hideMark"]')).hide();
 
-    $('#algorithmCategoryBtn1').click(function(){
-        showHideCategory(this, "#algorithmCategoryElements1");
-    });
+    // $('#algorithmCategoryBtn1').click(function(){
+    //     showHideCategory(this, "#algorithmCategoryElements1");
+    // });
 
-    $('#algorithmCategoryBtn0').click(function(){
-        showHideCategory(this, "#algorithmCategoryElements0");
-    });
+    // $('#algorithmCategoryBtn0').click(function(){
+    //     showHideCategory(this, "#algorithmCategoryElements0");
+    // });
 }
 
 //window.onload = function ()
