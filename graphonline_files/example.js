@@ -815,11 +815,40 @@ const defaultVertexDiameter = 30;
 function VertexModel() {
     this.diameter = globalApplication.GetDefaultVertexSize();
 }
+
+/**
+ * Information
+ */
+function Dependency(source, target){
+    this.label = ''
+    this.source = source;
+    this.target = target;
+    this.weight = 3;
+    this.uid = "uid" + Math.random().toString(16).slice(2);
+}
+function Resource(link, description){
+    this.link = link
+    this.description = description
+    this.uid = "uid" + Math.random().toString(16).slice(2);
+}
+function NodeInfo(){
+    this.title = '';
+    this.description = ''
+    this.resources = []
+    this.uid = "uid" + Math.random().toString(16).slice(2);
+
+    this.outgoing = []; // edges
+    this.ingoing = [];
+}
+NodeInfo.prototype.AddEdge = function(target){
+    var dep = new Dependency(this, target);
+    this.outgoing.push(dep)
+    target.ingoing.push(dep)
+}
 /**
  * Base node class.
  *
  */
-
 
 function BaseVertex(x, y, vertexEnumType) {
     this.position = new Point(x, y);
@@ -830,6 +859,7 @@ function BaseVertex(x, y, vertexEnumType) {
     this.model = new VertexModel();
     this.hasUndefinedPosition = false;
     this.ownStyles = {};
+    this.nodeInfo = new NodeInfo();
 };
 
 BaseVertex.prototype.position = new Point(0, 0);
@@ -2622,15 +2652,66 @@ BaseHandler.prototype.UndoColoring = function(){
     }
     this.needRedraw = true;
 }
+
+function listResoures(mouseoverObject){
+    var infoResources = document.getElementById('info-resources')
+    infoResources.innerHTML = ''
+    mouseoverObject.nodeInfo.resources = mouseoverObject.nodeInfo.resources.filter(function(el){
+        return el.link != '' || el.description != '';
+    })
+    mouseoverObject.nodeInfo.resources.forEach(function(item, index){
+        const aChild = document.createElement('a');
+        aChild.href = item.link;
+        aChild.target = '_blank'
+        aChild.innerHTML = 'open';
+
+        const inputChild = document.createElement('input');
+        inputChild.value = item.link;
+        inputChild.onchange = function(ev){
+            item.link = inputChild.value;
+            aChild.href = item.link;
+        }
+
+        const textareaChild = document.createElement('textarea');
+        textareaChild.value = item.description;
+        textareaChild.rows = 2
+        textareaChild.cols = 100
+        textareaChild.onchange = function(ev){
+            item.description = textareaChild.value;
+        }
+
+        const liChild = document.createElement('li');
+        liChild.appendChild(aChild)
+        liChild.appendChild(inputChild)
+        liChild.appendChild(textareaChild)
+        liChild.id = item.uid;
+
+        infoResources.prepend(liChild)
+    });
+}
+
 BaseHandler.prototype.MouseMove = function(pos) { 
-    console.log(this.globalHoverObject)
     var mouseoverObject = this.GetSelectedObject(pos);
 
-    var vertexTitle = document.getElementById('vertex-title')
+    var infoTitle = document.getElementById('info-title');
+    var infoUid = document.getElementById('info-uid')
+    var infoResources = document.getElementById('info-resources')
+    var addResourceButton = document.getElementById('add-resource-button')
     
     if(mouseoverObject instanceof BaseVertex){
-
-        vertexTitle.innerHTML = mouseoverObject.mainText;
+        addResourceButton.disabled = false;
+        addResourceButton.onclick = function addResource(e){
+            mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
+            listResoures(mouseoverObject)
+        };
+        infoTitle.value = mouseoverObject.nodeInfo.title;
+        infoTitle.onchange = function(ev){
+            mouseoverObject.nodeInfo.title = infoTitle.value;
+        }
+        infoUid.innerHTML = mouseoverObject.nodeInfo.uid;
+        listResoures(mouseoverObject);
+        
+        // infoResources.appendChild()
 
         // change node style
         this.UndoColoring();
@@ -2638,7 +2719,11 @@ BaseHandler.prototype.MouseMove = function(pos) {
         this.globalHoverObject.currentStyle = new HoverVertexStyle();
         this.needRedraw = true;
     }else if(mouseoverObject instanceof BaseEdge){
-        vertexTitle.innerHTML = 'connecting'
+        infoTitle.value = 'connecting';
+        infoUid.innerHTML = 'edge';
+        infoResources.innerHTML = '';
+        addResourceButton.disabled = true;
+
         this.UndoColoring();
         this.globalHoverObject = mouseoverObject;
         mouseoverObject.vertex1.currentStyle = new HoverVertexStyle();
@@ -2705,8 +2790,7 @@ BaseHandler.prototype.GetNodesPath = function(array, start, count)
     return res;
 }
 
-BaseHandler.prototype.RestoreAll = function()
-{
+BaseHandler.prototype.RestoreAll = function() {
 }
 
 BaseHandler.prototype.GetSelectVertexMenu = function(menuName)
@@ -4892,6 +4976,8 @@ Graph.prototype.AddNewVertex = function(vertex)
 	{
 		vertex.SetId (this.uidGraph);
 		this.uidGraph = this.uidGraph + 1;
+        vertex.nodeInfo.title = this.uidGraph;
+        vertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.uidGraph))
 		this.vertices.push(vertex);
 	}
 	return this.vertices.length - 1;
