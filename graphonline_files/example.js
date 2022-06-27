@@ -831,19 +831,56 @@ function Resource(link, description){
     this.description = description
     this.uid = "uid" + Math.random().toString(16).slice(2);
 }
+Resource.prototype.SaveToXML = function(){
+    var ret = "<resource " +
+    "link=\"" + this.link + "\" " +
+    "description=\"" + this.description + "\" " +
+    "uid=\"" + this.uid + "\" " +
+    ">" + "</resource>\n";
+    return ret;
+}
+Resource.prototype.LoadFromXML = function(xml){
+    this.link = xml.attr('link') == null ? 'saving error? contact admin' : xml.attr("link");
+    this.description = xml.attr('description') == null ? 'saving error? contact admin' : xml.attr("description");
+    this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
+}
 function NodeInfo(){
     this.title = '';
     this.description = ''
     this.resources = []
     this.uid = "uid" + Math.random().toString(16).slice(2);
 
-    this.outgoing = []; // edges
-    this.ingoing = [];
+    // this.outgoing = []; // edges
+    // this.ingoing = [];
 }
-NodeInfo.prototype.AddEdge = function(target){
-    var dep = new Dependency(this, target);
-    this.outgoing.push(dep)
-    target.ingoing.push(dep)
+// NodeInfo.prototype.AddEdge = function(target){
+//     var dep = new Dependency(this, target);
+//     this.outgoing.push(dep)
+//     target.ingoing.push(dep)
+// }
+NodeInfo.prototype.SaveToXML = function(){
+    var ret = "\t\t<topic " +
+    "title=\"" + this.title + "\" " +
+    "description=\"" + this.description + "\" " +
+    "uid=\"" + this.uid + "\" " +
+    ">\n"
+    this.resources.forEach(function(item, index){
+        ret = ret + "\t\t\t" + item.SaveToXML();
+    });
+    ret = ret + "\t\t</topic>\n"; 
+    return ret;
+}
+NodeInfo.prototype.LoadFromXML = function(xml){
+    this.title = xml.attr('title') == null ? 'saving error? contact admin' : xml.attr("title");
+    this.description = xml.attr('description') == null ? 'saving error? contact admin' : xml.attr("description");
+    this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
+    resources = []
+    $(xml.find('resource')).each(function(){
+        var resource = new Resource();
+        resource.LoadFromXML($(this));
+        resources.push(resource);
+    })
+    this.resources = resources;
 }
 /**
  * Base node class.
@@ -876,7 +913,7 @@ BaseVertex.prototype.copyFrom = function (other) {
 }
 
 BaseVertex.prototype.SaveToXML = function () {
-    return "<node " +
+    var ret =  "\t<node " +
         "positionX=\"" + this.position.x + "\" " +
         "positionY=\"" + this.position.y + "\" " +
         "id=\"" + this.id + "\" " +
@@ -884,7 +921,10 @@ BaseVertex.prototype.SaveToXML = function () {
         "upText=\"" + gEncodeToHTML(this.upText) + "\" " +
         ((Object.keys(this.ownStyles).length > 0) ? "ownStyles = \"" + gEncodeToHTML(JSON.stringify(this.ownStyles)) + "\" " : "") +
         "size=\"" + this.model.diameter + "\" " +
-        "></node>";
+        ">\n";
+    ret = ret + this.nodeInfo.SaveToXML();
+    ret = ret + "\t</node>\n";
+    return ret;
 }
 
 BaseVertex.prototype.LoadFromXML = function (xml) {
@@ -1052,7 +1092,7 @@ BaseEdge.prototype.copyFrom = function (other) {
 }
 
 BaseEdge.prototype.SaveToXML = function () {
-    return "<edge " +
+    return "\t<edge " +
         "source=\"" + this.vertex1.id + "\" " +
         "target=\"" + this.vertex2.id + "\" " +
         "isDirect=\"" + this.isDirect + "\" " +
@@ -1065,7 +1105,7 @@ BaseEdge.prototype.SaveToXML = function () {
         "arrayStyleFinish=\"" + this.arrayStyleFinish + "\" " +
         ((Object.keys(this.ownStyles).length > 0) ? "ownStyles = \"" + gEncodeToHTML(JSON.stringify(this.ownStyles)) + "\" " : "") +
         this.model.SaveToXML() +
-        "></edge>";
+        "></edge>\n";
 }
 
 BaseEdge.prototype.LoadFromXML = function (xml, graph) {
@@ -2736,8 +2776,7 @@ BaseHandler.prototype.MouseDown = function(pos) {}
 
 BaseHandler.prototype.MouseUp   = function(pos) {}
 
-BaseHandler.prototype.GetSelectedGroup = function(object) 
-{
+BaseHandler.prototype.GetSelectedGroup = function(object) {
 	return 0;
 }
 
@@ -5803,8 +5842,8 @@ Graph.prototype.SplitMatrixString = function (line, separator)
 
 Graph.prototype.SaveToXML = function (additionalData)
 {
-	var mainHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><graphml>";
-	var header   = "<graph id=\"Graph\" uidGraph=\"" + this.uidGraph + "\"" + " uidEdge=\"" + this.uidEdge + "\">";
+	var mainHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<graphml>\n";
+	var header   = "<graph id=\"Graph\" uidGraph=\"" + this.uidGraph + "\"" + " uidEdge=\"" + this.uidEdge + "\">\n";
 
 	var xmlBoby = "";
 	  
@@ -5820,17 +5859,42 @@ Graph.prototype.SaveToXML = function (additionalData)
 		xmlBoby = xmlBoby + this.edges[i].SaveToXML();
 	}
 
-	xmlBoby = xmlBoby + "";
-    
     additionalField = "";
     if (additionalData.length > 0)
     {
         additionalField = "<additional data=\"" + additionalData + "\"/>"
     }
 
-	return mainHeader + header + xmlBoby + "</graph>" + additionalField + "</graphml>";
+	return mainHeader + header + xmlBoby + "</graph>\n" + additionalField + "</graphml>";
 }
 
+function saveToXML(){
+    var xml = application.graph.SaveToXML([]);
+    console.log(xml)
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xml));
+    element.setAttribute('download', "graph.xml");
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+function loadFromXML(files){
+
+    var graphFileToLoad = files[0];
+
+    var fileReader = new FileReader();
+    fileReader.onload = function (fileLoadedEvent) {
+        var textFromFileLoaded = fileLoadedEvent.target.result;
+        console.log(textFromFileLoaded);
+        application.LoadGraphFromString(textFromFileLoaded);
+    };
+
+    fileReader.readAsText(graphFileToLoad, "UTF-8");
+}
 Graph.prototype.LoadFromXML = function (xmlText, additionalData)
 {
 	xmlDoc = $.parseXML( xmlText );
@@ -5866,6 +5930,9 @@ Graph.prototype.LoadFromXML = function (xmlText, additionalData)
 		var vertex = new BaseVertex();
 		vertex.LoadFromXML($(this));
         vertexs.push(vertex);
+        var nodeInfo = new NodeInfo();
+        nodeInfo.LoadFromXML($(this).find('topic'))
+        vertex.nodeInfo = nodeInfo;
 	});
 	this.vertices = vertexs;
 
