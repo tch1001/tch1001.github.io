@@ -2529,7 +2529,7 @@ function BaseHandler(app)
     this.contextMenuObject = null;
     this.contextMenuPoint = null;
     //this.app.ClearUndoStack();
-    this.globalHoverVertex = null;
+    this.globalHoverObject = null;
 }
 
 // Need redraw or nor.
@@ -2613,8 +2613,17 @@ BaseHandler.prototype.GetMessage = function()
 	return this.message;
 }
 
+BaseHandler.prototype.UndoColoring = function(){
+    if(this.globalHoverObject instanceof BaseVertex){
+        this.globalHoverObject.currentStyle = new CommonVertexStyle();
+    }else if(this.globalHoverObject instanceof BaseEdge){
+        this.globalHoverObject.vertex1.currentStyle = new CommonVertexStyle();
+        this.globalHoverObject.vertex2.currentStyle = new CommonVertexStyle();
+    }
+    this.needRedraw = true;
+}
 BaseHandler.prototype.MouseMove = function(pos) { 
-    console.log(this.globalHoverVertex)
+    console.log(this.globalHoverObject)
     var mouseoverObject = this.GetSelectedObject(pos);
 
     var vertexTitle = document.getElementById('vertex-title')
@@ -2624,14 +2633,17 @@ BaseHandler.prototype.MouseMove = function(pos) {
         vertexTitle.innerHTML = mouseoverObject.mainText;
 
         // change node style
-        if(this.globalHoverVertex){
-            this.globalHoverVertex.currentStyle = new CommonVertexStyle();
-        }
-        this.globalHoverVertex = mouseoverObject;
-        this.globalHoverVertex.currentStyle = new HoverVertexStyle();
+        this.UndoColoring();
+        this.globalHoverObject = mouseoverObject;
+        this.globalHoverObject.currentStyle = new HoverVertexStyle();
         this.needRedraw = true;
     }else if(mouseoverObject instanceof BaseEdge){
         vertexTitle.innerHTML = 'connecting'
+        this.UndoColoring();
+        this.globalHoverObject = mouseoverObject;
+        mouseoverObject.vertex1.currentStyle = new HoverVertexStyle();
+        mouseoverObject.vertex2.currentStyle = new HoverVertexStyle();
+        this.needRedraw = true;
     }
 }
 
@@ -6631,11 +6643,11 @@ Application.prototype.UpdateNodesCurrentStyle = function(ForceCommonStyle, Force
         else
             currentStyle = selected ? selectedStyle[selectedGroup] : commonStyle;
 
-        console.log(this.handler.globalHoverVertex)
-        if(this.handler.globalHoverVertex){
-          this.handler.globalHoverVertex.currentStyle = new HoverVertexStyle();
-          // TODO find out of this is the best practice
-        }
+        // console.log(this.handler.globalHoverObject)
+        // if(this.handler.globalHoverObject){
+        //   this.handler.globalHoverObject.currentStyle = new HoverVertexStyle();
+        //   // TODO find out of this is the best practice
+        // }
 
         if(this.graph.vertices[i].currentStyle){
         }else{
