@@ -6791,6 +6791,8 @@ Application.prototype.UndoColoring = function(){
 
 Application.prototype.MouseMove = function(pos){
     var mouseoverObject = this.handler.GetSelectedObject(pos);
+    if(this.lock && !this.objectChanged) return;
+    this.objectChanged = false;
 
     var infoTitle = document.getElementById('info-title');
     var infoUid = document.getElementById('info-uid')
@@ -6827,8 +6829,8 @@ Application.prototype.CanvasOnMouseMove  = function(e)
 	// X,Y position.
 	var pos = this.getMousePos(this.canvas, e);
 
-	this.handler.MouseMove(pos);
     this.MouseMove(pos);
+    this.handler.MouseMove(pos);
 	if (this.handler.IsNeedRedraw())
 	{
 		this.handler.RestRedraw();
@@ -6838,6 +6840,18 @@ Application.prototype.CanvasOnMouseMove  = function(e)
     this.updateMessage();
 }
 
+Application.prototype.MouseDown = function(pos){
+    var selected = this.handler.GetSelectedObject(pos);
+    if(selected){
+        this.lock = true;
+        if(selected != this.globalHoverObject) this.objectChanged = true;
+        else this.globalChanged = false;
+    }else{
+        this.lock = false;
+        this.objectChanged = false;
+    }
+    this.MouseMove(pos)
+}
 Application.prototype.CanvasOnMouseDown = function(e)
 {
     // Skip non left button.
@@ -6846,6 +6860,7 @@ Application.prototype.CanvasOnMouseDown = function(e)
     var pos = this.getMousePos(this.canvas, e); /// provide this canvas and event
 
 	this.handler.MouseDown(pos);
+    this.MouseDown(pos);
 	if (this.handler.IsNeedRedraw())
 	{
 		this.handler.RestRedraw();
