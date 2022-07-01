@@ -5823,7 +5823,8 @@ function saveToXML(){
     console.log(xml)
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xml));
-    element.setAttribute('download', "graph.xml");
+    var filename = document.getElementById('filename').value
+    element.setAttribute('download', filename + ".xml");
 
     element.style.display = 'none';
     document.body.appendChild(element);
