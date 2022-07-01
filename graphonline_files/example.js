@@ -2683,16 +2683,6 @@ BaseHandler.prototype.GetMessage = function()
 	return this.message;
 }
 
-BaseHandler.prototype.UndoColoring = function(){
-    if(this.globalHoverObject instanceof BaseVertex){
-        this.globalHoverObject.currentStyle = new CommonVertexStyle();
-    }else if(this.globalHoverObject instanceof BaseEdge){
-        this.globalHoverObject.vertex1.currentStyle = new CommonVertexStyle();
-        this.globalHoverObject.vertex2.currentStyle = new CommonVertexStyle();
-    }
-    this.needRedraw = true;
-}
-
 function listResoures(mouseoverObject){
     var infoResources = document.getElementById('info-resources')
     infoResources.innerHTML = ''
@@ -2730,47 +2720,7 @@ function listResoures(mouseoverObject){
     });
 }
 
-BaseHandler.prototype.MouseMove = function(pos) { 
-    var mouseoverObject = this.GetSelectedObject(pos);
-
-    var infoTitle = document.getElementById('info-title');
-    var infoUid = document.getElementById('info-uid')
-    var infoResources = document.getElementById('info-resources')
-    var addResourceButton = document.getElementById('add-resource-button')
-    
-    if(mouseoverObject instanceof BaseVertex){
-        addResourceButton.disabled = false;
-        addResourceButton.onclick = function addResource(e){
-            mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
-            listResoures(mouseoverObject)
-        };
-        infoTitle.value = mouseoverObject.nodeInfo.title;
-        infoTitle.onchange = function(ev){
-            mouseoverObject.nodeInfo.title = infoTitle.value;
-        }
-        infoUid.innerHTML = mouseoverObject.nodeInfo.uid;
-        listResoures(mouseoverObject);
-        
-        // infoResources.appendChild()
-
-        // change node style
-        this.UndoColoring();
-        this.globalHoverObject = mouseoverObject;
-        this.globalHoverObject.currentStyle = new HoverVertexStyle();
-        this.needRedraw = true;
-    }else if(mouseoverObject instanceof BaseEdge){
-        infoTitle.value = 'connecting';
-        infoUid.innerHTML = 'edge';
-        infoResources.innerHTML = '';
-        addResourceButton.disabled = true;
-
-        this.UndoColoring();
-        this.globalHoverObject = mouseoverObject;
-        mouseoverObject.vertex1.currentStyle = new HoverVertexStyle();
-        mouseoverObject.vertex2.currentStyle = new HoverVertexStyle();
-        this.needRedraw = true;
-    }
-}
+BaseHandler.prototype.MouseMove = function(pos) {}
 
 BaseHandler.prototype.MouseDown = function(pos) {}
 
@@ -6829,12 +6779,56 @@ Application.prototype.updateMessage = function()
 	this.handler.InitControls();
 }
 
+Application.prototype.UndoColoring = function(){
+    if(this.globalHoverObject instanceof BaseVertex){
+        this.globalHoverObject.currentStyle = new CommonVertexStyle();
+    }else if(this.globalHoverObject instanceof BaseEdge){
+        this.globalHoverObject.vertex1.currentStyle = new CommonVertexStyle();
+        this.globalHoverObject.vertex2.currentStyle = new CommonVertexStyle();
+    }
+    this.needRedraw = true;
+}
+
+Application.prototype.MouseMove = function(pos){
+    var mouseoverObject = this.handler.GetSelectedObject(pos);
+
+    var infoTitle = document.getElementById('info-title');
+    var infoUid = document.getElementById('info-uid')
+    var infoResources = document.getElementById('info-resources')
+    var addResourceButton = document.getElementById('add-resource-button')
+    
+    if(mouseoverObject instanceof BaseVertex){
+        addResourceButton.disabled = false;
+        addResourceButton.onclick = function addResource(e){
+            mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
+            listResoures(mouseoverObject)
+        };
+        infoTitle.value = mouseoverObject.nodeInfo.title;
+        infoTitle.onchange = function(ev){
+            mouseoverObject.nodeInfo.title = infoTitle.value;
+        }
+        infoUid.innerHTML = mouseoverObject.nodeInfo.uid;
+        listResoures(mouseoverObject);
+        
+        // infoResources.appendChild()
+
+        // change node style
+        this.UndoColoring();
+        this.globalHoverObject = mouseoverObject;
+        this.globalHoverObject.currentStyle = new HoverVertexStyle();
+        this.handler.needRedraw = true;
+    }else if(mouseoverObject instanceof BaseEdge){
+        return;
+    }
+}
+
 Application.prototype.CanvasOnMouseMove  = function(e)
 {
 	// X,Y position.
 	var pos = this.getMousePos(this.canvas, e);
 
 	this.handler.MouseMove(pos);
+    this.MouseMove(pos);
 	if (this.handler.IsNeedRedraw())
 	{
 		this.handler.RestRedraw();
@@ -8503,19 +8497,19 @@ function postLoadPage()
         }
         else if (key == 'w' || key == 'ц') // up
         {
-            application.onCanvasMove(new Point(0, moveValue));
+//            application.onCanvasMove(new Point(0, moveValue));
         }
         else if (key == 's' || key == 'ы') // down
         {
-            application.onCanvasMove(new Point(0, -moveValue));
+            // application.onCanvasMove(new Point(0, -moveValue));
         }
         else if (key == 'a' || key == 'ф') // left
         {
-            application.onCanvasMove(new Point(moveValue, 0));
+            // application.onCanvasMove(new Point(moveValue, 0));
         }
         else if (key == 'd' || key == 'в') // right
         {
-            application.onCanvasMove(new Point(-moveValue, 0));
+            // application.onCanvasMove(new Point(-moveValue, 0));
         }
         else if (key == 'v' || key == 'м') // vertex
         {
@@ -8550,7 +8544,7 @@ function postLoadPage()
             console.log('meowtch')
             var x = Math.random() * application.canvas.width;
             var y = Math.random() * application.canvas.height;
-            application.CreateNewGraph(x,y)
+            // application.CreateNewGraph(x,y)
         }
     }
  
