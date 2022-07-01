@@ -833,15 +833,17 @@ function Resource(link, description){
 }
 Resource.prototype.SaveToXML = function(){
     var ret = "<resource " +
-    "link=\"" + this.link + "\" " +
-    "description=\"" + this.description + "\" " +
+    "link=\"" + encodeURIComponent(this.link) + "\" " +
+    "description=\"" + encodeURIComponent(this.description) + "\" " +
     "uid=\"" + this.uid + "\" " +
     ">" + "</resource>\n";
     return ret;
 }
 Resource.prototype.LoadFromXML = function(xml){
     this.link = xml.attr('link') == null ? 'saving error? contact admin' : xml.attr("link");
+    this.link = decodeURIComponent(this.link)
     this.description = xml.attr('description') == null ? 'saving error? contact admin' : xml.attr("description");
+    this.description = decodeURIComponent(this.description)
     this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
 }
 function NodeInfo(){
@@ -860,9 +862,9 @@ function NodeInfo(){
 // }
 NodeInfo.prototype.SaveToXML = function(){
     var ret = "\t\t<topic " +
-    "title=\"" + this.title + "\" " +
-    "description=\"" + this.description + "\" " +
-    "uid=\"" + this.uid + "\" " +
+    "title=\"" + encodeURIComponent(this.title) + "\" " +
+    "description=\"" + encodeURIComponent(this.description) + "\" " +
+    "uid=\"" + encodeURIComponent(this.uid) + "\" " +
     ">\n"
     this.resources.forEach(function(item, index){
         ret = ret + "\t\t\t" + item.SaveToXML();
@@ -872,7 +874,9 @@ NodeInfo.prototype.SaveToXML = function(){
 }
 NodeInfo.prototype.LoadFromXML = function(xml){
     this.title = xml.attr('title') == null ? 'saving error? contact admin' : xml.attr("title");
+    this.title = decodeURIComponent(this.title)
     this.description = xml.attr('description') == null ? 'saving error? contact admin' : xml.attr("description");
+    this.description = decodeURIComponent(this.description)
     this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
     resources = []
     $(xml.find('resource')).each(function(){
@@ -3481,6 +3485,7 @@ AddGraphHandler.prototype = Object.create(BaseHandler.prototype);
 
 AddGraphHandler.prototype.MouseDown = function(pos) 
 {
+    if(this.GetSelectedObject(pos)) return;
     this.app.PushToStack("Add");
 
 	this.app.CreateNewGraph(pos.x, pos.y);
@@ -8505,11 +8510,11 @@ function postLoadPage()
         var moveValue = 10;
         if (code == 61 || code == 43) // +
         {
-            application.multCanvasScale(1.5);
+            // application.multCanvasScale(1.5);
         }
         else if (code == 45) // -
         {
-            application.multCanvasScale(1 / 1.5);
+            // application.multCanvasScale(1 / 1.5);
         }
         else if (key == 'w' || key == 'ц') // up
         {
