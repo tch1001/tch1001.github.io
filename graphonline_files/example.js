@@ -6337,7 +6337,7 @@ function Application(document, window)
 {
     this.document = document;
     this.canvas  = this.document.getElementById('canvas');
-    this.handler = new AddGraphHandler(this);
+    this.handler = new DefaultHandler(this);
     this.savedGraphName = "";
     this.currentEnumVertesType = new BaseEnumVertices(this, 1);//this.enumVertexesTextList[0];
     this.findPathReport = 1;
@@ -7236,7 +7236,7 @@ Application.prototype.onLoad = function()
 {
     this.canvas = this.document.getElementById('canvas');
 
-    this.handler = new AddGraphHandler(this);
+    this.handler = new DefaultHandler(this);
 
     this.updateMessage();
     this.redrawGraph();
@@ -8508,13 +8508,13 @@ function postLoadPage()
         var isCtrl = evtobj ? evtobj.ctrlKey : false;
         
         var moveValue = 10;
-        if (code == 61 || code == 43) // +
+        if (e.key == ']') // +
         {
-            // application.multCanvasScale(1.5);
+            application.multCanvasScale(1.5);
         }
-        else if (code == 45) // -
+        else if (e.key == '[') // -
         {
-            // application.multCanvasScale(1 / 1.5);
+            application.multCanvasScale(1 / 1.5);
         }
         else if (key == 'w' || key == 'ц') // up
         {
