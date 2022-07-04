@@ -2705,6 +2705,7 @@ function listResoures(mouseoverObject){
         inputChild.onchange = function(ev){
             item.link = inputChild.value;
             aChild.href = item.link;
+            autosaveXML();
         }
         inputChild.style = 'width:80%'
 
@@ -2714,6 +2715,7 @@ function listResoures(mouseoverObject){
         textareaChild.rows = 4
         textareaChild.onchange = function(ev){
             item.description = textareaChild.value;
+            autosaveXML();
         }
 
         const liChild = document.createElement('li');
@@ -3662,6 +3664,7 @@ DeleteGraphHandler.prototype.MouseDown = function(pos)
     this.app.PushToStack("Delete");
     this.app.DeleteObject(selectedObject);
 	this.needRedraw = true;
+
 }
 
 /**
@@ -5738,7 +5741,7 @@ Graph.prototype.GetIncidenceMatrix = function ()
 
 Graph.prototype.SplitMatrixString = function (line, separator)
 {
-  if (separator === undefined) 
+   (separator === undefined) 
   {
     separator = ",";
   }
@@ -5834,10 +5837,6 @@ function updateSearchResults(e){
 
 function saveToXML(){
     var xml = application.graph.SaveToXML([]);
-    var date = new Date();
-    const expDays = 100;
-    date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
-    const expires = "expires="+date.toUTCString();
     localStorage.setItem('xml', xml);
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xml));
@@ -5850,6 +5849,11 @@ function saveToXML(){
     element.click();
 
     document.body.removeChild(element);
+}
+function autosaveXML(){
+    console.log('called')
+    var xml = application.graph.SaveToXML([]);
+    localStorage.setItem('xml', xml);
 }
 function loadFromXML(files){
 
@@ -6825,15 +6829,15 @@ Application.prototype.MouseMove = function(pos){
         addResourceButton.onclick = function addResource(e){
             mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
             listResoures(mouseoverObject)
+            autosaveXML();
         };
         infoTitle.value = mouseoverObject.nodeInfo.title;
         infoTitle.onchange = function(ev){
             mouseoverObject.nodeInfo.title = infoTitle.value;
+            autosaveXML();
         }
         infoUid.innerHTML = mouseoverObject.nodeInfo.uid;
         listResoures(mouseoverObject);
-        
-        // infoResources.appendChild()
 
         // change node style
         this.UndoColoring();
@@ -6907,6 +6911,8 @@ Application.prototype.CanvasOnMouseUp = function(e)
 	}
 
     this.updateMessage();
+
+    autosaveXML();
 }
 
 Application.prototype.multCanvasScale = function(factor)
@@ -8455,11 +8461,13 @@ function postLoadPage()
 
 	application.canvas.onmousedown = function (e)
 		{
+            autosaveXML();
 			return application.CanvasOnMouseDown(e);
 		};
 		
 	application.canvas.onmouseup   = function (e)
 		{
+            autosaveXML();
 			return application.CanvasOnMouseUp(e);
 		}
     

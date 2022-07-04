@@ -61,13 +61,15 @@
             class="glyphicon glyphicon-resize-full fa-fw" id="FullscreenIcon"></span></button> -->
       <div style="width:100%;">
         <text style="font-size:30px;">twigslot</text>
+        <label for="autosave">Autosave</label>
+        <input type="checkbox" id='autosave' checked/>
         <button>
-          <label for="save-to-xml" class="btn">Save</label>
+          <label for="save-to-xml" class="btn">Export</label>
           <input id='save-to-xml' type='button' onclick="saveToXML()" style="display:none;">
           <input id="filename" value="graph"></input>
         </button>
         <button>
-          <label for="load-from-xml" class="btn">Load</label>
+          <label for="load-from-xml" class="btn">Import</label>
           <input id='load-from-xml' type='file' accept=".xml" onchange="loadFromXML(this.files)"
             style="display:none;"></input>
         </button>
