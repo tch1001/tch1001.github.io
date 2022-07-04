@@ -5832,7 +5832,21 @@ Graph.prototype.SaveToXML = function (additionalData)
 
 function updateSearchResults(e){
     console.log(e.value)
-
+    toggleRightSection(false);
+    document.getElementById('search-results').textContent = 'Search Results for: ' + e.value;
+    
+    var i = 0;
+    for(const node of application.graph.vertices){
+        // node.nodeInfo.title
+        // node.nodeInfo.description
+        // node.nodeInfo.uid
+        for(const res of node.nodeInfo.resources){
+            // res.link
+            // res.description
+            // res.uid
+        }
+    }
+    console.log(i)
 }
 
 function saveToXML(){
@@ -5851,7 +5865,7 @@ function saveToXML(){
     document.body.removeChild(element);
 }
 function autosaveXML(){
-    console.log('called')
+    if(!document.getElementById('autosave').checked) return;
     var xml = application.graph.SaveToXML([]);
     localStorage.setItem('xml', xml);
 }
@@ -5866,9 +5880,9 @@ function loadFromXML(files){
         application.LoadGraphFromString(textFromFileLoaded);
     };
 
-    fileReader.readAsText(graphFileToLoad, "UTF-8");
+    if(graphFileToLoad) fileReader.readAsText(graphFileToLoad, "UTF-8");
     // console.log(localStorage.getItem('xml'))
-    // application.LoadGraphFromString(localStorage.getItem('xml'))
+    // application.LoadGraphFromString(locarlStorage.getItem('xml'))
 }
 Graph.prototype.LoadFromXML = function (xmlText, additionalData)
 {
@@ -6814,6 +6828,17 @@ Application.prototype.UndoColoring = function(){
     this.needRedraw = true;
 }
 
+function toggleRightSection(showResources){
+    var resourcesSection = document.getElementById('resources-section');
+    resourcesSection.style.display = 'none';
+    var resultsSection = document.getElementById('search-results-section');
+    resultsSection.style.display = 'none';
+    if(showResources){
+        resourcesSection.style.display = 'block';
+    }else{
+        resultsSection.style.display = 'block';
+    }
+}
 Application.prototype.MouseMove = function(pos){
     var mouseoverObject = this.handler.GetSelectedObject(pos);
     if(this.lock && !this.objectChanged) return;
@@ -6825,6 +6850,8 @@ Application.prototype.MouseMove = function(pos){
     var addResourceButton = document.getElementById('add-resource-button')
     
     if(mouseoverObject instanceof BaseVertex){
+        toggleRightSection(true);
+
         addResourceButton.disabled = false;
         addResourceButton.onclick = function addResource(e){
             mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
@@ -6836,7 +6863,7 @@ Application.prototype.MouseMove = function(pos){
             mouseoverObject.nodeInfo.title = infoTitle.value;
             autosaveXML();
         }
-        infoUid.innerHTML = mouseoverObject.nodeInfo.uid;
+        infoUid.textContent = mouseoverObject.nodeInfo.uid;
         listResoures(mouseoverObject);
 
         // change node style

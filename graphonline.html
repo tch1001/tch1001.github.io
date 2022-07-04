@@ -62,7 +62,7 @@
       <div style="width:100%;">
         <text style="font-size:30px;">twigslot</text>
         <label for="autosave">Autosave</label>
-        <input type="checkbox" id='autosave' checked/>
+        <input type="checkbox" id='autosave' checked onchange="autosaveXML()"/>
         <button>
           <label for="save-to-xml" class="btn">Export</label>
           <input id='save-to-xml' type='button' onclick="saveToXML()" style="display:none;">
@@ -94,13 +94,19 @@
         <h6 id='info-uid'>UID</h6>
 
       </section>
-      <section id="resources-section" style="width:39%; float:right;">
+      <section id="resources-section" style="width:39%; float:right; display:none;">
         <h4>Resources</h4>
         <input type="button" id="add-resource-button" value="Add" />
         <div style="padding-top:10px; height:500px; overflow-y:scroll;" id="info-resources-div">
           <ul id="info-resources">
           </ul>
         </div>
+      </section>
+      <section id="search-results-section" style="width:39%; float:right; display:none;">
+        <h4 id="search-results">Search Results</h4>
+        <div>search result 1</div>
+        <div>search result 2</div>
+        <div>search result 3</div>
       </section>
   </div>
 
