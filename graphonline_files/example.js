@@ -2698,6 +2698,7 @@ function listResoures(mouseoverObject){
         aChild.href = item.link;
         aChild.target = '_blank'
         aChild.innerHTML = 'open';
+        aChild.style = 'padding-left:10px'
 
         const inputChild = document.createElement('input');
         inputChild.value = item.link;
@@ -2705,19 +2706,22 @@ function listResoures(mouseoverObject){
             item.link = inputChild.value;
             aChild.href = item.link;
         }
+        inputChild.style = 'width:80%'
 
         const textareaChild = document.createElement('textarea');
         textareaChild.value = item.description;
-        textareaChild.rows = 2
-        textareaChild.cols = 100
+        textareaChild.style = "width:100%; resize:vertical;"
+        textareaChild.rows = 4
         textareaChild.onchange = function(ev){
             item.description = textareaChild.value;
         }
 
         const liChild = document.createElement('li');
-        liChild.appendChild(aChild)
-        liChild.appendChild(inputChild)
-        liChild.appendChild(textareaChild)
+        liChild.append(inputChild)
+        liChild.append(aChild)
+        const textareaWrapper = $("<div style='padding-top:10px'></div>");
+        textareaWrapper.append(textareaChild);
+        liChild.append(textareaWrapper[0])
         liChild.id = item.uid;
 
         infoResources.prepend(liChild)
@@ -8314,17 +8318,18 @@ function restButtons (me)
 
 var single = 0;
 
-function resizeCanvas()
-{
-  var adv = document.getElementById('bottom_info');
-  var canvas    = document.getElementById('canvas');
-  canvas.width  = document.getElementById('canvasSection').offsetWidth;
-  var mainContainer = document.getElementById('mainContainer');
-  var offset = (mainContainer.offsetTop + mainContainer.offsetHeight) - (canvas.offsetTop + canvas.offsetHeight) + ($("#footerContent").css("display") === 'block' ? 0 : 24);
-        
-  canvas.height = $(window).height() - document.getElementById('canvas').offsetTop - (adv && $("#bottom_info").css("display") === 'block' ? document.getElementById('bottom_info').offsetHeight : 0) - ($("#footer").css("display") === 'block' ? document.getElementById('footer').offsetHeight : 0) - offset;
+function resizeCanvas() {
+    var adv = document.getElementById('bottom_info');
+    var canvas = document.getElementById('canvas');
+    canvas.width = document.getElementById('canvasSection').offsetWidth;
+    var mainContainer = document.getElementById('mainContainer');
+    var offset = (mainContainer.offsetTop) - (canvas.offsetTop + canvas.offsetHeight);
+    offset = 150;
 
-  application.redrawGraph();
+    canvas.height = $(window).height() - document.getElementById('canvas').offsetTop - offset;
+    console.log(canvas.height)
+
+    application.redrawGraph();
 }
 
 function touchHandler(event)
@@ -8493,7 +8498,7 @@ function postLoadPage()
             || ($('#saveDialog').hasClass('ui-dialog-content') && $('#saveDialog').dialog('isOpen'))
             || ($('#saveImageDialog').hasClass('ui-dialog-content') && $('#saveImageDialog').dialog('isOpen'))
             || ($('#GroupRenameDialog').hasClass('ui-dialog-content') && $('#GroupRenameDialog').dialog('isOpen'))
-            || $('#developerTools').css("display") != "none"
+            // || $('#developerTools').css("display") != "none"
             || ($('#NeedAlgorithm').hasClass('ui-dialog-content') && $('#NeedAlgorithm').dialog('isOpen')))
         {
             console.log("prevent");
@@ -8767,25 +8772,25 @@ function postLoadPage()
     //     application.SetHandlerMode("user.algorithm");
     // }
     
-    document.getElementById('submitUserScript').onclick = function ()
-    {
-        var script = document.getElementById('userScript');
-        var data = "message=" + script.value + "&";
-    
-        $.ajax({
-            type: "POST",
-            url: "/feedback",
-            data: data
-        });
-        
-        $( "#sentAlgorithm" ).dialog({
-                                     resizable: false,
-                                     height: "auto",
-                                     width:  400,
-                                     modal: true,
-                                     dialogClass: 'EdgeDialog'
-                                     });
-    }
+    // document.getElementById('submitUserScript').onclick = function ()
+    // {
+        // var script = document.getElementById('userScript');
+        // var data = "message=" + script.value + "&";
+    // 
+        // $.ajax({
+            // type: "POST",
+            // url: "/feedback",
+            // data: data
+        // });
+        // 
+        // $( "#sentAlgorithm" ).dialog({
+                                    //  resizable: false,
+                                    //  height: "auto",
+                                    //  width:  400,
+                                    //  modal: true,
+                                    //  dialogClass: 'EdgeDialog'
+                                    //  });
+    // }
     
     // Get algorithms list and load it.
     $.get( "/" + SiteDir + "cgi-bin/getPluginsList.php",
@@ -8814,8 +8819,8 @@ function postLoadPage()
           
             });
 
-    var devTools = document.getElementById('developerTools');
-    devTools.style.left = 0;
+    // var devTools = document.getElementById('developerTools');
+    // devTools.style.left = 0;
 	resizeCanvas();
 	application.onPostLoadEvent();
 

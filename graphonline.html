@@ -57,52 +57,46 @@
 <body>
   <div class="container page-wrap" id="mainContainer" style="margin-left: 0px; width:100%; height:100%; display:table;">
     <nav class="navbar navbar-default" id="navigation">
-      <section id="canvasSection">
-        <span id="CanvasMessage"></span>
-        <!-- <button type="button" class="btn btn-default btn-sm hidden-phone" id="Fullscreen"><span
+      <!-- <button type="button" class="btn btn-default btn-sm hidden-phone" id="Fullscreen"><span
             class="glyphicon glyphicon-resize-full fa-fw" id="FullscreenIcon"></span></button> -->
-        <div style="width:80%;">
-          <text style="font-size:50px;">Twigslot</text>
-          <button>
-            <label for="save-to-xml" class="btn">Save</label>
-            <input id='save-to-xml' type='button' onclick="saveToXML()" style="display:none;">
-            <input id="filename" value="graph"></input>
-          </button>
-          <button>
-            <label for="load-from-xml" class="btn">Load</label>
-            <input id='load-from-xml' type='file' accept=".xml" onchange="loadFromXML(this.files)" style="display:none;"></input>
-          </button>
-          <button type="button" class="collapsible">Instructions</button>
-          <div class="content">
-            <ul>
-              <li>(m)ove</li>
-              <li>(v)ertex</li>
-              <li>(e)dge</li>
-              <li>(r)emove</li>
-              <li>scroll to zoom, drag to pan</li>
-            </ul>
-          </div>
-        </div>
-        <!-- <div style="display: table-row;"> -->
-        <div style="width:50%;">
-          <canvas id="canvas">Your browser is not supported</canvas>
-        </div>
-          <input id='info-title' value="Title" style="width:75%"></input><br>
-          <h6 id='info-uid'>UID</input>
-          <h4>Resources</h4>
-          <input type="button" id="add-resource-button" value="Add"/>
-          <ul id="info-resources">
-            <li><a href="google.com">open</a> <input value="google.com"/><textarea value="desc" rows="4" cols="100"></textarea></li>
+      <div style="width:100%;">
+        <text style="font-size:30px;">twigslot</text>
+        <button>
+          <label for="save-to-xml" class="btn">Save</label>
+          <input id='save-to-xml' type='button' onclick="saveToXML()" style="display:none;">
+          <input id="filename" value="graph"></input>
+        </button>
+        <button>
+          <label for="load-from-xml" class="btn">Load</label>
+          <input id='load-from-xml' type='file' accept=".xml" onchange="loadFromXML(this.files)"
+            style="display:none;"></input>
+        </button>
+        <button type="button" class="collapsible">Instructions</button>
+        <div class="content">
+          <ul>
+            <li>(m)ove</li>
+            <li>(v)ertex</li>
+            <li>(e)dge</li>
+            <li>(r)emove</li>
+            <li>scroll to zoom, drag to pan</li>
           </ul>
-        <!-- </div> -->
-        <div id="developerTools" class="well well-sm" style="left: 0px;">
-          <h4>Create algorithm</h4> <span class="glyphicon glyphicon-resize-full fa-fw leftTopPosition"
-            id="devToolsZoom"></span>
-          <span>Paste your algorithm below and press Run</span>
-          <textarea id="userScript">        </textarea>
-          <input type="button" value="Run" id="runUserScript" class="btn btn-success btn-sm">
-          <input type="button" value="Submit to site" id="submitUserScript" class="btn btn-default btn-sm"
-            style="float: right;">
+        </div>
+      </div>
+      <section id="canvasSection" style="width:60%; float:left;">
+        <span id="CanvasMessage"></span>
+        <div>
+          <canvas id="canvas" style="width:100%">Your browser is not supported</canvas>
+        </div>
+        <input id='info-title' value="Title" style="width:100%"></input><br>
+        <h6 id='info-uid'>UID</h6>
+
+      </section>
+      <section id="resources-section" style="width:39%; float:right;">
+        <h4>Resources</h4>
+        <input type="button" id="add-resource-button" value="Add" />
+        <div style="padding-top:10px; height:500px; overflow-y:scroll;" id="info-resources-div">
+          <ul id="info-resources">
+          </ul>
         </div>
       </section>
   </div>
