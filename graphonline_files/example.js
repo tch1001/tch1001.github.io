@@ -5827,9 +5827,18 @@ Graph.prototype.SaveToXML = function (additionalData)
 	return mainHeader + header + xmlBoby + "</graph>\n" + additionalField + "</graphml>";
 }
 
+function updateSearchResults(e){
+    console.log(e.value)
+
+}
+
 function saveToXML(){
     var xml = application.graph.SaveToXML([]);
-    console.log(xml)
+    var date = new Date();
+    const expDays = 100;
+    date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
+    const expires = "expires="+date.toUTCString();
+    localStorage.setItem('xml', xml);
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xml));
     var filename = document.getElementById('filename').value
@@ -5854,6 +5863,8 @@ function loadFromXML(files){
     };
 
     fileReader.readAsText(graphFileToLoad, "UTF-8");
+    // console.log(localStorage.getItem('xml'))
+    // application.LoadGraphFromString(localStorage.getItem('xml'))
 }
 Graph.prototype.LoadFromXML = function (xmlText, additionalData)
 {
@@ -8872,6 +8883,7 @@ $(document).ready(function ()
 {
 
     resizeCanvas();
+    application.LoadGraphFromString(localStorage.getItem('xml'))
 	window.onresize = function(event) 
 		{
 			resizeCanvas();
