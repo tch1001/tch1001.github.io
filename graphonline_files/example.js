@@ -5830,23 +5830,57 @@ Graph.prototype.SaveToXML = function (additionalData)
 	return mainHeader + header + xmlBoby + "</graph>\n" + additionalField + "</graphml>";
 }
 
+function boldSearchTerm(text, searchTerm){
+    return text.replaceAll(searchTerm, `<span style='color: #ff0000'>${searchTerm}</span>`)
+}
+
+function createSearchResult(node, from, searchTerm){
+    var sr;
+    var title = document.createElement('h5')
+    if(from instanceof NodeInfo){
+        sr = $("<div class='nodeInfoSearchResult'></div>")
+        title.innerHTML = boldSearchTerm(from.title, searchTerm)
+    }else if(from instanceof Resource){
+        sr = $("<div class='resourceSearchResult'></div>")
+        title.innerHTML = boldSearchTerm(from.link, searchTerm)
+    }
+    sr.append(title)
+
+    var description = document.createElement('h5')
+    description.innerHTML = boldSearchTerm(from.description, searchTerm)
+    sr.append(description)
+    sr.hover(function(e){
+        this.classList.add("searchResultBorder")        
+    });
+    sr.mouseleave(function(e){
+        this.classList.remove("searchResultBorder")
+    });
+    sr.click(function(e){
+        toggleRightSection(true);
+        focusOnNode(node);
+		application.handler.RestRedraw();
+		application.redrawGraph();
+    })
+    return sr[0]
+}
+
 function updateSearchResults(e){
-    console.log(e.value)
+    e.value = e.value.toLowerCase();
+    if(e.value.length < 3) return;
     toggleRightSection(false);
-    document.getElementById('search-results').textContent = 'Search Results for: ' + e.value;
+    var resultsDiv = document.getElementById('search-results-div')
+    resultsDiv.innerHTML = ''
     
-    var i = 0;
     for(const node of application.graph.vertices){
-        // node.nodeInfo.title
-        // node.nodeInfo.description
-        // node.nodeInfo.uid
+        if( node.nodeInfo.title.toLowerCase().indexOf(e.value) != -1 ||
+            node.nodeInfo.description.toLowerCase().indexOf(e.value) != -1 )
+            resultsDiv.append(createSearchResult(node, node.nodeInfo, e.value))
         for(const res of node.nodeInfo.resources){
-            // res.link
-            // res.description
-            // res.uid
+            if( res.description.toLowerCase().indexOf(e.value) != -1 )
+                resultsDiv.append(createSearchResult(node, res, e.value))
         }
     }
-    console.log(i)
+    document.getElementById('search-results-title').textContent = "Showing " + resultsDiv.childElementCount + " results for: \n" + e.value; 
 }
 
 function saveToXML(){
@@ -6839,6 +6873,15 @@ function toggleRightSection(showResources){
         resultsSection.style.display = 'block';
     }
 }
+function focusOnNode(mouseoverObject) {
+    listResoures(mouseoverObject);
+
+    // change node style
+    application.UndoColoring();
+    application.globalHoverObject = mouseoverObject;
+    application.globalHoverObject.currentStyle = new HoverVertexStyle();
+    application.handler.needRedraw = true;
+}
 Application.prototype.MouseMove = function(pos){
     var mouseoverObject = this.handler.GetSelectedObject(pos);
     if(this.lock && !this.objectChanged) return;
@@ -6864,13 +6907,7 @@ Application.prototype.MouseMove = function(pos){
             autosaveXML();
         }
         infoUid.textContent = mouseoverObject.nodeInfo.uid;
-        listResoures(mouseoverObject);
-
-        // change node style
-        this.UndoColoring();
-        this.globalHoverObject = mouseoverObject;
-        this.globalHoverObject.currentStyle = new HoverVertexStyle();
-        this.handler.needRedraw = true;
+        focusOnNode(mouseoverObject);
     }else if(mouseoverObject instanceof BaseEdge){
         return;
     }
@@ -8583,6 +8620,11 @@ function postLoadPage()
         {
             // application.onCanvasMove(new Point(-moveValue, 0));
         }
+        else if (e.key == 'f' && e.ctrlKey) // right
+        {
+            document.getElementById('search-input').focus();
+            e.preventDefault();
+        }
         else if (key == 'v' || key == 'м') // vertex
         {
             selectHandler('AddGraph', 'addGraph');
@@ -8613,9 +8655,9 @@ function postLoadPage()
         }
         else if (key == 't')
         {
-            console.log('meowtch')
-            var x = Math.random() * application.canvas.width;
-            var y = Math.random() * application.canvas.height;
+            // console.log('meowtch')
+            // var x = Math.random() * application.canvas.width;
+            // var y = Math.random() * application.canvas.height;
             // application.CreateNewGraph(x,y)
         }
     }

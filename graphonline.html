@@ -27,17 +27,17 @@
 
   <script src="./graphonline_files/RadiusAndDiameter.js"></script>
   <style>
-    /* .collapsible {
-      background-color: #777;
-      color: white;
-      cursor: pointer;
-      padding: 18px;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 15px;
-    } */
+    .nodeInfoSearchResult {
+      background-color: lightblue;
+    }
+
+    .resourceSearchResult {
+      background-color: lightpink;
+    }
+
+    .searchResultBorder{
+      background-color: white;
+    }
 
     .active,
     .collapsible:hover {
@@ -62,7 +62,7 @@
       <div style="width:100%;">
         <text style="font-size:30px;">twigslot</text>
         <label for="autosave">Autosave</label>
-        <input type="checkbox" id='autosave' checked onchange="autosaveXML()"/>
+        <input type="checkbox" id='autosave' checked onchange="autosaveXML()" />
         <button>
           <label for="save-to-xml" class="btn">Export</label>
           <input id='save-to-xml' type='button' onclick="saveToXML()" style="display:none;">
@@ -74,7 +74,7 @@
             style="display:none;"></input>
         </button>
         <button type="button" class="collapsible">Instructions</button>
-        <input type="text" oninput="updateSearchResults(this)" placeholder="Search"/>
+        <input type="text" onfocus="updateSearchResults(this)" oninput="updateSearchResults(this)" placeholder="Search" id='search-input' />
         <div class="content">
           <ul>
             <li>(m)ove</li>
@@ -103,10 +103,9 @@
         </div>
       </section>
       <section id="search-results-section" style="width:39%; float:right; display:none;">
-        <h4 id="search-results">Search Results</h4>
-        <div>search result 1</div>
-        <div>search result 2</div>
-        <div>search result 3</div>
+        <h4 id="search-results-title">Search Results</h4>
+        <div id="search-results-div">
+        </div>
       </section>
   </div>
 
