@@ -8973,19 +8973,19 @@ $(document).ready(function ()
     document.getElementById('canvas').addEventListener("touchcancel", touchHandler, true);
 
     // Try load emscripted implementation
-    var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
-    if (!isMobile && !DisableEmscripted) {
-      const jsScript = document.createElement('script');
-      jsScript.src   = '/script/Graphoffline.Emscripten.js';
-      document.body.appendChild(jsScript);      
-      jsScript.addEventListener('load', () => {
-        Module['onRuntimeInitialized'] = onRuntimeInitialized;
-        var process = Module.cwrap('ProcessAlgorithm', 'string', ['string']);
-        function onRuntimeInitialized() {
-          application.setEmscripten(process);
-        }
-      });
-    }
+    // var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
+    // if (!isMobile && !DisableEmscripted) {
+    //   const jsScript = document.createElement('script');
+    //   jsScript.src   = '/script/Graphoffline.Emscripten.js';
+    //   document.body.appendChild(jsScript);      
+    //   jsScript.addEventListener('load', () => {
+        // Module['onRuntimeInitialized'] = onRuntimeInitialized;
+        // var process = Module.cwrap('ProcessAlgorithm', 'string', ['string']);
+        // function onRuntimeInitialized() {
+        //   application.setEmscripten(process);
+        // }
+    //   });
+    // }
 /*
 	$(document).ready(function(){
 	    //set up some basic options for the feedback_me plugin
