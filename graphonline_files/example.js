@@ -2745,8 +2745,22 @@ function listResoures(mouseoverObject){
     });
     var tagsDiv = document.getElementById('tags-div')
     tagsDiv.innerHTML = ''
-    mouseoverObject.nodeInfo.tags.forEach(function(item, index){
-        tagsDiv.append($(`<span class='tag'>${item.name}</span>`)[0]);
+    mouseoverObject.nodeInfo.tags.forEach(function (item, index) {
+        var tag = $(`<span class='tag'>${item.name}</span>`);
+        tag.on('mousedown', function (e) {
+            if (e.which == 3) {
+                mouseoverObject.nodeInfo.tags = mouseoverObject.nodeInfo.tags.filter(function (i) {
+                    return i.name != e.currentTarget.textContent;
+                });
+                listResoures(mouseoverObject);
+                e.preventDefault();
+            }
+        })
+        tag[0].addEventListener('contextmenu', e => {
+            e.preventDefault();
+        });
+
+        tagsDiv.append(tag[0]);
     });
     autosaveXML();
 }
@@ -8980,7 +8994,8 @@ function addTag(){
     var obj = application.globalHoverObject;
     if(obj == null) return;
     var tagInput = document.getElementById('add-tag-input');
-    obj.nodeInfo.tags.push(new Tag(tagInput.value));
+    if(tagInput.value.trim() == '') return;
+    obj.nodeInfo.tags.push(new Tag(tagInput.value.trim()));
     listResoures(obj)
     tagInput.value = ''
 }
@@ -9007,6 +9022,7 @@ $(document).ready(function ()
             addTag();
         }
     });
+    
 
     // Try load emscripted implementation
     // var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);

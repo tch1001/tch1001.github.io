@@ -24,7 +24,10 @@
   <script src="./graphonline_files/example.js"></script>
 
   <script src="./graphonline_files/context.js" async=""></script>
-
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script> -->
   <!-- <script src="./graphonline_files/RadiusAndDiameter.js"></script> -->
   <style>
     .nodeInfoSearchResult {
@@ -90,6 +93,8 @@
             <li>(e)dge</li>
             <li>(r)emove</li>
             <li>scroll to zoom, drag to pan</li>
+            <li>ctrl-f to search</li>
+            <li>right click a tag to remove it</li>
           </ul>
         </div>
       </div>
@@ -110,10 +115,9 @@
           </ul>
         </div>
         <span style="padding-left:10px;">Tags:</span>
-        <div id="tags-div" style="display:inline;">
-          <span class="tag">hello</span>
+        <div id="tags-div" style="display:inline;" oncontextmenu="return false;">
         </div>
-        <input id='add-tag-input' /><button onclick="addTag()">Add</button>
+        <input id='add-tag-input' oncontextmenu="return false;"/><button onclick="addTag()">Add</button>
       </section>
       <section id="search-results-section" style="width:39%; float:right; display:none;">
         <h4 id="search-results-title">Search Results</h4>
