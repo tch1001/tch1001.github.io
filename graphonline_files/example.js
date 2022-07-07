@@ -846,20 +846,25 @@ Resource.prototype.LoadFromXML = function(xml){
     this.description = decodeURIComponent(this.description)
     this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
 }
+function Tag(name){
+    this.name = name
+}
+Tag.prototype.SaveToXML = function(){
+    var ret = "<tag " +
+    "name=\"" + encodeURIComponent(this.name) + "\" " +
+    ">" + "</tag>\n";
+    return ret;
+}
+Tag.prototype.LoadFromXML = function(xml){
+    this.name = xml.attr('name') == null ? 'saving error? contact admin' : xml.attr('name');
+}
 function NodeInfo(){
     this.title = '';
     this.description = ''
     this.resources = []
     this.uid = "uid" + Math.random().toString(16).slice(2);
-
-    // this.outgoing = []; // edges
-    // this.ingoing = [];
+    this.tags = []
 }
-// NodeInfo.prototype.AddEdge = function(target){
-//     var dep = new Dependency(this, target);
-//     this.outgoing.push(dep)
-//     target.ingoing.push(dep)
-// }
 NodeInfo.prototype.SaveToXML = function(){
     var ret = "\t\t<topic " +
     "title=\"" + encodeURIComponent(this.title) + "\" " +
@@ -869,6 +874,9 @@ NodeInfo.prototype.SaveToXML = function(){
     this.resources.forEach(function(item, index){
         ret = ret + "\t\t\t" + item.SaveToXML();
     });
+    this.tags.forEach(function(item,index){
+        ret = ret + "\t\t\t" + item.SaveToXML();
+    })
     ret = ret + "\t\t</topic>\n"; 
     return ret;
 }
@@ -885,6 +893,13 @@ NodeInfo.prototype.LoadFromXML = function(xml){
         resources.push(resource);
     })
     this.resources = resources;
+    tags = []
+    $(xml.find('tag')).each(function(){
+        var tag = new Tag();
+        tag.LoadFromXML($(this));
+        tags.push(tag);
+    })
+    this.tags = tags;
 }
 /**
  * Base node class.
@@ -2728,6 +2743,12 @@ function listResoures(mouseoverObject){
 
         infoResources.prepend(liChild)
     });
+    var tagsDiv = document.getElementById('tags-div')
+    tagsDiv.innerHTML = ''
+    mouseoverObject.nodeInfo.tags.forEach(function(item, index){
+        tagsDiv.append($(`<span class='tag'>${item.name}</span>`)[0]);
+    });
+    autosaveXML();
 }
 
 BaseHandler.prototype.MouseMove = function(pos) {}
@@ -8955,6 +8976,15 @@ function postLoadPage()
     // });
 }
 
+function addTag(){
+    var obj = application.globalHoverObject;
+    if(obj == null) return;
+    var tagInput = document.getElementById('add-tag-input');
+    obj.nodeInfo.tags.push(new Tag(tagInput.value));
+    listResoures(obj)
+    tagInput.value = ''
+}
+
 //window.onload = function ()
 $(document).ready(function ()
 {
@@ -8971,6 +9001,12 @@ $(document).ready(function ()
     document.getElementById('canvas').addEventListener("touchmove", touchHandler, true);
     document.getElementById('canvas').addEventListener("touchend", touchHandler, true);
     document.getElementById('canvas').addEventListener("touchcancel", touchHandler, true);
+    document.getElementById('add-tag-input').addEventListener("keypress", function(e){
+        if(e.key == "Enter"){
+            e.preventDefault();
+            addTag();
+        }
+    });
 
     // Try load emscripted implementation
     // var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);

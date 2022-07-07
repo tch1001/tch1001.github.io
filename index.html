@@ -35,7 +35,7 @@
       background-color: lightpink;
     }
 
-    .searchResultBorder{
+    .searchResultBorder {
       background-color: white;
     }
 
@@ -49,6 +49,13 @@
       display: none;
       overflow: hidden;
       background-color: #f1f1f1;
+    }
+
+    .tag {
+      background: pink;
+      border-radius: 20px;
+      padding: 5px;
+      margin: 2px;
     }
   </style>
 
@@ -73,7 +80,8 @@
           <input id='load-from-xml' type='file' accept=".xml" onchange="loadFromXML(this.files)"
             style="display:none;"></input>
         </button>
-        <input type="text" onfocus="updateSearchResults(this)" oninput="updateSearchResults(this)" placeholder="Search" id='search-input' />
+        <input type="text" onfocus="updateSearchResults(this)" oninput="updateSearchResults(this)" placeholder="Search"
+          id='search-input' />
         <button type="button" class="collapsible">Instructions</button>
         <div class="content">
           <ul>
@@ -101,6 +109,11 @@
           <ul id="info-resources">
           </ul>
         </div>
+        <span style="padding-left:10px;">Tags:</span>
+        <div id="tags-div" style="display:inline;">
+          <span class="tag">hello</span>
+        </div>
+        <input id='add-tag-input' /><button onclick="addTag()">Add</button>
       </section>
       <section id="search-results-section" style="width:39%; float:right; display:none;">
         <h4 id="search-results-title">Search Results</h4>
