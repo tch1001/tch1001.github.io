@@ -856,7 +856,7 @@ Tag.prototype.SaveToXML = function(){
     return ret;
 }
 Tag.prototype.LoadFromXML = function(xml){
-    this.name = xml.attr('name') == null ? 'saving error? contact admin' : xml.attr('name');
+    this.name = xml.attr('name') == null ? 'saving error? contact admin' : decodeURIComponent(xml.attr('name'));
 }
 function NodeInfo(){
     this.title = '';
@@ -7159,20 +7159,25 @@ Application.prototype.SetHandlerMode = function(mode)
         this.handler.RestoreAll();
     }
     
+    var modeIndicator = document.getElementById('mode-indicator')
 	if (mode == "default")
 	{
+        modeIndicator.textContent = 'Mode: (M)ove'
 		this.handler = new DefaultHandler(this);
 	}
 	else if (mode == "addGraph")
 	{
+        modeIndicator.textContent = 'Mode: Add (V)ertex'
 		this.handler = new AddGraphHandler(this);
 	}
 	else if (mode == "addArc")
 	{
+        modeIndicator.textContent = 'Mode: Add (E)dge'
 		this.handler = new ConnectionGraphHandler(this);
 	}
 	else if (mode == "delete")
 	{
+        modeIndicator.textContent = 'Mode: (R)emove'
 		this.handler = new DeleteGraphHandler(this);
 	}
 	else if (mode == "deleteAll")
@@ -8685,8 +8690,8 @@ function postLoadPage()
         }
         else if (code == 26 && isCtrl)
         {
-            userAction("Key_GraphUndo");
-            application.SetHandlerMode("graphUndo");        
+            // userAction("Key_GraphUndo");
+            // application.SetHandlerMode("graphUndo");        
         }
         else if (key == 't')
         {
