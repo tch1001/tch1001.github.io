@@ -2720,6 +2720,28 @@ function listResoures(mouseoverObject){
         inputChild.onchange = function(ev){
             item.link = inputChild.value;
             aChild.href = item.link;
+            if(inputChild.value.indexOf('youtube.com') != -1){
+                var apiKey = '';
+                apiKey = "AIzaSyD8mjjKuMprrGJjb3ZbZn7G5hS12_BsfzU";   
+                const youtubeID = inputChild.value.split('v=')[1].split('&')[0]
+                const query = `https://www.googleapis.com/youtube/v3/videos?id=${youtubeID}&key=${apiKey}&part=snippet`
+                console.log(query)
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function(){
+                    if(this.readyState == 4){
+                        const obj = JSON.parse(xhttp.responseText);
+                        if(/^\d+$/.test(mouseoverObject.nodeInfo.title)){
+                            mouseoverObject.nodeInfo.title = obj.items[0].snippet.title;
+                            document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
+                        }
+                        item.description = obj.items[0].snippet.description;
+                        listResoures(mouseoverObject)
+                        autosaveXML();
+                    }
+                }
+                xhttp.open("GET",query,true);
+                xhttp.send();
+            }
             autosaveXML();
         }
         inputChild.style = 'width:80%'
