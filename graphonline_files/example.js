@@ -5417,7 +5417,19 @@ Graph.prototype.SaveToXML = function (additionalData) {
 }
 
 function boldSearchTerm(text, searchTerm) {
-    return text.replaceAll(searchTerm, `<span style='color: #ff0000'>${searchTerm}</span>`)
+    var newText = '';
+    while(text.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1){
+        const idx = text.toLowerCase().indexOf(searchTerm.toLowerCase())
+        newText += text.substr(0,idx)
+        console.log(text.substr(0,idx))
+        text = text.slice(idx);
+        console.log(text)
+        const highlighted = text.substr(0, searchTerm.length)
+        newText += `<span style='color: #ff0000'>${highlighted}</span>`;
+        text = text.slice(searchTerm.length)
+    }
+    newText += text
+    return newText;
 }
 
 function createSearchResult(node, from, searchTerm) {
@@ -5451,18 +5463,17 @@ function createSearchResult(node, from, searchTerm) {
 }
 
 function updateSearchResults(e) {
-    e.value = e.value.toLowerCase();
     if (e.value.length < 3) return;
     toggleRightSection(false);
     var resultsDiv = document.getElementById('search-results-div')
     resultsDiv.innerHTML = ''
 
     for (const node of application.graph.vertices) {
-        if (node.nodeInfo.title.toLowerCase().indexOf(e.value) != -1 ||
-            node.nodeInfo.description.toLowerCase().indexOf(e.value) != -1)
+        if (node.nodeInfo.title.toLowerCase().indexOf(e.value.toLowerCase()) != -1 ||
+            node.nodeInfo.description.toLowerCase().indexOf(e.value.toLowerCase()) != -1)
             resultsDiv.append(createSearchResult(node, node.nodeInfo, e.value))
         for (const res of node.nodeInfo.resources) {
-            if (res.description.toLowerCase().indexOf(e.value) != -1)
+            if (res.description.toLowerCase().indexOf(e.value.toLowerCase()) != -1)
                 resultsDiv.append(createSearchResult(node, res, e.value))
         }
     }
