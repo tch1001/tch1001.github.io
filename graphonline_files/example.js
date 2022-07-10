@@ -1,26 +1,4 @@
 //
-function gEncodeToHTML(str) {
-    if (typeof str !== 'string')
-        return str;
-
-    return str.replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-}
-
-function gDecodeFromHTML(str) {
-    if (typeof str !== 'string')
-        return str;
-
-    return str.replace(/&apos;/g, "'")
-        .replace(/&quot;/g, '"')
-        .replace(/&gt;/g, '>')
-        .replace(/&lt;/g, '<')
-        .replace(/&amp;/g, '&');
-}
-
 function FullObjectCopy(obj) {
     var newObj = Object.create(Object.getPrototypeOf(obj));
 
@@ -936,9 +914,9 @@ BaseVertex.prototype.SaveToXML = function () {
         "positionX=\"" + this.position.x + "\" " +
         "positionY=\"" + this.position.y + "\" " +
         "id=\"" + this.id + "\" " +
-        "mainText=\"" + gEncodeToHTML(this.mainText) + "\" " +
-        "upText=\"" + gEncodeToHTML(this.upText) + "\" " +
-        ((Object.keys(this.ownStyles).length > 0) ? "ownStyles = \"" + gEncodeToHTML(JSON.stringify(this.ownStyles)) + "\" " : "") +
+        "mainText=\"" + encodeURIComponent(this.mainText) + "\" " +
+        "upText=\"" + encodeURIComponent(this.upText) + "\" " +
+        ((Object.keys(this.ownStyles).length > 0) ? "ownStyles = \"" + encodeURIComponent(JSON.stringify(this.ownStyles)) + "\" " : "") +
         "size=\"" + this.model.diameter + "\" " +
         ">\n";
     ret = ret + this.nodeInfo.SaveToXML();
@@ -958,16 +936,16 @@ BaseVertex.prototype.LoadFromXML = function (xml) {
     if (typeof this.mainText === 'undefined')
         this.mainText = this.id;
     else
-        this.mainText = gDecodeFromHTML(this.mainText);
+        this.mainText = decodeURIComponent(this.mainText);
 
     if (typeof this.upText === 'undefined')
         this.upText = "";
     else
-        this.upText = gDecodeFromHTML(this.upText);
+        this.upText = decodeURIComponent(this.upText);
 
     var ownStyle = xml.attr('ownStyles');
     if (typeof ownStyle !== 'undefined') {
-        var parsedSave = gDecodeFromHTML(JSON.parse(ownStyle));
+        var parsedSave = decodeURIComponent(JSON.parse(ownStyle));
 
         for (var indexField in parsedSave) {
             var index = parseInt(indexField);
@@ -1118,11 +1096,11 @@ BaseEdge.prototype.SaveToXML = function () {
         "weight=\"" + this.weight + "\" " +
         "useWeight=\"" + this.useWeight + "\" " +
         "id=\"" + this.id + "\" " +
-        "text=\"" + gEncodeToHTML(this.text) + "\" " +
-        "upText=\"" + gEncodeToHTML(this.upText) + "\" " +
+        "text=\"" + encodeURIComponent(this.text) + "\" " +
+        "upText=\"" + encodeURIComponent(this.upText) + "\" " +
         "arrayStyleStart=\"" + this.arrayStyleStart + "\" " +
         "arrayStyleFinish=\"" + this.arrayStyleFinish + "\" " +
-        ((Object.keys(this.ownStyles).length > 0) ? "ownStyles = \"" + gEncodeToHTML(JSON.stringify(this.ownStyles)) + "\" " : "") +
+        ((Object.keys(this.ownStyles).length > 0) ? "ownStyles = \"" + encodeURIComponent(JSON.stringify(this.ownStyles)) + "\" " : "") +
         this.model.SaveToXML() +
         "></edge>\n";
 }
@@ -1146,7 +1124,7 @@ BaseEdge.prototype.LoadFromXML = function (xml, graph) {
     this.hasPair = xml.attr('hasPair') == "true";
     this.useWeight = xml.attr('useWeight') == "true";
     this.id = xml.attr('id');
-    this.text = xml.attr("text") == null ? "" : gDecodeFromHTML(xml.attr("text"));
+    this.text = xml.attr("text") == null ? "" : decodeURIComponent(xml.attr("text"));
     this.arrayStyleStart = xml.attr("arrayStyleStart") == null ? "" : xml.attr("arrayStyleStart");
     this.arrayStyleFinish = xml.attr("arrayStyleFinish") == null ? "" : xml.attr("arrayStyleFinish");
     this.upText = xml.attr('upText');
@@ -1154,12 +1132,12 @@ BaseEdge.prototype.LoadFromXML = function (xml, graph) {
         this.upText = "";
     }
     else {
-        this.upText = gDecodeFromHTML(this.upText);
+        this.upText = decodeURIComponent(this.upText);
     }
 
     var ownStyle = xml.attr('ownStyles');
     if (typeof ownStyle !== 'undefined') {
-        var parsedSave = gDecodeFromHTML(JSON.parse(ownStyle));
+        var parsedSave = decodeURIComponent(JSON.parse(ownStyle));
 
         for (var indexField in parsedSave) {
             var index = parseInt(indexField);
@@ -5509,11 +5487,10 @@ function loadFromXML(files) {
         var textFromFileLoaded = fileLoadedEvent.target.result;
         console.log(textFromFileLoaded);
         application.LoadGraphFromString(textFromFileLoaded);
+        document.getElementById('load-from-xml').value = '';
     };
 
     if (graphFileToLoad) fileReader.readAsText(graphFileToLoad, "UTF-8");
-    // console.log(localStorage.getItem('xml'))
-    // application.LoadGraphFromString(locarlStorage.getItem('xml'))
 }
 Graph.prototype.LoadFromXML = function (xmlText, additionalData) {
     xmlDoc = $.parseXML(xmlText);
@@ -6975,19 +6952,6 @@ Application.prototype.LoadGraphFromString = function (str) {
     this.redrawGraph();
 }
 
-Application.prototype.LoadGraphFromDisk = function (graphName) {
-    var app = this;
-
-    $.ajax({
-        type: "GET",
-        url: "/" + SiteDir + "cgi-bin/loadGraph.php?name=" + graphName
-    })
-        .done(function (msg) {
-            app.LoadGraphFromString(msg);
-        });
-}
-
-
 Application.prototype.GetNewGraphName = function () {
     var name = this.GetNewName();
 
@@ -7419,11 +7383,11 @@ Application.prototype.LoadUserSettings = function (json) {
 }
 
 Application.prototype.EncodeToHTML = function (str) {
-    return gEncodeToHTML(str);
+    return encodeURIComponent(str);
 }
 
 Application.prototype.DecodeFromHTML = function (str) {
-    return gDecodeFromHTML(str);
+    return decodeURIComponent(str);
 }
 
 Application.prototype.SetVertexStyle = function (index, style) {
@@ -7799,19 +7763,6 @@ function createAlgorithmMenu() {
 }
 
 
-function handelImportGraph(files) {
-    var graphFileToLoad = files[0];
-
-    var fileReader = new FileReader();
-    fileReader.onload = function (fileLoadedEvent) {
-        var textFromFileLoaded = fileLoadedEvent.target.result;
-        console.log(textFromFileLoaded);
-        application.LoadGraphFromString(textFromFileLoaded);
-        ImportGraphFiles.value = "";
-    };
-
-    fileReader.readAsText(graphFileToLoad, "UTF-8");
-}
 function animationLoop() {
     // console.log(application.graph)
 }
