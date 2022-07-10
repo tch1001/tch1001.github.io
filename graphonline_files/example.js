@@ -3641,6 +3641,10 @@ ConnectionGraphHandler.prototype.SelectVertex = function(selectedObject)
 ConnectionGraphHandler.prototype.MouseDown = function(pos) 
 {
 	var selectedObject = this.GetSelectedGraph(pos);
+    if(selectedObject == null){
+        application.SetHandlerMode('default')
+        return;
+    }
 	if (selectedObject && (selectedObject instanceof BaseVertex))
 	{
         this.SelectVertex(selectedObject);
@@ -3714,6 +3718,10 @@ DeleteGraphHandler.prototype = Object.create(BaseHandler.prototype);
 DeleteGraphHandler.prototype.MouseDown = function(pos) 
 {
 	var selectedObject = this.GetSelectedObject(pos);
+    if(selectedObject == null){
+        application.SetHandlerMode('default')
+        return;
+    }
         
     if (!this.app.IsCorrectObject(selectedObject))
         return;
