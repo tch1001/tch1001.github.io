@@ -1,4 +1,75 @@
 
+// Vertex shape
+const VertexCircleShape = 0,
+    VertexSquareShape = 1,
+    VertexTriangleShape = 2,
+    VertexPentagonShape = 3,
+    VertexHomeShape = 4;
+
+// Common text position
+const CommonTextCenter = 0,
+    CommonTextUp = 1;
+
+function GetSquarePoints(diameter) {
+    var res = [];
+
+    var a = diameter;
+    res.push(new Point(-a / 2, - a / 2));
+    res.push(new Point(a / 2, -a / 2));
+    res.push(new Point(a / 2, a / 2));
+    res.push(new Point(-a / 2, a / 2));
+
+    return res;
+}
+
+function GetTrianglePoints(diameter) {
+    var res = [];
+
+    var effectiveDiameter = diameter * 1.5;
+    var upOffset = effectiveDiameter / 2;
+    var downOffset = effectiveDiameter / 4;
+    var lrOffset = effectiveDiameter * 3 / (Math.sqrt(3) * 4);
+
+    res.push(new Point(0, - upOffset));
+    res.push(new Point(lrOffset, downOffset));
+    res.push(new Point(- lrOffset, downOffset));
+
+    return res;
+}
+
+function GetPentagonPoints(diameter) {
+    var res = [];
+
+    var baseValue = diameter / 2 * 1.2;
+
+    res.push(new Point(0, - baseValue));
+    res.push((new Point(0, - baseValue)).rotate(new Point(0, 0), 72));
+    res.push((new Point(0, - baseValue)).rotate(new Point(0, 0), 72 * 2));
+    res.push((new Point(0, - baseValue)).rotate(new Point(0, 0), 72 * 3));
+    res.push((new Point(0, - baseValue)).rotate(new Point(0, 0), 72 * 4));
+    res.push((new Point(0, - baseValue)).rotate(new Point(0, 0), 72 * 5));
+
+    return res;
+}
+
+function GetPointsForShape(shape, diameter) {
+    var pointsVertex1 = null;
+    switch (parseInt(shape)) {
+        case VertexSquareShape: pointsVertex1 = GetSquarePoints(diameter); break;
+        case VertexTriangleShape: pointsVertex1 = GetTrianglePoints(diameter); break;
+        case VertexPentagonShape: pointsVertex1 = GetPentagonPoints(diameter); break;
+    }
+    return pointsVertex1;
+}
+
+function GetSizeForShape(shape, diameter) {
+    switch (parseInt(shape)) {
+        case VertexSquareShape: return diameter; break;
+        case VertexTriangleShape: return diameter * 1.5; break;
+        case VertexPentagonShape: return diameter * 1.2; break;
+    }
+    return diameter;
+}
 function BaseVertexStyle() {
     this.baseStyles = [];
 }
