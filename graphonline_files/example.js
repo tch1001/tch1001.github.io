@@ -819,82 +819,82 @@ function VertexModel() {
 /**
  * Information
  */
-function Dependency(source, target){
+function Dependency(source, target) {
     this.label = ''
     this.source = source;
     this.target = target;
     this.weight = 3;
     this.uid = "uid" + Math.random().toString(16).slice(2);
 }
-function Resource(link, description){
+function Resource(link, description) {
     this.link = link
     this.description = description
     this.uid = "uid" + Math.random().toString(16).slice(2);
 }
-Resource.prototype.SaveToXML = function(){
+Resource.prototype.SaveToXML = function () {
     var ret = "<resource " +
-    "link=\"" + encodeURIComponent(this.link) + "\" " +
-    "description=\"" + encodeURIComponent(this.description) + "\" " +
-    "uid=\"" + this.uid + "\" " +
-    ">" + "</resource>\n";
+        "link=\"" + encodeURIComponent(this.link) + "\" " +
+        "description=\"" + encodeURIComponent(this.description) + "\" " +
+        "uid=\"" + this.uid + "\" " +
+        ">" + "</resource>\n";
     return ret;
 }
-Resource.prototype.LoadFromXML = function(xml){
+Resource.prototype.LoadFromXML = function (xml) {
     this.link = xml.attr('link') == null ? 'saving error? contact admin' : xml.attr("link");
     this.link = decodeURIComponent(this.link)
     this.description = xml.attr('description') == null ? 'saving error? contact admin' : xml.attr("description");
     this.description = decodeURIComponent(this.description)
     this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
 }
-function Tag(name){
+function Tag(name) {
     this.name = name
 }
-Tag.prototype.SaveToXML = function(){
+Tag.prototype.SaveToXML = function () {
     var ret = "<tag " +
-    "name=\"" + encodeURIComponent(this.name) + "\" " +
-    ">" + "</tag>\n";
+        "name=\"" + encodeURIComponent(this.name) + "\" " +
+        ">" + "</tag>\n";
     return ret;
 }
-Tag.prototype.LoadFromXML = function(xml){
+Tag.prototype.LoadFromXML = function (xml) {
     this.name = xml.attr('name') == null ? 'saving error? contact admin' : decodeURIComponent(xml.attr('name'));
 }
-function NodeInfo(){
+function NodeInfo() {
     this.title = '';
     this.description = ''
     this.resources = []
     this.uid = "uid" + Math.random().toString(16).slice(2);
     this.tags = []
 }
-NodeInfo.prototype.SaveToXML = function(){
+NodeInfo.prototype.SaveToXML = function () {
     var ret = "\t\t<topic " +
-    "title=\"" + encodeURIComponent(this.title) + "\" " +
-    "description=\"" + encodeURIComponent(this.description) + "\" " +
-    "uid=\"" + encodeURIComponent(this.uid) + "\" " +
-    ">\n"
-    this.resources.forEach(function(item, index){
+        "title=\"" + encodeURIComponent(this.title) + "\" " +
+        "description=\"" + encodeURIComponent(this.description) + "\" " +
+        "uid=\"" + encodeURIComponent(this.uid) + "\" " +
+        ">\n"
+    this.resources.forEach(function (item, index) {
         ret = ret + "\t\t\t" + item.SaveToXML();
     });
-    this.tags.forEach(function(item,index){
+    this.tags.forEach(function (item, index) {
         ret = ret + "\t\t\t" + item.SaveToXML();
     })
-    ret = ret + "\t\t</topic>\n"; 
+    ret = ret + "\t\t</topic>\n";
     return ret;
 }
-NodeInfo.prototype.LoadFromXML = function(xml){
+NodeInfo.prototype.LoadFromXML = function (xml) {
     this.title = xml.attr('title') == null ? 'saving error? contact admin' : xml.attr("title");
     this.title = decodeURIComponent(this.title)
     this.description = xml.attr('description') == null ? 'saving error? contact admin' : xml.attr("description");
     this.description = decodeURIComponent(this.description)
     this.uid = xml.attr('uid') == null ? 'saving error? contact admin' : xml.attr("uid");
     resources = []
-    $(xml.find('resource')).each(function(){
+    $(xml.find('resource')).each(function () {
         var resource = new Resource();
         resource.LoadFromXML($(this));
         resources.push(resource);
     })
     this.resources = resources;
     tags = []
-    $(xml.find('tag')).each(function(){
+    $(xml.find('tag')).each(function () {
         var tag = new Tag();
         tag.LoadFromXML($(this));
         tags.push(tag);
@@ -932,7 +932,7 @@ BaseVertex.prototype.copyFrom = function (other) {
 }
 
 BaseVertex.prototype.SaveToXML = function () {
-    var ret =  "\t<node " +
+    var ret = "\t<node " +
         "positionX=\"" + this.position.x + "\" " +
         "positionY=\"" + this.position.y + "\" " +
         "id=\"" + this.id + "\" " +
@@ -1454,45 +1454,42 @@ BaseVertexStyle.prototype.Clear = function () {
     delete this.lineWidth;
 }
 
-BaseVertexStyle.prototype.ShouldLoad = function (field)
-{
-	return field != "baseStyles";
+BaseVertexStyle.prototype.ShouldLoad = function (field) {
+    return field != "baseStyles";
 }
 
 // Common style of Graphs.
-function CommonVertexStyle()
-{
-  BaseVertexStyle.apply(this, arguments);
+function CommonVertexStyle() {
+    BaseVertexStyle.apply(this, arguments);
 
-  this.lineWidth   = 2;
-  this.strokeStyle = '#c7b7c7';
-  this.fillStyle   = '#68aeba';
-  this.mainTextColor = '#f0d543';
-  this.shape       = VertexCircleShape;
-  this.upTextColor = '#68aeba';
-  this.commonTextPosition = CommonTextCenter;
+    this.lineWidth = 2;
+    this.strokeStyle = '#c7b7c7';
+    this.fillStyle = '#68aeba';
+    this.mainTextColor = '#f0d543';
+    this.shape = VertexCircleShape;
+    this.upTextColor = '#68aeba';
+    this.commonTextPosition = CommonTextCenter;
 
-  this.baseStyles = [];
+    this.baseStyles = [];
 }
 
 CommonVertexStyle.prototype = Object.create(BaseVertexStyle.prototype);
 
-function CommonPrintVertexStyle()
-{
-  BaseVertexStyle.apply(this, arguments);
-  
-  this.strokeStyle = '#000000';
-  this.fillStyle   = '#FFFFFF';
-  this.mainTextColor = '#000000';
+function CommonPrintVertexStyle() {
+    BaseVertexStyle.apply(this, arguments);
 
-  this.baseStyles.push("common");
+    this.strokeStyle = '#000000';
+    this.fillStyle = '#FFFFFF';
+    this.mainTextColor = '#000000';
+
+    this.baseStyles.push("common");
 }
 
-function HoverVertexStyle(){
+function HoverVertexStyle() {
     BaseVertexStyle.apply(this, arguments);
     this.strokeStyle = '#f0d543';
-	this.mainTextColor  = '#f0d543';
-	this.fillStyle = '#0000FF';
+    this.mainTextColor = '#f0d543';
+    this.fillStyle = '#0000FF';
 
     this.baseStyles.push("common");
 }
@@ -1501,181 +1498,164 @@ HoverVertexStyle.prototype = Object.create(BaseVertexStyle.prototype)
 CommonPrintVertexStyle.prototype = Object.create(BaseVertexStyle.prototype);
 
 // Selected style of Graphs.
-function SelectedVertexStyle0()
-{
-	BaseVertexStyle.apply(this, arguments);
+function SelectedVertexStyle0() {
+    BaseVertexStyle.apply(this, arguments);
 
-	this.strokeStyle = '#f0d543';
-	this.mainTextColor  = '#f0d543';
-	this.fillStyle   = '#c7627a';
+    this.strokeStyle = '#f0d543';
+    this.mainTextColor = '#f0d543';
+    this.fillStyle = '#c7627a';
 
-	this.baseStyles.push("common");
+    this.baseStyles.push("common");
 }
 
 SelectedVertexStyle0.prototype = Object.create(BaseVertexStyle.prototype);
 
-function SelectedVertexStyle1()
-{
-	BaseVertexStyle.apply(this, arguments);
+function SelectedVertexStyle1() {
+    BaseVertexStyle.apply(this, arguments);
 
-	this.strokeStyle = '#7a9ba0';
-	this.mainTextColor  = '#c3d2d5';
-	this.fillStyle   = '#534641';
+    this.strokeStyle = '#7a9ba0';
+    this.mainTextColor = '#c3d2d5';
+    this.fillStyle = '#534641';
 
-	this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 
 SelectedVertexStyle1.prototype = Object.create(BaseVertexStyle.prototype);
 
-function SelectedVertexStyle2()
-{
-	BaseVertexStyle.apply(this, arguments);
+function SelectedVertexStyle2() {
+    BaseVertexStyle.apply(this, arguments);
 
-	this.strokeStyle = '#8C4C86';
-	this.mainTextColor  = '#dbbdd8';
-	this.fillStyle   = '#253267';
+    this.strokeStyle = '#8C4C86';
+    this.mainTextColor = '#dbbdd8';
+    this.fillStyle = '#253267';
 
-	this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 
 SelectedVertexStyle2.prototype = Object.create(BaseVertexStyle.prototype);
 
-function SelectedVertexStyle3()
-{
-	BaseVertexStyle.apply(this, arguments);
+function SelectedVertexStyle3() {
+    BaseVertexStyle.apply(this, arguments);
 
-	this.strokeStyle = '#6188FF';
-	this.mainTextColor  = '#6188FF';
-	this.fillStyle   = '#E97CF9';
+    this.strokeStyle = '#6188FF';
+    this.mainTextColor = '#6188FF';
+    this.fillStyle = '#E97CF9';
 
-	this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 
 SelectedVertexStyle3.prototype = Object.create(BaseVertexStyle.prototype);
 
-function SelectedVertexStyle4()
-{
-	BaseVertexStyle.apply(this, arguments);
+function SelectedVertexStyle4() {
+    BaseVertexStyle.apply(this, arguments);
 
-	this.strokeStyle = '#C6B484';
-	this.mainTextColor  = '#C6B484';
-	this.fillStyle   = '#E0DEE1';
+    this.strokeStyle = '#C6B484';
+    this.mainTextColor = '#C6B484';
+    this.fillStyle = '#E0DEE1';
 
-	this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 
 SelectedVertexStyle4.prototype = Object.create(BaseVertexStyle.prototype);
 
-function SelectedPrintVertexStyle()
-{
-	BaseVertexStyle.apply(this, arguments);
+function SelectedPrintVertexStyle() {
+    BaseVertexStyle.apply(this, arguments);
 
-	this.strokeStyle   = '#000000';
-	this.mainTextColor = '#000000';
-	this.fillStyle     = '#AAAAAA';
+    this.strokeStyle = '#000000';
+    this.mainTextColor = '#000000';
+    this.fillStyle = '#AAAAAA';
 
-	this.baseStyles.push("printed");
+    this.baseStyles.push("printed");
 }
 
 SelectedPrintVertexStyle.prototype = Object.create(BaseVertexStyle.prototype);
 
 var DefaultSelectedGraphStyles = [new SelectedVertexStyle0(), new SelectedVertexStyle1(),
-	new SelectedVertexStyle2(), new SelectedVertexStyle3(), new SelectedVertexStyle4()];
+new SelectedVertexStyle2(), new SelectedVertexStyle3(), new SelectedVertexStyle4()];
 
 var DefaultPrintSelectedGraphStyles = [new SelectedPrintVertexStyle()];
 
-function BaseVertexDrawer(context)
-{ 
-  this.context = context;
+function BaseVertexDrawer(context) {
+    this.context = context;
 }
 
-BaseVertexDrawer.prototype.Draw = function(baseGraph, graphStyle)
-{
-  this.SetupStyle(graphStyle);
-  this.DrawShape(baseGraph);
+BaseVertexDrawer.prototype.Draw = function (baseGraph, graphStyle) {
+    this.SetupStyle(graphStyle);
+    this.DrawShape(baseGraph);
 
-  if (this.currentStyle.lineWidth != 0)
-  	this.context.stroke();
+    if (this.currentStyle.lineWidth != 0)
+        this.context.stroke();
 
-  this.context.fill();
+    this.context.fill();
 
-  var shapeSize = GetSizeForShape(graphStyle.shape, baseGraph.model.diameter + graphStyle.lineWidth);
-  
-  if (graphStyle.commonTextPosition == CommonTextCenter)
-  {
-  	this.DrawCenterText(baseGraph.position, baseGraph.mainText, graphStyle.mainTextColor, graphStyle.fillStyle, true, true, 16);  
-  	// Top text
-  	this.DrawCenterText(baseGraph.position.add(new Point(0, - shapeSize / 2.0 - 9.0)), 
-	baseGraph.upText, graphStyle.upTextColor, graphStyle.strokeStyle, false, false, 12.0);
-  }
-  else if (graphStyle.commonTextPosition == CommonTextUp)
-  {
-	this.DrawCenterText(baseGraph.position.add(new Point(0, - shapeSize / 2.0 - 7.0)), baseGraph.mainText, graphStyle.mainTextColor, graphStyle.fillStyle, true, false, 16);  
-	// Top text
-	this.DrawCenterText(baseGraph.position.add(new Point(0, shapeSize / 2.0 + 9.0)), baseGraph.upText, graphStyle.upTextColor, graphStyle.strokeStyle, false, false, 12.0);
-  }
-/*	
-  // Bottom text
-  this.DrawCenterText(baseGraph.position.add(new Point(0, + baseGraph.model.diameter / 2.0 + 7.0)), 
-	"Text 2", graphStyle.fillStyle, false, 12.0);
-*/
+    var shapeSize = GetSizeForShape(graphStyle.shape, baseGraph.model.diameter + graphStyle.lineWidth);
+
+    if (graphStyle.commonTextPosition == CommonTextCenter) {
+        this.DrawCenterText(baseGraph.position, baseGraph.mainText, graphStyle.mainTextColor, graphStyle.fillStyle, true, true, 16);
+        // Top text
+        this.DrawCenterText(baseGraph.position.add(new Point(0, - shapeSize / 2.0 - 9.0)),
+            baseGraph.upText, graphStyle.upTextColor, graphStyle.strokeStyle, false, false, 12.0);
+    }
+    else if (graphStyle.commonTextPosition == CommonTextUp) {
+        this.DrawCenterText(baseGraph.position.add(new Point(0, - shapeSize / 2.0 - 7.0)), baseGraph.mainText, graphStyle.mainTextColor, graphStyle.fillStyle, true, false, 16);
+        // Top text
+        this.DrawCenterText(baseGraph.position.add(new Point(0, shapeSize / 2.0 + 9.0)), baseGraph.upText, graphStyle.upTextColor, graphStyle.strokeStyle, false, false, 12.0);
+    }
+    /*	
+      // Bottom text
+      this.DrawCenterText(baseGraph.position.add(new Point(0, + baseGraph.model.diameter / 2.0 + 7.0)), 
+        "Text 2", graphStyle.fillStyle, false, 12.0);
+    */
 }
 
-BaseVertexDrawer.prototype.SetupStyle = function(style)
-{
-  this.currentStyle = style;
-  this.context.lineWidth   = style.lineWidth;
-  this.context.strokeStyle = style.strokeStyle;
-  this.context.fillStyle   = style.fillStyle;
+BaseVertexDrawer.prototype.SetupStyle = function (style) {
+    this.currentStyle = style;
+    this.context.lineWidth = style.lineWidth;
+    this.context.strokeStyle = style.strokeStyle;
+    this.context.fillStyle = style.fillStyle;
 }
 
-BaseVertexDrawer.prototype.DrawShape = function(baseGraph)
-{
-  this.context.beginPath();
-  if (this.currentStyle.shape == VertexCircleShape)
-  {
-  	this.context.arc(baseGraph.position.x, baseGraph.position.y, baseGraph.model.diameter / 2.0, 0, 2 * Math.PI);
-  }
-  else
-  {
-	var points = GetPointsForShape(this.currentStyle.shape, baseGraph.model.diameter);
+BaseVertexDrawer.prototype.DrawShape = function (baseGraph) {
+    this.context.beginPath();
+    if (this.currentStyle.shape == VertexCircleShape) {
+        this.context.arc(baseGraph.position.x, baseGraph.position.y, baseGraph.model.diameter / 2.0, 0, 2 * Math.PI);
+    }
+    else {
+        var points = GetPointsForShape(this.currentStyle.shape, baseGraph.model.diameter);
 
-	this.context.moveTo(baseGraph.position.x + points[points.length - 1].x, baseGraph.position.y + points[points.length - 1].y);
+        this.context.moveTo(baseGraph.position.x + points[points.length - 1].x, baseGraph.position.y + points[points.length - 1].y);
 
-	var context = this.context;
+        var context = this.context;
 
-	points.forEach(function(point) {
-		context.lineTo(baseGraph.position.x + point.x, baseGraph.position.y + point.y);
-	  });
-  }
+        points.forEach(function (point) {
+            context.lineTo(baseGraph.position.x + point.x, baseGraph.position.y + point.y);
+        });
+    }
 
-  this.context.closePath();
+    this.context.closePath();
 }
 
-BaseVertexDrawer.prototype.DrawText = function(position, text, color, outlineColor, outline, font)
-{
-	this.context.fillStyle = color;
-	this.context.font = font;
+BaseVertexDrawer.prototype.DrawText = function (position, text, color, outlineColor, outline, font) {
+    this.context.fillStyle = color;
+    this.context.font = font;
     this.context.lineWidth = 4;
     this.context.strokeStyle = outlineColor;
 
-    if (outline)
-    {
+    if (outline) {
         this.context.save();
         this.context.lineJoin = 'round';
         this.context.strokeText(text, position.x, position.y);
         this.context.restore();
     }
-    
+
     this.context.fillText(text, position.x, position.y);
 }
 
-BaseVertexDrawer.prototype.DrawCenterText = function(position, text, color, outlineColor, bold, outline, size)
-{
-	this.context.textBaseline="middle";
-	this.context.font = (bold ? "bold " : "") + size + "px sans-serif";
-	var textWidth  = this.context.measureText(text).width;	
-	this.DrawText(new Point(position.x - textWidth / 2, position.y), text, color, outlineColor, outline, this.context.font);
+BaseVertexDrawer.prototype.DrawCenterText = function (position, text, color, outlineColor, bold, outline, size) {
+    this.context.textBaseline = "middle";
+    this.context.font = (bold ? "bold " : "") + size + "px sans-serif";
+    var textWidth = this.context.measureText(text).width;
+    this.DrawText(new Point(position.x - textWidth / 2, position.y), text, color, outlineColor, outline, this.context.font);
 }
 
 /**
@@ -1683,62 +1663,58 @@ BaseVertexDrawer.prototype.DrawCenterText = function(position, text, color, outl
  */
 
 
- const lineDashTypes = [
-          [],
-          [4, 4],
-          [12, 12],
-          [16, 4, 4, 4],
-        ];
+const lineDashTypes = [
+    [],
+    [4, 4],
+    [12, 12],
+    [16, 4, 4, 4],
+];
 
 // Common text position
 const WeightTextCenter = 0,
-      WeightTextUp     = 1;
+    WeightTextUp = 1;
 
- function BaseEdgeStyle()
- {
-   this.baseStyles = [];
- }
- 
- BaseEdgeStyle.prototype.GetStyle = function (baseStyle, object)
- {
-   this.baseStyles.forEach(function(element) {
-     var styleObject = globalApplication.GetStyle("edge", element, object);
-     baseStyle       = styleObject.GetStyle(baseStyle, object);
-   });
- 
-   if (this.hasOwnProperty('weightText'))
-     baseStyle.weightText   = this.weightText;
-   if (this.hasOwnProperty('strokeStyle'))
-     baseStyle.strokeStyle = this.strokeStyle;
-   if (this.hasOwnProperty('fillStyle'))
-     baseStyle.fillStyle   = this.fillStyle;
-   if (this.hasOwnProperty('textPadding'))
-     baseStyle.textPadding = this.textPadding;
-   if (this.hasOwnProperty('textStrockeWidth'))
-     baseStyle.textStrockeWidth = this.textStrockeWidth;
-   if (this.hasOwnProperty('lineDash'))
-     baseStyle.lineDash = this.lineDash;
-   if (this.hasOwnProperty('additionalTextColor'))
-     baseStyle.additionalTextColor = this.additionalTextColor;
-   if (this.hasOwnProperty('weightPosition'))
-     baseStyle.weightPosition = this.weightPosition;
- 
-   return this.FixNewFields(baseStyle);
-}
-  
-BaseEdgeStyle.prototype.FixNewFields = function (style)
-{
-  if (!style.hasOwnProperty('lineDash'))
-    style.lineDash = 0;
-
-  if (!style.hasOwnProperty('weightPosition'))
-    style.weightPosition = WeightTextCenter;
-
-  return style;
+function BaseEdgeStyle() {
+    this.baseStyles = [];
 }
 
- BaseEdgeStyle.prototype.Clear = function ()
- {
+BaseEdgeStyle.prototype.GetStyle = function (baseStyle, object) {
+    this.baseStyles.forEach(function (element) {
+        var styleObject = globalApplication.GetStyle("edge", element, object);
+        baseStyle = styleObject.GetStyle(baseStyle, object);
+    });
+
+    if (this.hasOwnProperty('weightText'))
+        baseStyle.weightText = this.weightText;
+    if (this.hasOwnProperty('strokeStyle'))
+        baseStyle.strokeStyle = this.strokeStyle;
+    if (this.hasOwnProperty('fillStyle'))
+        baseStyle.fillStyle = this.fillStyle;
+    if (this.hasOwnProperty('textPadding'))
+        baseStyle.textPadding = this.textPadding;
+    if (this.hasOwnProperty('textStrockeWidth'))
+        baseStyle.textStrockeWidth = this.textStrockeWidth;
+    if (this.hasOwnProperty('lineDash'))
+        baseStyle.lineDash = this.lineDash;
+    if (this.hasOwnProperty('additionalTextColor'))
+        baseStyle.additionalTextColor = this.additionalTextColor;
+    if (this.hasOwnProperty('weightPosition'))
+        baseStyle.weightPosition = this.weightPosition;
+
+    return this.FixNewFields(baseStyle);
+}
+
+BaseEdgeStyle.prototype.FixNewFields = function (style) {
+    if (!style.hasOwnProperty('lineDash'))
+        style.lineDash = 0;
+
+    if (!style.hasOwnProperty('weightPosition'))
+        style.weightPosition = WeightTextCenter;
+
+    return style;
+}
+
+BaseEdgeStyle.prototype.Clear = function () {
     delete this.weightText;
     delete this.strokeStyle;
     delete this.fillStyle;
@@ -1747,355 +1723,318 @@ BaseEdgeStyle.prototype.FixNewFields = function (style)
     delete this.lineDash;
     delete this.additionalTextColor;
     delete this.weightPosition;
- }
+}
 
- BaseEdgeStyle.prototype.ShouldLoad = function (field)
- {
-   return field != "baseStyles";
- }
- 
-function CommonEdgeStyle()
-{
-  BaseEdgeStyle.apply(this, arguments);
+BaseEdgeStyle.prototype.ShouldLoad = function (field) {
+    return field != "baseStyles";
+}
 
-	this.strokeStyle = '#c7b7c7';
-	this.weightText  = '#f0d543';
- 	this.fillStyle   = '#68aeba';
- 	this.textPadding = 4;
-	this.textStrockeWidth = 2;
-  this.lineDash = 0;
-  this.additionalTextColor = '#c7b7c7';
-  this.weightPosition = WeightTextCenter;
+function CommonEdgeStyle() {
+    BaseEdgeStyle.apply(this, arguments);
+
+    this.strokeStyle = '#c7b7c7';
+    this.weightText = '#f0d543';
+    this.fillStyle = '#68aeba';
+    this.textPadding = 4;
+    this.textStrockeWidth = 2;
+    this.lineDash = 0;
+    this.additionalTextColor = '#c7b7c7';
+    this.weightPosition = WeightTextCenter;
 }
 
 CommonEdgeStyle.prototype = Object.create(BaseEdgeStyle.prototype);
 
-function CommonPrintEdgeStyle()
-{
-	BaseEdgeStyle.apply(this, arguments);
-    
-	this.strokeStyle = '#000000';
-	this.weightText  = '#000000';
- 	this.fillStyle   = '#FFFFFF';
- 	this.textPadding = 4;
-	this.textStrockeWidth = 2;
+function CommonPrintEdgeStyle() {
+    BaseEdgeStyle.apply(this, arguments);
+
+    this.strokeStyle = '#000000';
+    this.weightText = '#000000';
+    this.fillStyle = '#FFFFFF';
+    this.textPadding = 4;
+    this.textStrockeWidth = 2;
 
     this.baseStyles.push("common");
 }
 CommonPrintEdgeStyle.prototype = Object.create(BaseEdgeStyle.prototype);
 
-function SelectedEdgeStyle0()
-{
-	BaseEdgeStyle.apply(this, arguments);  
+function SelectedEdgeStyle0() {
+    BaseEdgeStyle.apply(this, arguments);
 
-	this.strokeStyle = '#f0d543';
-	this.weightText  = '#f0d543';
-	this.fillStyle   = '#c7627a';
+    this.strokeStyle = '#f0d543';
+    this.weightText = '#f0d543';
+    this.fillStyle = '#c7627a';
 
-  this.baseStyles.push("common");
+    this.baseStyles.push("common");
 }
 SelectedEdgeStyle0.prototype = Object.create(BaseEdgeStyle.prototype);
 
-function SelectedEdgeStyle1()
-{
-	BaseEdgeStyle.apply(this, arguments);  
+function SelectedEdgeStyle1() {
+    BaseEdgeStyle.apply(this, arguments);
 
-	this.strokeStyle = '#8FBF83';
-	this.weightText  = '#8FBF83';
-	this.fillStyle   = '#F9F9D5';
+    this.strokeStyle = '#8FBF83';
+    this.weightText = '#8FBF83';
+    this.fillStyle = '#F9F9D5';
 
-  this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 SelectedEdgeStyle1.prototype = Object.create(BaseEdgeStyle.prototype);
 
-function SelectedEdgeStyle2()
-{
-	BaseEdgeStyle.apply(this, arguments);  
+function SelectedEdgeStyle2() {
+    BaseEdgeStyle.apply(this, arguments);
 
-	this.strokeStyle = '#8C4C86';
-	this.weightText  = '#8C4C86';
-	this.fillStyle   = '#253267';
+    this.strokeStyle = '#8C4C86';
+    this.weightText = '#8C4C86';
+    this.fillStyle = '#253267';
 
-  this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 SelectedEdgeStyle2.prototype = Object.create(BaseEdgeStyle.prototype);
 
 
-function SelectedEdgeStyle3()
-{
-	BaseEdgeStyle.apply(this, arguments);  
+function SelectedEdgeStyle3() {
+    BaseEdgeStyle.apply(this, arguments);
 
-	this.strokeStyle = '#6188FF';
-	this.weightText  = '#6188FF';
-	this.fillStyle   = '#E97CF9';
+    this.strokeStyle = '#6188FF';
+    this.weightText = '#6188FF';
+    this.fillStyle = '#E97CF9';
 
-  this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 SelectedEdgeStyle3.prototype = Object.create(BaseEdgeStyle.prototype);
 
 
-function SelectedEdgeStyle4()
-{
-	BaseEdgeStyle.apply(this, arguments);  
+function SelectedEdgeStyle4() {
+    BaseEdgeStyle.apply(this, arguments);
 
-	this.strokeStyle = '#C6B484';
-	this.weightText  = '#C6B484';
-	this.fillStyle   = '#E0DEE1';
+    this.strokeStyle = '#C6B484';
+    this.weightText = '#C6B484';
+    this.fillStyle = '#E0DEE1';
 
-  this.baseStyles.push("selected");
+    this.baseStyles.push("selected");
 }
 SelectedEdgeStyle4.prototype = Object.create(BaseEdgeStyle.prototype);
 
-function SelectedEdgePrintStyle()
-{
-	BaseEdgeStyle.apply(this, arguments);  
+function SelectedEdgePrintStyle() {
+    BaseEdgeStyle.apply(this, arguments);
 
-	this.strokeStyle = '#AAAAAA';
-	this.weightText  = '#000000';
-	this.fillStyle   = '#AAAAAA';
+    this.strokeStyle = '#AAAAAA';
+    this.weightText = '#000000';
+    this.fillStyle = '#AAAAAA';
 
-  this.baseStyles.push("printed");
+    this.baseStyles.push("printed");
 }
 SelectedEdgePrintStyle.prototype = Object.create(BaseEdgeStyle.prototype);
 
-var DefaultSelectedEdgeStyles      = [new SelectedEdgeStyle0(), new SelectedEdgeStyle1(), 
-	new SelectedEdgeStyle2(), new SelectedEdgeStyle3(), new SelectedEdgeStyle4()];
+var DefaultSelectedEdgeStyles = [new SelectedEdgeStyle0(), new SelectedEdgeStyle1(),
+new SelectedEdgeStyle2(), new SelectedEdgeStyle3(), new SelectedEdgeStyle4()];
 
 var DefaultPrintSelectedEdgeStyles = [new SelectedEdgePrintStyle()];
 
-function BaseEdgeDrawer(context, drawObjects)
-{ 
-  if (drawObjects === undefined) 
-  {
-    drawObjects = null;
-  }
-    
-  this.context = context;
-    
-  this.drawObject = null;
-  this.drawArc = null;
-  this.startArrowDiretion  = null;
-  this.finishArrowDiretion = null;
-  this.textCenterObject    = null;
-  this.getPointOnArc       = null;   
-    
-  if (drawObjects)
-  {
-    if (drawObjects.hasOwnProperty("drawObject"))
-      this.drawObject = drawObjects.drawObject;
-    if (drawObjects.hasOwnProperty("drawArc"))
-      this.drawArc = drawObjects.drawArc;
-    if (drawObjects.hasOwnProperty("startArrowDiretion"))
-      this.startArrowDiretion = drawObjects.startArrowDiretion;
-    if (drawObjects.hasOwnProperty("finishArrowDiretion"))
-      this.finishArrowDiretion = drawObjects.finishArrowDiretion;
-    if (drawObjects.hasOwnProperty("textCenterObject"))
-      this.textCenterObject = drawObjects.textCenterObject;
-    if (drawObjects.hasOwnProperty("getPointOnArc"))
-      this.getPointOnArc = drawObjects.getPointOnArc;
-  }
+function BaseEdgeDrawer(context, drawObjects) {
+    if (drawObjects === undefined) {
+        drawObjects = null;
+    }
+
+    this.context = context;
+
+    this.drawObject = null;
+    this.drawArc = null;
+    this.startArrowDiretion = null;
+    this.finishArrowDiretion = null;
+    this.textCenterObject = null;
+    this.getPointOnArc = null;
+
+    if (drawObjects) {
+        if (drawObjects.hasOwnProperty("drawObject"))
+            this.drawObject = drawObjects.drawObject;
+        if (drawObjects.hasOwnProperty("drawArc"))
+            this.drawArc = drawObjects.drawArc;
+        if (drawObjects.hasOwnProperty("startArrowDiretion"))
+            this.startArrowDiretion = drawObjects.startArrowDiretion;
+        if (drawObjects.hasOwnProperty("finishArrowDiretion"))
+            this.finishArrowDiretion = drawObjects.finishArrowDiretion;
+        if (drawObjects.hasOwnProperty("textCenterObject"))
+            this.textCenterObject = drawObjects.textCenterObject;
+        if (drawObjects.hasOwnProperty("getPointOnArc"))
+            this.getPointOnArc = drawObjects.getPointOnArc;
+    }
 }
 
-BaseEdgeDrawer.prototype.Draw = function(baseEdge, arcStyle) 
-{
-  if (this.drawObject && this.drawObject != this)
-  {
-    this.drawObject.Draw(baseEdge, arcStyle);
-    return;
-  }
-    
-  this.SetupStyle(baseEdge, arcStyle);
-    
-  var lengthArrow = Math.max(baseEdge.model.width * 4, 8);
-  var widthArrow  =  Math.max(baseEdge.model.width * 2, 4);
-  var position1 = baseEdge.vertex1.position;
-  var position2 = baseEdge.vertex2.position;
-  var direction = position1.subtract(position2); 
-  direction.normalize(1.0);
-  var positions = baseEdge.GetEdgePositionsShift();
-  
-  var hasStartStyle  = !position1.equals(position2) && baseEdge.GetStartEdgeStyle() != "";
-  var hasFinishStyle = !position1.equals(position2) && baseEdge.GetFinishEdgeStyle() != "";
-    
-  var arcPos1 = positions[0];
-  var arcPos2 = positions[1];
-
-  if (hasStartStyle)
-  {
-    var dirArrow = this.GetStartArrowDiretion(positions[0], positions[1], lengthArrow);
-    arcPos1 = arcPos1.add(dirArrow.multiply(lengthArrow / 2));
-  }
-
-  if (hasFinishStyle)
-  {
-    var dirArrow = this.GetFinishArrowDiretion(positions[0], positions[1], lengthArrow);
-    arcPos2 = arcPos2.add(dirArrow.multiply(-lengthArrow / 2));
-  }
-
-  this.DrawArc (arcPos1, arcPos2, arcStyle);
-
-  this.context.fillStyle = this.context.strokeStyle;
-  this.context.lineWidth = 0;
-
-  if (hasStartStyle)
-  {
-    this.DrawArrow(positions[0], this.GetStartArrowDiretion(positions[0], positions[1], lengthArrow), lengthArrow, widthArrow);
-  }
-  if (hasFinishStyle)
-  {
-    this.DrawArrow(positions[1], this.GetFinishArrowDiretion(positions[0], positions[1], lengthArrow), lengthArrow, widthArrow);
-  }
-    
-  this.SetupStyle(baseEdge, arcStyle);
-
-  if (arcStyle.weightPosition == WeightTextCenter)
-  {
-    if (baseEdge.GetText().length > 0)
-    {
-      this.DrawWeight(positions[0], positions[1], baseEdge.GetText(), arcStyle, false);
+BaseEdgeDrawer.prototype.Draw = function (baseEdge, arcStyle) {
+    if (this.drawObject && this.drawObject != this) {
+        this.drawObject.Draw(baseEdge, arcStyle);
+        return;
     }
 
-    if (baseEdge.GetUpText().length > 0)
-    {
-      this.DrawUpText(positions[0], positions[1], baseEdge.GetUpText(), arcStyle, false, arcStyle.additionalTextColor, baseEdge.model.width / 2 + 20, null);
+    this.SetupStyle(baseEdge, arcStyle);
+
+    var lengthArrow = Math.max(baseEdge.model.width * 4, 8);
+    var widthArrow = Math.max(baseEdge.model.width * 2, 4);
+    var position1 = baseEdge.vertex1.position;
+    var position2 = baseEdge.vertex2.position;
+    var direction = position1.subtract(position2);
+    direction.normalize(1.0);
+    var positions = baseEdge.GetEdgePositionsShift();
+
+    var hasStartStyle = !position1.equals(position2) && baseEdge.GetStartEdgeStyle() != "";
+    var hasFinishStyle = !position1.equals(position2) && baseEdge.GetFinishEdgeStyle() != "";
+
+    var arcPos1 = positions[0];
+    var arcPos2 = positions[1];
+
+    if (hasStartStyle) {
+        var dirArrow = this.GetStartArrowDiretion(positions[0], positions[1], lengthArrow);
+        arcPos1 = arcPos1.add(dirArrow.multiply(lengthArrow / 2));
     }
-  }
-  else if (arcStyle.weightPosition == WeightTextUp)
-  {
-    if (baseEdge.GetText().length > 0)
-    {
-      this.DrawUpText(positions[0], positions[1], baseEdge.GetText(), arcStyle, false, arcStyle.weightText, baseEdge.model.width / 2 + 10, "16px");
+
+    if (hasFinishStyle) {
+        var dirArrow = this.GetFinishArrowDiretion(positions[0], positions[1], lengthArrow);
+        arcPos2 = arcPos2.add(dirArrow.multiply(-lengthArrow / 2));
     }
-    
-    if (baseEdge.GetUpText().length > 0)
-    {
-      this.DrawUpText(positions[0], positions[1], baseEdge.GetUpText(), arcStyle, false, arcStyle.additionalTextColor, - baseEdge.model.width / 2 - 15, null);
+
+    this.DrawArc(arcPos1, arcPos2, arcStyle);
+
+    this.context.fillStyle = this.context.strokeStyle;
+    this.context.lineWidth = 0;
+
+    if (hasStartStyle) {
+        this.DrawArrow(positions[0], this.GetStartArrowDiretion(positions[0], positions[1], lengthArrow), lengthArrow, widthArrow);
     }
-  }
+    if (hasFinishStyle) {
+        this.DrawArrow(positions[1], this.GetFinishArrowDiretion(positions[0], positions[1], lengthArrow), lengthArrow, widthArrow);
+    }
+
+    this.SetupStyle(baseEdge, arcStyle);
+
+    if (arcStyle.weightPosition == WeightTextCenter) {
+        if (baseEdge.GetText().length > 0) {
+            this.DrawWeight(positions[0], positions[1], baseEdge.GetText(), arcStyle, false);
+        }
+
+        if (baseEdge.GetUpText().length > 0) {
+            this.DrawUpText(positions[0], positions[1], baseEdge.GetUpText(), arcStyle, false, arcStyle.additionalTextColor, baseEdge.model.width / 2 + 20, null);
+        }
+    }
+    else if (arcStyle.weightPosition == WeightTextUp) {
+        if (baseEdge.GetText().length > 0) {
+            this.DrawUpText(positions[0], positions[1], baseEdge.GetText(), arcStyle, false, arcStyle.weightText, baseEdge.model.width / 2 + 10, "16px");
+        }
+
+        if (baseEdge.GetUpText().length > 0) {
+            this.DrawUpText(positions[0], positions[1], baseEdge.GetUpText(), arcStyle, false, arcStyle.additionalTextColor, - baseEdge.model.width / 2 - 15, null);
+        }
+    }
 }
 
 
-BaseEdgeDrawer.prototype.SetupStyle = function(baseEdge, arcStyle)
-{
-  this.context.lineWidth   = baseEdge.model.width;
-  this.context.strokeStyle = arcStyle.strokeStyle;
-  this.context.fillStyle   = arcStyle.fillStyle;
-  this.model               = baseEdge.model;
-  this.style               = arcStyle;
+BaseEdgeDrawer.prototype.SetupStyle = function (baseEdge, arcStyle) {
+    this.context.lineWidth = baseEdge.model.width;
+    this.context.strokeStyle = arcStyle.strokeStyle;
+    this.context.fillStyle = arcStyle.fillStyle;
+    this.model = baseEdge.model;
+    this.style = arcStyle;
 }
 
-BaseEdgeDrawer.prototype.DrawArc = function(position1, position2, arcStyle)
-{
-  if (this.drawArc && this.drawArc != this)
-  {
-      this.drawArc.DrawArc(position1, position2, arcStyle);
-      return;
-  }
-   
-  this.context.setLineDash(lineDashTypes[arcStyle.lineDash]);
-  if (position1.equals(position2))
-  {
+BaseEdgeDrawer.prototype.DrawArc = function (position1, position2, arcStyle) {
+    if (this.drawArc && this.drawArc != this) {
+        this.drawArc.DrawArc(position1, position2, arcStyle);
+        return;
+    }
+
+    this.context.setLineDash(lineDashTypes[arcStyle.lineDash]);
+    if (position1.equals(position2)) {
+        this.context.beginPath();
+        this.context.arc(position1.x - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(),
+            position1.y - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(), this.model.GetLoopSize(), 0, 2 * Math.PI);
+        this.context.stroke();
+    }
+    else {
+        this.context.beginPath();
+        this.context.moveTo(position1.x, position1.y);
+        this.context.lineTo(position2.x, position2.y);
+        this.context.stroke();
+    }
+    this.context.setLineDash([]);
+}
+
+BaseEdgeDrawer.prototype.DrawWeight = function (position1, position2, text, arcStyle, hasPair) {
+    var centerPoint = this.GetTextCenterPoint(position1, position2, hasPair, arcStyle);
+
+    this.context.font = "bold 16px sans-serif";
+    this.context.textBaseline = "middle";
+    this.context.lineWidth = arcStyle.textStrockeWidth;
+    this.context.fillStyle = arcStyle.fillStyle;
+
+    var widthText = this.context.measureText(text).width;
+
     this.context.beginPath();
-    this.context.arc(position1.x - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(), 
-                     position1.y - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(), this.model.GetLoopSize(), 0, 2 * Math.PI);
+    this.context.rect(centerPoint.x - widthText / 2 - arcStyle.textPadding / 2,
+        centerPoint.y - 8 - arcStyle.textPadding / 2,
+        widthText + arcStyle.textPadding, 16 + arcStyle.textPadding);
+    this.context.closePath();
+    this.context.fill();
     this.context.stroke();
-  }
-  else
-  {
-    this.context.beginPath();
-    this.context.moveTo(position1.x, position1.y);
-    this.context.lineTo(position2.x, position2.y);
-    this.context.stroke();
-  }
-  this.context.setLineDash([]);  
+
+    this.context.fillStyle = arcStyle.weightText;
+    this.context.fillText(text, centerPoint.x - widthText / 2, centerPoint.y);
 }
 
-BaseEdgeDrawer.prototype.DrawWeight = function(position1, position2, text, arcStyle, hasPair)
-{ 
-  var centerPoint = this.GetTextCenterPoint(position1, position2, hasPair, arcStyle);
-        
-  this.context.font         = "bold 16px sans-serif";
-  this.context.textBaseline = "middle";
-  this.context.lineWidth    = arcStyle.textStrockeWidth;
-  this.context.fillStyle    = arcStyle.fillStyle;	
+BaseEdgeDrawer.prototype.DrawUpText = function (position1, position2, text, arcStyle, hasPair, color, offset, fontSize) {
+    var centerPoint = this.GetTextCenterPoint(position1, position2, hasPair, arcStyle);
 
-  var widthText = this.context.measureText(text).width;
+    this.context.font = fontSize == null ? "bold 12px sans-serif" : "bold " + fontSize + " sans-serif";
+    this.context.textBaseline = "middle";
 
-  this.context.beginPath();
-  this.context.rect(centerPoint.x - widthText / 2 - arcStyle.textPadding / 2, 
-                    centerPoint.y - 8 - arcStyle.textPadding / 2, 
-                    widthText + arcStyle.textPadding, 16 + arcStyle.textPadding);
-  this.context.closePath();
-  this.context.fill();
-  this.context.stroke ();
+    var widthText = this.context.measureText(text).width;
 
-  this.context.fillStyle = arcStyle.weightText;	
-  this.context.fillText(text, centerPoint.x - widthText / 2, centerPoint.y);
-}
+    this.context.fillStyle = color;
 
-BaseEdgeDrawer.prototype.DrawUpText = function(position1, position2, text, arcStyle, hasPair, color, offset, fontSize)
-{ 
-  var centerPoint = this.GetTextCenterPoint(position1, position2, hasPair, arcStyle);
-        
-  this.context.font         = fontSize == null ? "bold 12px sans-serif" : "bold " + fontSize + " sans-serif";
-  this.context.textBaseline = "middle";
-
-  var widthText = this.context.measureText(text).width;
-
-  this.context.fillStyle = color;	
-
-  var vectorEdge   = new Point(position2.x - position1.x, position2.y - position1.y);
-  var angleRadians = Math.atan2(vectorEdge.y, vectorEdge.x);
-  if (angleRadians > Math.PI / 2 || angleRadians < -Math.PI / 2)
-  {
-    vectorEdge   = new Point(position1.x - position2.x, position1.y - position2.y);
-    angleRadians = Math.atan2(vectorEdge.y, vectorEdge.x);          
-  }
-  var normalize    = vectorEdge.normal().normalizeCopy(offset);
-  this.context.save();
-  this.context.translate(centerPoint.x - normalize.x, centerPoint.y - normalize.y);
-  this.context.rotate(angleRadians);
-  this.context.textAlign = "center";
-    
-  this.context.fillText(text, 0, 0);
-
-  this.context.restore();
-}
-
-BaseEdgeDrawer.prototype.DrawArrow = function(position, direction, length, width) 
-{
-  var normal = direction.normal();
-  
-  var pointOnLine = position.subtract(direction.multiply(length));
-  var point1 = pointOnLine.add(normal.multiply(width));
-  var point2 = pointOnLine.add(normal.multiply(-width));
-  
-  this.context.beginPath();
-  this.context.moveTo(position.x, position.y);
-  this.context.lineTo(point1.x, point1.y);
-  this.context.lineTo(point2.x, point2.y);
-  this.context.lineTo(position.x, position.y);
-  this.context.closePath();
-  this.context.fill();
-}
-
-BaseEdgeDrawer.prototype.GetStartArrowDiretion = function(position1, position2, lengthArrow) 
-{
-    if (this.startArrowDiretion && this.startArrowDiretion != this)
-    {
-      return this.startArrowDiretion.GetStartArrowDiretion(position1, position2, lengthArrow);
+    var vectorEdge = new Point(position2.x - position1.x, position2.y - position1.y);
+    var angleRadians = Math.atan2(vectorEdge.y, vectorEdge.x);
+    if (angleRadians > Math.PI / 2 || angleRadians < -Math.PI / 2) {
+        vectorEdge = new Point(position1.x - position2.x, position1.y - position2.y);
+        angleRadians = Math.atan2(vectorEdge.y, vectorEdge.x);
     }
-    
+    var normalize = vectorEdge.normal().normalizeCopy(offset);
+    this.context.save();
+    this.context.translate(centerPoint.x - normalize.x, centerPoint.y - normalize.y);
+    this.context.rotate(angleRadians);
+    this.context.textAlign = "center";
+
+    this.context.fillText(text, 0, 0);
+
+    this.context.restore();
+}
+
+BaseEdgeDrawer.prototype.DrawArrow = function (position, direction, length, width) {
+    var normal = direction.normal();
+
+    var pointOnLine = position.subtract(direction.multiply(length));
+    var point1 = pointOnLine.add(normal.multiply(width));
+    var point2 = pointOnLine.add(normal.multiply(-width));
+
+    this.context.beginPath();
+    this.context.moveTo(position.x, position.y);
+    this.context.lineTo(point1.x, point1.y);
+    this.context.lineTo(point2.x, point2.y);
+    this.context.lineTo(position.x, position.y);
+    this.context.closePath();
+    this.context.fill();
+}
+
+BaseEdgeDrawer.prototype.GetStartArrowDiretion = function (position1, position2, lengthArrow) {
+    if (this.startArrowDiretion && this.startArrowDiretion != this) {
+        return this.startArrowDiretion.GetStartArrowDiretion(position1, position2, lengthArrow);
+    }
+
     var direction = position1.subtract(position2);
     direction.normalize(1.0);
     return direction;
 }
 
-BaseEdgeDrawer.prototype.GetFinishArrowDiretion = function(position1, position2, lengthArrow) 
-{
-    if (this.finishArrowDiretion && this.finishArrowDiretion != this)
-    {
-      return this.finishArrowDiretion.GetFinishArrowDiretion(position1, position2, lengthArrow);
+BaseEdgeDrawer.prototype.GetFinishArrowDiretion = function (position1, position2, lengthArrow) {
+    if (this.finishArrowDiretion && this.finishArrowDiretion != this) {
+        return this.finishArrowDiretion.GetFinishArrowDiretion(position1, position2, lengthArrow);
     }
 
     var direction = position2.subtract(position1);
@@ -2103,68 +2042,59 @@ BaseEdgeDrawer.prototype.GetFinishArrowDiretion = function(position1, position2,
     return direction;
 }
 
-BaseEdgeDrawer.prototype.GetTextCenterPoint = function (position1, position2, hasPair, arcStyle)
-{
-  if (this.textCenterObject && this.textCenterObject != this)
-  {
-    return this.textCenterObject.GetTextCenterPoint(position1, position2, hasPair, arcStyle);
-  }
-    
-  var textShift   = Math.min(12 / position1.subtract(position2).length(), 0.4);
-  var centerPoint = Point.interpolate(position1, position2, 0.5);
-  if (position1.equals(position2))
-  {
-    centerPoint.y = centerPoint.y - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
-    centerPoint.x = centerPoint.x - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
-  } 
-    
-  return centerPoint;
-}
-
-BaseEdgeDrawer.prototype.GetPointOnArc = function (position1, position2, procent)
-{
-    if (this.getPointOnArc && this.getPointOnArc != this)
-    {
-      return this.getPointOnArc.GetPointOnArc(position1, position2, procent);
+BaseEdgeDrawer.prototype.GetTextCenterPoint = function (position1, position2, hasPair, arcStyle) {
+    if (this.textCenterObject && this.textCenterObject != this) {
+        return this.textCenterObject.GetTextCenterPoint(position1, position2, hasPair, arcStyle);
     }
-    
-  return Point.interpolate(position1, position2, procent);
+
+    var textShift = Math.min(12 / position1.subtract(position2).length(), 0.4);
+    var centerPoint = Point.interpolate(position1, position2, 0.5);
+    if (position1.equals(position2)) {
+        centerPoint.y = centerPoint.y - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
+        centerPoint.x = centerPoint.x - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
+    }
+
+    return centerPoint;
 }
 
-function ProgressArcDrawer(context, baseDrawer, progress)
-{
-    this.context    = context;
+BaseEdgeDrawer.prototype.GetPointOnArc = function (position1, position2, procent) {
+    if (this.getPointOnArc && this.getPointOnArc != this) {
+        return this.getPointOnArc.GetPointOnArc(position1, position2, procent);
+    }
+
+    return Point.interpolate(position1, position2, procent);
+}
+
+function ProgressArcDrawer(context, baseDrawer, progress) {
+    this.context = context;
     this.baseDrawer = baseDrawer;
-    this.progress   = progress;
+    this.progress = progress;
 }
 
 ProgressArcDrawer.prototype = Object.create(BaseEdgeDrawer.prototype);
 
 
-ProgressArcDrawer.prototype.Draw = function(baseEdge, arcStyle)
-{
+ProgressArcDrawer.prototype.Draw = function (baseEdge, arcStyle) {
     this.baseDrawer.Draw(baseEdge, arcStyle);
-    
+
     this.context.lineWidth = 10;
-    
+
     var positions = baseEdge.GetEdgePositionsShift();
     var progressSize = 10;
-    
-    if (positions[0].equals(positions[1]))
-    {
+
+    if (positions[0].equals(positions[1])) {
         var sizeInRadian = progressSize / (2 * Math.PI * this.baseDrawer.model.GetLoopSize()) * 6;
-        
+
         this.context.beginPath();
         this.context.arc(positions[0].x - Math.cos(this.baseDrawer.model.GetLoopShiftAngel()) * this.baseDrawer.model.GetLoopSize(),
-                         positions[0].y - Math.sin(this.baseDrawer.model.GetLoopShiftAngel()) * this.baseDrawer.model.GetLoopSize(), this.baseDrawer.model.GetLoopSize(), this.progress * 2 * Math.PI, this.progress * 2 * Math.PI + sizeInRadian);
+            positions[0].y - Math.sin(this.baseDrawer.model.GetLoopShiftAngel()) * this.baseDrawer.model.GetLoopSize(), this.baseDrawer.model.GetLoopSize(), this.progress * 2 * Math.PI, this.progress * 2 * Math.PI + sizeInRadian);
         this.context.stroke();
     }
-    else
-    {
-        var startPosition  = this.baseDrawer.GetPointOnArc(positions[0], positions[1], this.progress);
-        var vectorOffset   = positions[0].subtract(positions[1]).normalizeCopy(progressSize);
+    else {
+        var startPosition = this.baseDrawer.GetPointOnArc(positions[0], positions[1], this.progress);
+        var vectorOffset = positions[0].subtract(positions[1]).normalizeCopy(progressSize);
         var finishPosition = startPosition.add(vectorOffset);
-        
+
         this.context.beginPath();
         this.context.moveTo(startPosition.x, startPosition.y);
         this.context.lineTo(finishPosition.x, finishPosition.y);
@@ -2173,120 +2103,104 @@ ProgressArcDrawer.prototype.Draw = function(baseEdge, arcStyle)
 }
 
 
-function CurvedArcDrawer(context, model)
-{
+function CurvedArcDrawer(context, model) {
     this.context = context;
-    this.model   = model;
+    this.model = model;
 }
 
 CurvedArcDrawer.prototype = Object.create(BaseEdgeDrawer.prototype);
 
-CurvedArcDrawer.prototype.DrawArc = function(position1, position2, arcStyle)
-{
-  this.context.setLineDash(lineDashTypes[arcStyle.lineDash]);
-  if (position1.equals(position2))
-  {
-    this.context.beginPath();
-    this.context.arc(position1.x - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(), 
-                     position1.y - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(), this.model.GetLoopSize(), 0, 2 * Math.PI);
-    this.context.closePath();
-    this.context.stroke();
-  }
-  else
-  {
-    var points = this.model.GetBezierPoints(position1, position2);
-    var firstBezierPoint  = points[0];  
-    var secondBezierPoint = points[1];
-    
-    this.context.beginPath();
-    this.context.moveTo(position1.x, position1.y);
-    this.context.bezierCurveTo(firstBezierPoint.x, firstBezierPoint.y, secondBezierPoint.x, secondBezierPoint.y, position2.x, position2.y);
-    this.context.stroke(); 
-  }
-  this.context.setLineDash([]);
+CurvedArcDrawer.prototype.DrawArc = function (position1, position2, arcStyle) {
+    this.context.setLineDash(lineDashTypes[arcStyle.lineDash]);
+    if (position1.equals(position2)) {
+        this.context.beginPath();
+        this.context.arc(position1.x - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(),
+            position1.y - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize(), this.model.GetLoopSize(), 0, 2 * Math.PI);
+        this.context.closePath();
+        this.context.stroke();
+    }
+    else {
+        var points = this.model.GetBezierPoints(position1, position2);
+        var firstBezierPoint = points[0];
+        var secondBezierPoint = points[1];
+
+        this.context.beginPath();
+        this.context.moveTo(position1.x, position1.y);
+        this.context.bezierCurveTo(firstBezierPoint.x, firstBezierPoint.y, secondBezierPoint.x, secondBezierPoint.y, position2.x, position2.y);
+        this.context.stroke();
+    }
+    this.context.setLineDash([]);
 }
 
-CurvedArcDrawer.prototype.GetStartArrowDiretion = function(position1, position2, lengthArrow) 
-{
+CurvedArcDrawer.prototype.GetStartArrowDiretion = function (position1, position2, lengthArrow) {
     var dist = position1.distance(position2);
     var direction = position1.subtract(this.model.GetCurvedPoint(position1, position2, lengthArrow / dist));
     direction.normalize(1.0);
     return direction;
 }
 
-CurvedArcDrawer.prototype.GetFinishArrowDiretion = function(position1, position2, lengthArrow) 
-{
-    var dist      = position1.distance(position2);
+CurvedArcDrawer.prototype.GetFinishArrowDiretion = function (position1, position2, lengthArrow) {
+    var dist = position1.distance(position2);
     var direction = position2.subtract(this.model.GetCurvedPoint(position1, position2, 1.0 - lengthArrow / dist));
     direction.normalize(1.0);
     return direction;
 }
 
-CurvedArcDrawer.prototype.GetTextCenterPoint = function (position1, position2, hasPair, arcStyle)
-{
-  var centerPoint = this.model.GetCurvedPoint(position1, position2, 0.5)
-  if (position1.equals(position2))
-  {
-    centerPoint.y = centerPoint.y - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
-    centerPoint.x = centerPoint.x - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
-  } 
-    
-  return centerPoint;
+CurvedArcDrawer.prototype.GetTextCenterPoint = function (position1, position2, hasPair, arcStyle) {
+    var centerPoint = this.model.GetCurvedPoint(position1, position2, 0.5)
+    if (position1.equals(position2)) {
+        centerPoint.y = centerPoint.y - Math.cos(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
+        centerPoint.x = centerPoint.x - Math.sin(this.model.GetLoopShiftAngel()) * this.model.GetLoopSize() * 2;
+    }
+
+    return centerPoint;
 }
 
-CurvedArcDrawer.prototype.GetPointOnArc = function (position1, position2, procent)
-{   
-  return this.model.GetCurvedPoint(position1, position2, procent);
+CurvedArcDrawer.prototype.GetPointOnArc = function (position1, position2, procent) {
+    return this.model.GetCurvedPoint(position1, position2, procent);
 }
 /**
  * Graph drawer.
  */
- 
- 
-function CommonBackgroundStyle()
-{
-	this.commonColor   = '#ffffff';
-	this.commonOpacity = 1.0;
+
+
+function CommonBackgroundStyle() {
+    this.commonColor = '#ffffff';
+    this.commonOpacity = 1.0;
 }
 
-CommonBackgroundStyle.prototype.Clear = function ()
-{
-  delete this.commonColor;
-  delete this.commonOpacity;
+CommonBackgroundStyle.prototype.Clear = function () {
+    delete this.commonColor;
+    delete this.commonOpacity;
 }
 
-CommonBackgroundStyle.prototype.ShouldLoad = function (field)
-{
-  return true;
+CommonBackgroundStyle.prototype.ShouldLoad = function (field) {
+    return true;
 }
 
 PrintBackgroundStyle.prototype = Object.create(CommonBackgroundStyle.prototype);
 
-function PrintBackgroundStyle()
-{
-  CommonBackgroundStyle.apply(this, arguments);
+function PrintBackgroundStyle() {
+    CommonBackgroundStyle.apply(this, arguments);
 
-	this.commonColor   = '#ffffff';
-	this.commonOpacity = 1.0;
+    this.commonColor = '#ffffff';
+    this.commonOpacity = 1.0;
 }
 
-function BaseBackgroundDrawer(context)
-{   
-  this.context = context;
+function BaseBackgroundDrawer(context) {
+    this.context = context;
 }
 
-BaseBackgroundDrawer.prototype.Draw = function(style, width, height, position, scale) 
-{
+BaseBackgroundDrawer.prototype.Draw = function (style, width, height, position, scale) {
     var context = this.context;
-    
+
     var rect = new Rect(position, position.add(new Point(width / scale, height / scale)));
-    
+
     context.clearRect(-rect.minPoint.x, -rect.minPoint.y, rect.size().x + 1, rect.size().y + 1);
-    
-    if (style.commonOpacity > 0.0)
-    {
+
+    if (style.commonOpacity > 0.0) {
         context.globalAlpha = style.commonOpacity;
-        context.fillStyle   = style.commonColor;
+        context.fillStyle = style.commonColor;
         context.fillRect(-rect.minPoint.x, -rect.minPoint.y, rect.size().x + 1, rect.size().y + 1);
         context.globalAlpha = 1.0;
     }
@@ -2296,86 +2210,73 @@ BaseBackgroundDrawer.prototype.Draw = function(style, width, height, position, s
  */
 
 // Return list of vertex with connected vertex.
-function getVertexToVertexArray(graph, ignoryDirection)
-{
-	res = {};
+function getVertexToVertexArray(graph, ignoryDirection) {
+    res = {};
 
-	for (var i = 0; i < graph.edges.length; i ++)
-	{
-		edge = graph.edges[i];		
-		if (!res.hasOwnProperty(edge.vertex1.id))
-		{
-			res[edge.vertex1.id] = [];
-		}
-		res[edge.vertex1.id].push(edge.vertex2);
-		if (!edge.isDirect || ignoryDirection)
-		{
-			if (!res.hasOwnProperty(edge.vertex2.id))
-			{
-				res[edge.vertex2.id] = [];
-			}
+    for (var i = 0; i < graph.edges.length; i++) {
+        edge = graph.edges[i];
+        if (!res.hasOwnProperty(edge.vertex1.id)) {
+            res[edge.vertex1.id] = [];
+        }
+        res[edge.vertex1.id].push(edge.vertex2);
+        if (!edge.isDirect || ignoryDirection) {
+            if (!res.hasOwnProperty(edge.vertex2.id)) {
+                res[edge.vertex2.id] = [];
+            }
 
-			res[edge.vertex2.id].push(edge.vertex1);
-		}
-	}
+            res[edge.vertex2.id].push(edge.vertex1);
+        }
+    }
 
-	return res;
+    return res;
 }
 
 // Global array of all algorithms.
-var g_Algorithms   = [];
+var g_Algorithms = [];
 var g_AlgorithmIds = [];
 
 // Call this function to register your factory algoritm.
-function RegisterAlgorithm (factory)
-{
+function RegisterAlgorithm(factory) {
     g_Algorithms.push(factory);
     g_AlgorithmIds.push(factory(null).getId());
 }
 
 // Base algorithm class.
-function BaseAlgorithm (graph, app)
-{
+function BaseAlgorithm(graph, app) {
     this.graph = graph;
     this.app = app;
 }
 
 // @return name of algorthm. For now we supports only 2 locals: "ru" and "en"
-BaseAlgorithm.prototype.getName = function(local)
-{
+BaseAlgorithm.prototype.getName = function (local) {
     return "unknown_name_" + local;
 }
 
 // @return id of algorthm. Please use format: "your id"."algorithm id". Ex. "OlegSh.ConnectedComponent"
-BaseAlgorithm.prototype.getId = function()
-{
+BaseAlgorithm.prototype.getId = function () {
     return "unknown.unknown";
 }
 
 // @return message for user.
-BaseAlgorithm.prototype.getMessage = function(local)
-{
+BaseAlgorithm.prototype.getMessage = function (local) {
     return "unknown_message_" + local;
 }
 
 // calls when user select vertex.
 // @return true if you allow to select this object or false.
-BaseAlgorithm.prototype.selectVertex = function(vertex)
-{
+BaseAlgorithm.prototype.selectVertex = function (vertex) {
     return false;
 }
 
 // calls when user select edge.
 // @return true if you allow to select this object or false.
-BaseAlgorithm.prototype.selectEdge = function(edge)
-{
+BaseAlgorithm.prototype.selectEdge = function (edge) {
     return false;
 }
 
 // user click to workspace.
 // @return true if you allow to deselect all
-BaseAlgorithm.prototype.deselectAll = function()
-{
+BaseAlgorithm.prototype.deselectAll = function () {
     return true;
 }
 
@@ -2383,58 +2284,49 @@ BaseAlgorithm.prototype.deselectAll = function()
 // If result if not ready, please return null.
 // It will be called after each user action.
 // Please return true, if you done.
-BaseAlgorithm.prototype.result = function(resultCallback)
-{
+BaseAlgorithm.prototype.result = function (resultCallback) {
     return null;
 }
 
 // If you no need to get feedback from user, return true.
 // In this case result will calls once.
-BaseAlgorithm.prototype.instance = function()
-{
+BaseAlgorithm.prototype.instance = function () {
     return true;
 }
 
 // @return false, if you change up text and do not want to restore it back.
-BaseAlgorithm.prototype.needRestoreUpText = function()
-{
+BaseAlgorithm.prototype.needRestoreUpText = function () {
     return true;
 }
 
 // @return true, if you change resotry graph after use.
-BaseAlgorithm.prototype.wantRestore = function()
-{
+BaseAlgorithm.prototype.wantRestore = function () {
     return false;
 }
 
 // calls this method if wantRestore return true.
-BaseAlgorithm.prototype.restore = function()
-{
+BaseAlgorithm.prototype.restore = function () {
 }
 
 // @return 0, if object is not selected, in other case return groupe of selection.
-BaseAlgorithm.prototype.getObjectSelectedGroup = function(object)
-{
+BaseAlgorithm.prototype.getObjectSelectedGroup = function (object) {
     return 0;
 }
 
 // This methos is called, when messages was updated on html page.
-BaseAlgorithm.prototype.messageWasChanged = function() {}
+BaseAlgorithm.prototype.messageWasChanged = function () { }
 
 // Algorithm priority in menu
-BaseAlgorithm.prototype.getPriority = function()
-{
+BaseAlgorithm.prototype.getPriority = function () {
     return 0;
 }
 
 // Algorithm support multi graph
-BaseAlgorithm.prototype.IsSupportMultiGraph = function()
-{
+BaseAlgorithm.prototype.IsSupportMultiGraph = function () {
     return false;
 }
 
-BaseAlgorithm.prototype.getCategory = function()
-{
+BaseAlgorithm.prototype.getCategory = function () {
     return 0;
 }
 
@@ -2443,18 +2335,16 @@ BaseAlgorithm.prototype.getCategory = function()
  * Select using mouse, drag.
  *
  */
-function BaseAlgorithmEx(graph, app)
-{
+function BaseAlgorithmEx(graph, app) {
     BaseAlgorithm.apply(this, arguments);
 }
 
 // inheritance.
 BaseAlgorithmEx.prototype = Object.create(BaseAlgorithm.prototype);
 
-BaseAlgorithmEx.prototype.CalculateAlgorithm = function(algorithmName, otherParams, resultCallback, ignoreSeparateNodes = false)
-{
+BaseAlgorithmEx.prototype.CalculateAlgorithm = function (algorithmName, otherParams, resultCallback, ignoreSeparateNodes = false) {
     if (location.hostname === "localhost" || location.hostname === "127.0.0.1")
-      console.log(algorithmName + " " + otherParams);
+        console.log(algorithmName + " " + otherParams);
 
     var graph = this.graph;
     var ignoreNodes = {};
@@ -2468,99 +2358,93 @@ BaseAlgorithmEx.prototype.CalculateAlgorithm = function(algorithmName, otherPara
     var pathObjects = [];
     var properties = {};
     var result = [];
-    
+
     var xml = creator.GetXMLString();
     console.log(xml);
 
     var processResult = function (msg) {
         console.log(msg);
         $('#debug').text(msg);
-        xmlDoc = $.parseXML( msg );
-        var $xml = $( xmlDoc );
-        
-        $results = $xml.find( "result" );
-        
-        $results.each(function(){
-                    $values = $(this).find( "value" );
-                    
-                    $values.each(function(){
-                                var type  = $(this).attr('type');
-                                var value = $(this).text();
-                                var res = {};
-                                res.type = type;
-                                res.value = value;
-                                result.push(res);
-                                });
-                    });
-        
-        $nodes = $xml.find( "node" );
-        
-        $nodes.each(function(){
-                    var id = $(this).attr('id');
-                    $data = $(this).find("data");
-                    $data.each(function(){
-                                if ("hightlightNode" == $(this).attr('key') && $(this).text() == "1")
-                                {
-                                    pathObjects.push(graph.FindVertex(id));
-                                }
-                                else
-                                {
-                                    if (!properties[id])
-                                    {
-                                        properties[id] = {};
-                                    }
-                                    properties[id][$(this).attr('key')] = $(this).text();
-                                }
-                                });
-                    });
-        
-        $edges = $xml.find( "edge" );
-        
-        $edges.each(function(){
-                        var source = $(this).attr('source');
-                        var target = $(this).attr('target');
-                        var edge = graph.FindEdge(source, target);
-                        if (typeof $(this).attr('id') !== 'undefined')
-                        {
-                            edge = graph.FindEdgeById($(this).attr('id'));
-                        }
-                        pathObjects.push(edge);
-            
-                        $data = $(this).find("data");
-                        $data.each(function(){
-                            if (!properties[edge.id])
-                            {
-                                properties[edge.id] = {};
-                            }
-                            properties[edge.id][$(this).attr('key')] = $(this).text();
-                        });
-                    });
-        
+        xmlDoc = $.parseXML(msg);
+        var $xml = $(xmlDoc);
+
+        $results = $xml.find("result");
+
+        $results.each(function () {
+            $values = $(this).find("value");
+
+            $values.each(function () {
+                var type = $(this).attr('type');
+                var value = $(this).text();
+                var res = {};
+                res.type = type;
+                res.value = value;
+                result.push(res);
+            });
+        });
+
+        $nodes = $xml.find("node");
+
+        $nodes.each(function () {
+            var id = $(this).attr('id');
+            $data = $(this).find("data");
+            $data.each(function () {
+                if ("hightlightNode" == $(this).attr('key') && $(this).text() == "1") {
+                    pathObjects.push(graph.FindVertex(id));
+                }
+                else {
+                    if (!properties[id]) {
+                        properties[id] = {};
+                    }
+                    properties[id][$(this).attr('key')] = $(this).text();
+                }
+            });
+        });
+
+        $edges = $xml.find("edge");
+
+        $edges.each(function () {
+            var source = $(this).attr('source');
+            var target = $(this).attr('target');
+            var edge = graph.FindEdge(source, target);
+            if (typeof $(this).attr('id') !== 'undefined') {
+                edge = graph.FindEdgeById($(this).attr('id'));
+            }
+            pathObjects.push(edge);
+
+            $data = $(this).find("data");
+            $data.each(function () {
+                if (!properties[edge.id]) {
+                    properties[edge.id] = {};
+                }
+                properties[edge.id][$(this).attr('key')] = $(this).text();
+            });
+        });
+
         console.log(result);
-        
+
         resultCallback(pathObjects, properties, result);
     };
 
     if (this.app.isSupportEmscripten()) {
         console.log("Use Emscripten");
         var delimiter = "<s\\emscript_split\\s>";
-        var processData = algorithmName + delimiter + xml + 
-                          delimiter + "report" + delimiter + "xml";
-        otherParams.forEach ( (param) => processData += delimiter + param.name + delimiter + param.value);
+        var processData = algorithmName + delimiter + xml +
+            delimiter + "report" + delimiter + "xml";
+        otherParams.forEach((param) => processData += delimiter + param.name + delimiter + param.value);
         var res = this.app.processEmscripten(processData);
         processResult(res);
     } else {
         console.log("Use new CGI");
         var queryString = algorithmName + "=cgiInput&report=xml";
-        otherParams.forEach ( (param) => queryString += "&" + param.name + "=" + param.value);
+        otherParams.forEach((param) => queryString += "&" + param.name + "=" + param.value);
         $.ajax({
             type: "POST",
             url: "/" + SiteDir + "cgi-bin/GraphCGI.exe?" + queryString,
             data: xml,
             dataType: "text",
-            })
-        .done(function( msg )
-            {
+        })
+            .done(function (msg) {
                 processResult(msg);
             });
     }
@@ -2568,26 +2452,20 @@ BaseAlgorithmEx.prototype.CalculateAlgorithm = function(algorithmName, otherPara
     return true;
 }
 
-BaseAlgorithmEx.prototype.GetNodesPath = function(array, start, count)
-{
+BaseAlgorithmEx.prototype.GetNodesPath = function (array, start, count) {
     var res = [];
-    for (var index = start; index < start + count; index++)
-    {
-        if (array[index].type == 4)
-        {
+    for (var index = start; index < start + count; index++) {
+        if (array[index].type == 4) {
             res.push(array[index].value);
         }
     }
     return res;
 }
 
-BaseAlgorithmEx.prototype.GetNodesEdgesPath = function(array, start, count)
-{
+BaseAlgorithmEx.prototype.GetNodesEdgesPath = function (array, start, count) {
     var res = [];
-    for (var index = start; index < start + count; index++)
-    {
-        if (array[index].type == 4 || array[index].type == 5)
-        {
+    for (var index = start; index < start + count; index++) {
+        if (array[index].type == 4 || array[index].type == 5) {
             res.push(array[index].value);
         }
     }
@@ -2606,12 +2484,11 @@ BaseAlgorithmEx.prototype.GetNodesEdgesPath = function(array, start, count)
  * Base Handler.
  *
  */
- 
-function BaseHandler(app)
-{
-	this.app = app;
+
+function BaseHandler(app) {
+    this.app = app;
     this.app.setRenderPath([]);
-    
+
     if (this.removeStack) {
         this.removeContextMenu();
     }
@@ -2623,92 +2500,79 @@ function BaseHandler(app)
 
 // Need redraw or nor.
 BaseHandler.prototype.needRedraw = false;
-BaseHandler.prototype.objects    = [];
-BaseHandler.prototype.message    = "";
+BaseHandler.prototype.objects = [];
+BaseHandler.prototype.message = "";
 
 
-BaseHandler.prototype.IsNeedRedraw = function(object)
-{
-	return this.needRedraw;
+BaseHandler.prototype.IsNeedRedraw = function (object) {
+    return this.needRedraw;
 }
 
-BaseHandler.prototype.RestRedraw = function(object)
-{
-	this.needRedraw = false;
+BaseHandler.prototype.RestRedraw = function (object) {
+    this.needRedraw = false;
 }
 
-BaseHandler.prototype.SetObjects = function(objects)
-{
-	this.objects = objects;
+BaseHandler.prototype.SetObjects = function (objects) {
+    this.objects = objects;
 }
 
-BaseHandler.prototype.GetSelectedGraph = function(pos)
-{
-	// Selected Graph.
+BaseHandler.prototype.GetSelectedGraph = function (pos) {
+    // Selected Graph.
     var res = null;
-    for (var i = 0; i < this.app.graph.vertices.length; i ++)
-    {
-		if (this.app.graph.vertices[i].HitTest(pos))
-		{
+    for (var i = 0; i < this.app.graph.vertices.length; i++) {
+        if (this.app.graph.vertices[i].HitTest(pos)) {
             // Select last of them.
             res = this.app.graph.vertices[i];
-		}
-	}
+        }
+    }
 
-	
-	return res;
+
+    return res;
 }
 
-BaseHandler.prototype.GetSelectedArc = function(pos)
-{
-	// Selected Arc.
-    for (var i = 0; i < this.app.graph.edges.length; i ++)
-    {
+BaseHandler.prototype.GetSelectedArc = function (pos) {
+    // Selected Arc.
+    for (var i = 0; i < this.app.graph.edges.length; i++) {
         var edge = this.app.graph.edges[i];
-        
+
         if (edge.HitTest(new Point(pos.x, pos.y)))
             return edge;
-	}
-	
-	return null;
+    }
+
+    return null;
 }
 
-BaseHandler.prototype.GetSelectedObject = function(pos)
-{
-	var graphObject = this.GetSelectedGraph(pos);
-	if (graphObject)
-	{
-		return graphObject;
-	}
-	
-	var arcObject = this.GetSelectedArc(pos);
-	if (arcObject)
-	{
-		return arcObject;
-	}
-	
-	return null;
+BaseHandler.prototype.GetSelectedObject = function (pos) {
+    var graphObject = this.GetSelectedGraph(pos);
+    if (graphObject) {
+        return graphObject;
+    }
+
+    var arcObject = this.GetSelectedArc(pos);
+    if (arcObject) {
+        return arcObject;
+    }
+
+    return null;
 }
 
 
-BaseHandler.prototype.GetUpText = function(object)
-{
-	return "";
+BaseHandler.prototype.GetUpText = function (object) {
+    return "";
 }
 
 
-BaseHandler.prototype.GetMessage = function()
-{
-	return this.message;
+BaseHandler.prototype.GetMessage = function () {
+    return this.message;
 }
 
-function listResoures(mouseoverObject){
+function listResoures(mouseoverObject) {
     var infoResources = document.getElementById('info-resources')
     infoResources.innerHTML = ''
-    mouseoverObject.nodeInfo.resources = mouseoverObject.nodeInfo.resources.filter(function(el){
+    mouseoverObject.nodeInfo.resources = mouseoverObject.nodeInfo.resources.filter(function (el) {
         return el.link != '' || el.description != '';
     })
-    mouseoverObject.nodeInfo.resources.forEach(function(item, index){
+    mouseoverObject.nodeInfo.resources.forEach(function (item, index) {
         const aChild = document.createElement('a');
         aChild.href = item.link;
         aChild.target = '_blank'
@@ -2717,20 +2581,20 @@ function listResoures(mouseoverObject){
 
         const inputChild = document.createElement('input');
         inputChild.value = item.link;
-        inputChild.onchange = function(ev){
+        inputChild.onchange = function (ev) {
             item.link = inputChild.value;
             aChild.href = item.link;
-            if(inputChild.value.indexOf('youtube.com') != -1){
+            if (inputChild.value.indexOf('youtube.com') != -1) {
                 var apiKey = '';
-                apiKey = "AIzaSyD8mjjKuMprrGJjb3ZbZn7G5hS12_BsfzU";   
+                apiKey = "AIzaSyD8mjjKuMprrGJjb3ZbZn7G5hS12_BsfzU";
                 const youtubeID = inputChild.value.split('v=')[1].split('&')[0]
                 const query = `https://www.googleapis.com/youtube/v3/videos?id=${youtubeID}&key=${apiKey}&part=snippet`
                 console.log(query)
                 var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function(){
-                    if(this.readyState == 4){
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
                         const obj = JSON.parse(xhttp.responseText);
-                        if(/^\d+$/.test(mouseoverObject.nodeInfo.title)){
+                        if (/^\d+$/.test(mouseoverObject.nodeInfo.title)) {
                             mouseoverObject.nodeInfo.title = obj.items[0].snippet.title;
                             document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
                         }
@@ -2739,7 +2603,7 @@ function listResoures(mouseoverObject){
                         autosaveXML();
                     }
                 }
-                xhttp.open("GET",query,true);
+                xhttp.open("GET", query, true);
                 xhttp.send();
             }
             autosaveXML();
@@ -2750,7 +2614,7 @@ function listResoures(mouseoverObject){
         textareaChild.value = item.description;
         textareaChild.style = "width:100%; resize:vertical;"
         textareaChild.rows = 4
-        textareaChild.onchange = function(ev){
+        textareaChild.onchange = function (ev) {
             item.description = textareaChild.value;
             autosaveXML();
         }
@@ -2787,111 +2651,93 @@ function listResoures(mouseoverObject){
     autosaveXML();
 }
 
-BaseHandler.prototype.MouseMove = function(pos) {}
+BaseHandler.prototype.MouseMove = function (pos) { }
 
-BaseHandler.prototype.MouseDown = function(pos) {}
+BaseHandler.prototype.MouseDown = function (pos) { }
 
-BaseHandler.prototype.MouseUp   = function(pos) {}
+BaseHandler.prototype.MouseUp = function (pos) { }
 
-BaseHandler.prototype.GetSelectedGroup = function(object) {
-	return 0;
+BaseHandler.prototype.GetSelectedGroup = function (object) {
+    return 0;
 }
 
-BaseHandler.prototype.InitControls = function() 
-{
+BaseHandler.prototype.InitControls = function () {
     var vertex1Text = document.getElementById("Vertex1");
-    if (vertex1Text)
-    {
+    if (vertex1Text) {
         var handler = this;
         vertex1Text.onchange = function () {
-           for (var i = 0; i < handler.app.graph.vertices.length; i++)
-           {   
-               if (handler.app.graph.vertices[i].mainText == vertex1Text.value)
-               {
-	               handler.SelectFirstVertexMenu(vertex1Text, handler.app.graph.vertices[i]);
-                   break;
-               }
-           }
+            for (var i = 0; i < handler.app.graph.vertices.length; i++) {
+                if (handler.app.graph.vertices[i].mainText == vertex1Text.value) {
+                    handler.SelectFirstVertexMenu(vertex1Text, handler.app.graph.vertices[i]);
+                    break;
+                }
+            }
         };
-        
+
         this.UpdateFirstVertexMenu(vertex1Text);
     }
-    
+
     var vertex2Text = document.getElementById("Vertex2");
-    if (vertex2Text)
-    {
+    if (vertex2Text) {
         var handler = this;
         vertex2Text.onchange = function () {
-           for (var i = 0; i < handler.app.graph.vertices.length; i++)
-           {   
-               if (handler.app.graph.vertices[i].mainText == vertex2Text.value)
-               {
-	               handler.SelectSecondVertexMenu(vertex2Text, handler.app.graph.vertices[i]);
-                   break;
-               }
-           }
+            for (var i = 0; i < handler.app.graph.vertices.length; i++) {
+                if (handler.app.graph.vertices[i].mainText == vertex2Text.value) {
+                    handler.SelectSecondVertexMenu(vertex2Text, handler.app.graph.vertices[i]);
+                    break;
+                }
+            }
         };
-        
+
         this.UpdateSecondVertexMenu(vertex2Text);
     }
 }
 
-BaseHandler.prototype.GetNodesPath = function(array, start, count)
-{
+BaseHandler.prototype.GetNodesPath = function (array, start, count) {
     var res = [];
-    for (var index = start; index < start + count; index++)
-    {
+    for (var index = start; index < start + count; index++) {
         res.push(this.app.graph.FindVertex(array[index].value));
     }
     return res;
 }
 
-BaseHandler.prototype.RestoreAll = function() {
+BaseHandler.prototype.RestoreAll = function () {
 }
 
-BaseHandler.prototype.GetSelectVertexMenu = function(menuName)
-{
-	var res = "<input list=\"vertexList" + menuName + "\" id=\"" + menuName + "\" class=\"SelectVertexInput\"/>" + 
-      "<datalist id=\"vertexList" + menuName + "\">";
-    
-	for (var i = 0; i < this.app.graph.vertices.length; i++)
-	{
-		res = res + "<option value=\"" + this.app.graph.vertices[i].mainText + "\"/>";
-	}
-    
+BaseHandler.prototype.GetSelectVertexMenu = function (menuName) {
+    var res = "<input list=\"vertexList" + menuName + "\" id=\"" + menuName + "\" class=\"SelectVertexInput\"/>" +
+        "<datalist id=\"vertexList" + menuName + "\">";
+
+    for (var i = 0; i < this.app.graph.vertices.length; i++) {
+        res = res + "<option value=\"" + this.app.graph.vertices[i].mainText + "\"/>";
+    }
+
     return res + "</datalist>";
 }
 
-BaseHandler.prototype.GetSelect2VertexMenu = function()
-{
-    return "<span style=\"float:right\">" + 
+BaseHandler.prototype.GetSelect2VertexMenu = function () {
+    return "<span style=\"float:right\">" +
         this.GetSelectVertexMenu("Vertex1") + " &rarr; " + this.GetSelectVertexMenu("Vertex2") + "</span>";
 }
 
-BaseHandler.prototype.SelectFirstVertexMenu = function(vertex1Text, vertex)
-{}
+BaseHandler.prototype.SelectFirstVertexMenu = function (vertex1Text, vertex) { }
 
-BaseHandler.prototype.UpdateFirstVertexMenu = function()
-{}
+BaseHandler.prototype.UpdateFirstVertexMenu = function () { }
 
-BaseHandler.prototype.SelectSecondVertexMenu = function(vertex2Text, vertex)
-{}
+BaseHandler.prototype.SelectSecondVertexMenu = function (vertex2Text, vertex) { }
 
-BaseHandler.prototype.UpdateSecondVertexMenu = function()
-{}
+BaseHandler.prototype.UpdateSecondVertexMenu = function () { }
 
-BaseHandler.prototype.GetSelectedVertex = function()
-{
+BaseHandler.prototype.GetSelectedVertex = function () {
     return null;
 }
 
-BaseHandler.prototype.addContextMenu = function()
-{
+BaseHandler.prototype.addContextMenu = function () {
     var $contextMenu = $("#contextMenu");
 
     var handler = this;
-    
-    $("#Context_Delete").click(function() {
+
+    $("#Context_Delete").click(function () {
         if (handler.contextMenuObject != null) {
             handler.app.PushToStack("DeleteObject");
             handler.app.DeleteObject(handler.contextMenuObject);
@@ -2900,23 +2746,23 @@ BaseHandler.prototype.addContextMenu = function()
         }
     });
 
-    $("#Context_Rename").click(function() {
+    $("#Context_Rename").click(function () {
         if (handler.contextMenuObject != null) {
             var callback = function (enumType) {
                 handler.RenameVertex(enumType.GetVertexText(0), handler.contextMenuObject);
                 userAction("RenameVertex_contextMenu");
-            };            
-            var customEnum =  new TextEnumVertexsCustom(handler.app);
-            customEnum.ShowDialog(callback, g_rename,  g_renameVertex, handler.contextMenuObject.mainText);
+            };
+            var customEnum = new TextEnumVertexsCustom(handler.app);
+            customEnum.ShowDialog(callback, g_rename, g_renameVertex, handler.contextMenuObject.mainText);
         }
     });
 
-    $("#Context_Connect").click(function() {
+    $("#Context_Connect").click(function () {
         if (handler.contextMenuObject != null && handler.GetSelectedVertex() != null) {
-            var addFunc = function(firstVertex, secondVertex, direct) {
-                handler.app.CreateNewArc(firstVertex, secondVertex, direct, 
-                    document.getElementById('EdgeWeight').value, 
-                    $("#RadiosReplaceEdge").prop("checked"), 
+            var addFunc = function (firstVertex, secondVertex, direct) {
+                handler.app.CreateNewArc(firstVertex, secondVertex, direct,
+                    document.getElementById('EdgeWeight').value,
+                    $("#RadiosReplaceEdge").prop("checked"),
                     document.getElementById('EdgeLable').value);
                 handler.app.redrawGraph();
             }
@@ -2924,7 +2770,7 @@ BaseHandler.prototype.addContextMenu = function()
         }
     });
 
-    $("#Context_Delete_Edge").click(function() {
+    $("#Context_Delete_Edge").click(function () {
         if (handler.contextMenuObject != null) {
             handler.app.PushToStack("DeleteObject");
             handler.app.DeleteObject(handler.contextMenuObject);
@@ -2932,39 +2778,39 @@ BaseHandler.prototype.addContextMenu = function()
             userAction("DeleteObject_contextMenu");
         }
     });
-    
-    $("#Context_Edit_Edge").click(function() {
+
+    $("#Context_Edit_Edge").click(function () {
         if (handler.contextMenuObject != null) {
             handler.ShowEditEdgeDialog(handler.contextMenuObject);
         }
     });
 
-    $("#Context_Add_Vertex").click(function() {
+    $("#Context_Add_Vertex").click(function () {
         handler.app.PushToStack("Add");
         handler.app.CreateNewGraph(handler.contextMenuPoint.x, handler.contextMenuPoint.y);
         handler.app.redrawGraph();
     });
-    
-    $("#Context_Back_Color").click(function() {
+
+    $("#Context_Back_Color").click(function () {
         var setupBackgroundStyle = new SetupBackgroundStyle(handler.app);
-		setupBackgroundStyle.show();
+        setupBackgroundStyle.show();
     });
 
-    $("body").on("contextmenu", "canvas", function(e) {
-        handler.contextMenuPoint = {x: e.offsetX, y: e.offsetY};
+    $("body").on("contextmenu", "canvas", function (e) {
+        handler.contextMenuPoint = { x: e.offsetX, y: e.offsetY };
         handler.contextMenuObject = handler.GetSelectedObject(handler.contextMenuPoint);
         if (handler.contextMenuObject instanceof BaseVertex) {
             $("#edgeContextMenu").hide();
-            $("#backgroundContextMenu").hide();    
+            $("#backgroundContextMenu").hide();
             $("#vertexContextMenu").show();
-            if (handler.GetSelectedVertex() == null)  {
+            if (handler.GetSelectedVertex() == null) {
                 $("#Context_Connect").hide();
             } else {
                 $("#Context_Connect").show();
             }
         } else if (handler.contextMenuObject instanceof BaseEdge) {
             $("#vertexContextMenu").hide();
-            $("#backgroundContextMenu").hide();    
+            $("#backgroundContextMenu").hide();
             $("#edgeContextMenu").show();
         } else {
             $("#vertexContextMenu").hide();
@@ -2980,86 +2826,82 @@ BaseHandler.prototype.addContextMenu = function()
         return false;
     });
 
-    $("body").click(function() {
+    $("body").click(function () {
         $contextMenu.hide();
-    });    
+    });
 }
 
-BaseHandler.prototype.removeContextMenu = function()
-{
+BaseHandler.prototype.removeContextMenu = function () {
     $("body").off("contextmenu");
     $("#Context_Delete").off("click");
     $("#Context_Rename").off("click");
-    $("#Context_Connect").off("click");    
-    $("#Context_Delete_Edge").off("click");  
-    $("#Context_Edit_Edge").off("click"); 
-    $("#Context_Add_Vertex").off("click"); 
-    $("#Context_Back_Color").off("click");    
+    $("#Context_Connect").off("click");
+    $("#Context_Delete_Edge").off("click");
+    $("#Context_Edit_Edge").off("click");
+    $("#Context_Add_Vertex").off("click");
+    $("#Context_Back_Color").off("click");
 }
 
-BaseHandler.prototype.RenameVertex = function(text, object)
-{
-    if (object != null && (object instanceof BaseVertex))
-    {
+BaseHandler.prototype.RenameVertex = function (text, object) {
+    if (object != null && (object instanceof BaseVertex)) {
         this.app.PushToStack("RenameVertex");
         object.mainText = text;
         this.app.redrawGraph();
     }
 }
 
-BaseHandler.prototype.ShowCreateEdgeDialog = function(firstVertex, secondVertex, addEdgeCallBack) {
-    this.app.PushToStack("Connect");                
+BaseHandler.prototype.ShowCreateEdgeDialog = function (firstVertex, secondVertex, addEdgeCallBack) {
+    this.app.PushToStack("Connect");
     addEdgeCallBack(firstVertex, secondVertex, true);
 }
 
-BaseHandler.prototype.ShowEditEdgeDialog = function(edgeObject) {
+BaseHandler.prototype.ShowEditEdgeDialog = function (edgeObject) {
     var dialogButtons = {};
 
     var handler = this;
 
-    dialogButtons[g_save] = function() {
+    dialogButtons[g_save] = function () {
         handler.app.PushToStack("ChangeEdge");
 
         edgeObject.SetWeight(document.getElementById('EdgeWeight').value);
         edgeObject.SetUpText(document.getElementById('EdgeLable').value);
-            
+
         handler.needRedraw = true;
         handler.app.redrawGraph();
 
         userAction("ChangeWeight");
-        $( this ).dialog( "close" );
+        $(this).dialog("close");
     };
 
-    document.getElementById('EdgeWeight').value       = edgeObject.useWeight ? edgeObject.weight : g_noWeight;
+    document.getElementById('EdgeWeight').value = edgeObject.useWeight ? edgeObject.weight : g_noWeight;
     document.getElementById('EdgeWeightSlider').value = edgeObject.useWeight ? edgeObject.weight : 0;
 
     var edgePresets = handler.app.GetEdgePresets();
-    var presetsStr  = "<span onClick=\"document.getElementById('EdgeWeight').value='" + g_DefaultWeightPreset + "'; document.getElementById('EdgeWeightSlider').value='" +
+    var presetsStr = "<span onClick=\"document.getElementById('EdgeWeight').value='" + g_DefaultWeightPreset + "'; document.getElementById('EdgeWeightSlider').value='" +
         g_DefaultWeightPreset + "';\" style=\"cursor: pointer\" class=\"defaultWeigth\">" + g_DefaultWeightPreset + "</span>";
 
-    for(var i = 0; i < edgePresets.length; i ++) 
-    {
+    for (var i = 0; i < edgePresets.length; i++) {
         var edgePreset = edgePresets[i];
-        presetsStr += "<span onClick=\"document.getElementById('EdgeWeight').value='" + edgePreset + "'; document.getElementById('EdgeWeightSlider').value=" + 
+        presetsStr += "<span onClick=\"document.getElementById('EdgeWeight').value='" + edgePreset + "'; document.getElementById('EdgeWeightSlider').value=" +
             edgePreset + ";\" style=\"cursor: pointer\" class=\"defaultWeigth\">" + edgePreset + "</span>";
-    }        
+    }
     document.getElementById("EdgesPresets").innerHTML = presetsStr;
     document.getElementById('EdgeLable').value = edgeObject.upText;
 
-    $( "#addEdge" ).dialog({
+    $("#addEdge").dialog({
         resizable: false,
         height: "auto",
-        width:  "auto",
+        width: "auto",
         modal: true,
         title: g_editWeight,
         buttons: dialogButtons,
         dialogClass: 'EdgeDialog',
         open: function () {
-        $(handler).off('submit').on('submit', function () {
-                                    return false;
-                                    });
+            $(handler).off('submit').on('submit', function () {
+                return false;
+            });
         }
-        });
+    });
 }
 
 /**
@@ -3067,19 +2909,18 @@ BaseHandler.prototype.ShowEditEdgeDialog = function(edgeObject) {
  * Select using mouse, drag.
  *
  */
-function DefaultHandler(app)
-{
+function DefaultHandler(app) {
     this.removeStack = true;
-	BaseHandler.apply(this, arguments);
-	this.message = g_textsSelectAndMove + " <span class=\"hidden-phone\">" + g_selectGroupText + "</span>" + " <span class=\"hidden-phone\">" + g_useContextMenuText + "</span>";
-        this.selectedObjects = [];
-        this.dragObject     = null;
-        this.selectedObject = null;
-	this.prevPosition   = null;
+    BaseHandler.apply(this, arguments);
+    this.message = g_textsSelectAndMove + " <span class=\"hidden-phone\">" + g_selectGroupText + "</span>" + " <span class=\"hidden-phone\">" + g_useContextMenuText + "</span>";
+    this.selectedObjects = [];
+    this.dragObject = null;
+    this.selectedObject = null;
+    this.prevPosition = null;
     this.groupingSelect = false;
-    this.selectedLogRect    = false;
-    this.selectedLogCtrl    = false;
-    this.saveUndo    = false;
+    this.selectedLogRect = false;
+    this.selectedLogCtrl = false;
+    this.saveUndo = false;
 
     this.addContextMenu();
 }
@@ -3089,236 +2930,213 @@ DefaultHandler.prototype = Object.create(BaseHandler.prototype);
 // Is pressed
 DefaultHandler.prototype.pressed = false;
 // Cuvled change value.
-DefaultHandler.prototype.curvedValue    = 0.1;
+DefaultHandler.prototype.curvedValue = 0.1;
 
-DefaultHandler.prototype.GetSelectedVertex = function()
-{
+DefaultHandler.prototype.GetSelectedVertex = function () {
     return (this.selectedObject instanceof BaseVertex) ? this.selectedObject : null;
 }
 
-DefaultHandler.prototype.MouseMove = function(pos) 
-{
-	if (this.dragObject)
-	{
-        if (!this.saveUndo)
-        {
+DefaultHandler.prototype.MouseMove = function (pos) {
+    if (this.dragObject) {
+        if (!this.saveUndo) {
             this.app.PushToStack("Move");
             this.saveUndo = true;
         }
 
-                this.dragObject.position.x = pos.x;
-                this.dragObject.position.y = pos.y;
-		this.needRedraw = true;
-	}
-        else if (this.selectedObjects.length > 0 && this.pressed && !this.groupingSelect)
-        {
-            if (!this.saveUndo)
-            {
-                this.app.PushToStack("Move");
-                this.saveUndo = true;
+        this.dragObject.position.x = pos.x;
+        this.dragObject.position.y = pos.y;
+        this.needRedraw = true;
+    }
+    else if (this.selectedObjects.length > 0 && this.pressed && !this.groupingSelect) {
+        if (!this.saveUndo) {
+            this.app.PushToStack("Move");
+            this.saveUndo = true;
+        }
+
+        var offset = (new Point(pos.x, pos.y)).subtract(this.prevPosition);
+        for (var i = 0; i < this.selectedObjects.length; i++) {
+            var object = this.selectedObjects[i];
+            if (object instanceof BaseVertex) {
+                object.position = object.position.add(offset);
             }
-    
-                var offset = (new Point(pos.x, pos.y)).subtract(this.prevPosition);
-                for (var i = 0; i < this.selectedObjects.length; i ++)
-                {
-                  var object = this.selectedObjects[i];
-                  if (object instanceof BaseVertex)
-                  {
-                    object.position = object.position.add(offset);
-                  }
-                }
-                this.prevPosition = pos;
-		this.needRedraw = true;         
         }
-        else if (this.pressed)
-        {
-          if (this.groupingSelect) 
-          {
-               // Rect select.
-               var newPos = new Point(pos.x, pos.y);
-               this.app.SetSelectionRect(new Rect(newPos.min(this.prevPosition), newPos.max(this.prevPosition)));
-               this.SelectObjectInRect(this.app.GetSelectionRect());    
-               this.needRedraw = true;
-               if (!this.selectedLogRect)
-               {
-                 userAction("GroupSelected.SelectRect");
-                 this.selectedLogRect = true;
-               }
-          }
-          else
-          {
-                // Move work space
-                this.app.onCanvasMove((new Point(pos.x, pos.y)).subtract(this.prevPosition).multiply(this.app.canvasScale));
-                this.needRedraw = true;
-          }
+        this.prevPosition = pos;
+        this.needRedraw = true;
+    }
+    else if (this.pressed) {
+        if (this.groupingSelect) {
+            // Rect select.
+            var newPos = new Point(pos.x, pos.y);
+            this.app.SetSelectionRect(new Rect(newPos.min(this.prevPosition), newPos.max(this.prevPosition)));
+            this.SelectObjectInRect(this.app.GetSelectionRect());
+            this.needRedraw = true;
+            if (!this.selectedLogRect) {
+                userAction("GroupSelected.SelectRect");
+                this.selectedLogRect = true;
+            }
         }
+        else {
+            // Move work space
+            this.app.onCanvasMove((new Point(pos.x, pos.y)).subtract(this.prevPosition).multiply(this.app.canvasScale));
+            this.needRedraw = true;
+        }
+    }
 }
 
-DefaultHandler.prototype.MouseDown = function(pos)
-{
-	this.dragObject     = null;
-	var selectedObject = this.GetSelectedObject(pos);
-	var severalSelect  = g_ctrlPressed;
+DefaultHandler.prototype.MouseDown = function (pos) {
+    this.dragObject = null;
+    var selectedObject = this.GetSelectedObject(pos);
+    var severalSelect = g_ctrlPressed;
 
-	if (selectedObject == null || (!severalSelect && !this.selectedObjects.includes(selectedObject)))
-    {
-  	      this.selectedObject = null;
-          this.selectedObjects = [];
-          this.groupingSelect = g_ctrlPressed;
-    }        
+    if (selectedObject == null || (!severalSelect && !this.selectedObjects.includes(selectedObject))) {
+        this.selectedObject = null;
+        this.selectedObjects = [];
+        this.groupingSelect = g_ctrlPressed;
+    }
 
-        if ((severalSelect || this.selectedObjects.includes(selectedObject)) && (this.selectedObjects.length > 0 || this.selectedObject != null) && selectedObject != null) 
-        {
-          if (this.selectedObjects.length == 0)
-          {
+    if ((severalSelect || this.selectedObjects.includes(selectedObject)) && (this.selectedObjects.length > 0 || this.selectedObject != null) && selectedObject != null) {
+        if (this.selectedObjects.length == 0) {
             this.selectedObjects.push(this.selectedObject);
             this.selectedObject = null;
             this.selectedObjects.push(selectedObject);
-          }
-          else if (!this.selectedObjects.includes(selectedObject))
-          {
+        }
+        else if (!this.selectedObjects.includes(selectedObject)) {
             this.selectedObjects.push(selectedObject);
-          }
-          else if (severalSelect && this.selectedObjects.includes(selectedObject))
-          {
+        }
+        else if (severalSelect && this.selectedObjects.includes(selectedObject)) {
             var index = this.selectedObjects.indexOf(selectedObject);
             this.selectedObjects.splice(index, 1);
-          }
-          if (!this.selectedLogCtrl)
-          {
+        }
+        if (!this.selectedLogCtrl) {
             userAction("GroupSelected.SelectCtrl");
             this.selectedLogCtrl = true;
-          }
         }
-        else {
-            if (selectedObject != null) {
-                this.selectedObject = selectedObject;
-            }
-            if ((selectedObject instanceof BaseVertex) && selectedObject != null) {
-                this.dragObject = selectedObject;
-                this.message = g_moveCursorForMoving;
-            }
+    }
+    else {
+        if (selectedObject != null) {
+            this.selectedObject = selectedObject;
         }
-	this.needRedraw = true;
-	this.pressed    = true;
-	this.prevPosition = pos;
-	this.app.canvas.style.cursor = "move";
+        if ((selectedObject instanceof BaseVertex) && selectedObject != null) {
+            this.dragObject = selectedObject;
+            this.message = g_moveCursorForMoving;
+        }
+    }
+    this.needRedraw = true;
+    this.pressed = true;
+    this.prevPosition = pos;
+    this.app.canvas.style.cursor = "move";
 }
 
-DefaultHandler.prototype.MouseUp = function(pos) 
-{
+DefaultHandler.prototype.MouseUp = function (pos) {
     this.saveUndo = false;
-	this.message = g_textsSelectAndMove + " <span class=\"hidden-phone\">" + g_selectGroupText + "</span>" + " <span class=\"hidden-phone\">" + g_useContextMenuText + "</span>";
-	this.dragObject = null;
-    this.pressed    = false;
+    this.message = g_textsSelectAndMove + " <span class=\"hidden-phone\">" + g_selectGroupText + "</span>" + " <span class=\"hidden-phone\">" + g_useContextMenuText + "</span>";
+    this.dragObject = null;
+    this.pressed = false;
     this.app.canvas.style.cursor = "auto";
 
     this.app.SetSelectionRect(null);
-    
+
     this.groupingSelect = false;
-    if (this.selectedObject != null && (this.selectedObject instanceof BaseVertex))
-    {
-        this.message = g_textsSelectAndMove        
-         +  "<div class=\"btn-group\" style=\"float:right;position: relative;\">"
-         +  "<button type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
-         +  " " + g_action + " <span class=\"caret\"></span>"
-         +  " </button>"
-         +  "<ul class=\"dropdown-menu dropdown-menu-right\" style=\"z-index:15; position: absolute;\">"
-         +  " <li><a href=\"#\" id=\"renameButton\">" + g_renameVertex + "</a></li>"
-         +  " <li><a href=\"#\" id=\"changeCommonStyle\">" + g_commonVertexStyle + "</a></li>"
-         +  " <li><a href=\"#\" id=\"changeSelectedStyle\">" + g_selectedVertexStyle + "</a></li>"
-         +  "</ul>"
-         +  "</div>";
-        
+    if (this.selectedObject != null && (this.selectedObject instanceof BaseVertex)) {
+        this.message = g_textsSelectAndMove
+            + "<div class=\"btn-group\" style=\"float:right;position: relative;\">"
+            + "<button type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
+            + " " + g_action + " <span class=\"caret\"></span>"
+            + " </button>"
+            + "<ul class=\"dropdown-menu dropdown-menu-right\" style=\"z-index:15; position: absolute;\">"
+            + " <li><a href=\"#\" id=\"renameButton\">" + g_renameVertex + "</a></li>"
+            + " <li><a href=\"#\" id=\"changeCommonStyle\">" + g_commonVertexStyle + "</a></li>"
+            + " <li><a href=\"#\" id=\"changeSelectedStyle\">" + g_selectedVertexStyle + "</a></li>"
+            + "</ul>"
+            + "</div>";
+
         var handler = this;
         var callback = function (enumType) {
-                handler.RenameVertex(enumType.GetVertexText(0), handler.selectedObject);
-                userAction("RenameVertex");
+            handler.RenameVertex(enumType.GetVertexText(0), handler.selectedObject);
+            userAction("RenameVertex");
         };
         $('#message').unbind();
-        $('#message').on('click', '#renameButton', function(){
-                        var customEnum =  new TextEnumVertexsCustom(handler.app);
-                        customEnum.ShowDialog(callback, g_rename,  g_renameVertex, handler.selectedObject.mainText);
-                     });
-        $('#message').on('click', '#changeCommonStyle', function(){
+        $('#message').on('click', '#renameButton', function () {
+            var customEnum = new TextEnumVertexsCustom(handler.app);
+            customEnum.ShowDialog(callback, g_rename, g_renameVertex, handler.selectedObject.mainText);
+        });
+        $('#message').on('click', '#changeCommonStyle', function () {
             var selectedVertexes = handler.app.GetSelectedVertexes();
             var setupVertexStyle = new SetupVertexStyle(handler.app);
             setupVertexStyle.show(0, selectedVertexes);
         });
-        $('#message').on('click', '#changeSelectedStyle', function(){
+        $('#message').on('click', '#changeSelectedStyle', function () {
             var selectedVertexes = handler.app.GetSelectedVertexes();
             var setupVertexStyle = new SetupVertexStyle(handler.app);
             setupVertexStyle.show(1, selectedVertexes);
-        });                                          
+        });
     }
-    else if (this.selectedObject != null && (this.selectedObject instanceof BaseEdge))
-    {
+    else if (this.selectedObject != null && (this.selectedObject instanceof BaseEdge)) {
         this.message = g_textsSelectAndMove
-        + "<span style=\"float:right;\"><button type=\"button\" id=\"incCurvel\" class=\"btn btn-default btn-xs\"> + </button>"
-        + " " + g_curveEdge + " "
-        + "<button type=\"button\" id=\"decCurvel\" class=\"btn btn-default btn-xs\"> - </button> &nbsp; "
-        +  "<div class=\"btn-group\" style=\"float:right;position: relative;\">"
-        +  "<button type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
-        +  " " + g_action + " <span class=\"caret\"></span>"
-        +  " </button>"
-        +  "<ul class=\"dropdown-menu dropdown-menu-right\" style=\"z-index:15; position: absolute;\">"
-        +  " <li><a href=\"#\" id=\"editEdge\">" + g_editWeight + "</a></li>"
-        +  " <li><a href=\"#\" id=\"changeCommonStyle\">" + g_commonEdgeStyle + "</a></li>"
-        +  " <li><a href=\"#\" id=\"changeSelectedStyle\">" + g_selectedEdgeStyle + "</a></li>"
-        +  "</ul>"
-        +  "</div>";
+            + "<span style=\"float:right;\"><button type=\"button\" id=\"incCurvel\" class=\"btn btn-default btn-xs\"> + </button>"
+            + " " + g_curveEdge + " "
+            + "<button type=\"button\" id=\"decCurvel\" class=\"btn btn-default btn-xs\"> - </button> &nbsp; "
+            + "<div class=\"btn-group\" style=\"float:right;position: relative;\">"
+            + "<button type=\"button\" class=\"btn btn-default btn-sm dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
+            + " " + g_action + " <span class=\"caret\"></span>"
+            + " </button>"
+            + "<ul class=\"dropdown-menu dropdown-menu-right\" style=\"z-index:15; position: absolute;\">"
+            + " <li><a href=\"#\" id=\"editEdge\">" + g_editWeight + "</a></li>"
+            + " <li><a href=\"#\" id=\"changeCommonStyle\">" + g_commonEdgeStyle + "</a></li>"
+            + " <li><a href=\"#\" id=\"changeSelectedStyle\">" + g_selectedEdgeStyle + "</a></li>"
+            + "</ul>"
+            + "</div>";
 
         var handler = this;
         $('#message').unbind();
-        $('#message').on('click', '#editEdge', function(){
-                         var direct = false;
-                         var dialogButtons = {};
+        $('#message').on('click', '#editEdge', function () {
+            var direct = false;
+            var dialogButtons = {};
 
-                         dialogButtons[g_save] = function() {
+            dialogButtons[g_save] = function () {
 
-                           handler.app.PushToStack("ChangeCurvelEdge");
-                        
-                           handler.selectedObject.SetWeight(document.getElementById('EdgeWeight').value);
-                           handler.selectedObject.SetUpText(document.getElementById('EdgeLable').value);
-                             
-                            handler.needRedraw = true;
-                            handler.app.redrawGraph();
+                handler.app.PushToStack("ChangeCurvelEdge");
 
-                            userAction("ChangeWeight");
-                            $( this ).dialog( "close" );
-                         };
+                handler.selectedObject.SetWeight(document.getElementById('EdgeWeight').value);
+                handler.selectedObject.SetUpText(document.getElementById('EdgeLable').value);
 
-                         document.getElementById('EdgeWeight').value = handler.selectedObject.useWeight ? handler.selectedObject.weight : g_noWeight;
-                         document.getElementById('EdgeWeightSlider').value = handler.selectedObject.useWeight ? handler.selectedObject.weight : 0;
+                handler.needRedraw = true;
+                handler.app.redrawGraph();
 
-                        var edgePresets = handler.app.GetEdgePresets();
-                        var presetsStr  = "<span onClick=\"document.getElementById('EdgeWeight').value='" + g_DefaultWeightPreset + "'; document.getElementById('EdgeWeightSlider').value='" + g_DefaultWeightPreset + "';\" style=\"cursor: pointer\" class=\"defaultWeigth\">" + g_DefaultWeightPreset + "</span>";
+                userAction("ChangeWeight");
+                $(this).dialog("close");
+            };
 
-                        for(var i = 0; i < edgePresets.length; i ++) 
-                        {
-                            var edgePreset = edgePresets[i];
-                            presetsStr += "<span onClick=\"document.getElementById('EdgeWeight').value='" + edgePreset + "'; document.getElementById('EdgeWeightSlider').value=" + edgePreset + ";\" style=\"cursor: pointer\" class=\"defaultWeigth\">" + edgePreset + "</span>";
-                        }        
-                        document.getElementById("EdgesPresets").innerHTML = presetsStr;
-                        document.getElementById('EdgeLable').value = handler.selectedObject.upText;
-            
-                         $( "#addEdge" ).dialog({
-                                                resizable: false,
-                                                height: "auto",
-                                                width:  "auto",
-                                                modal: true,
-                                                title: g_editWeight,
-                                                buttons: dialogButtons,
-                                                dialogClass: 'EdgeDialog',
-                                                open: function () {
-                                                $(handler).off('submit').on('submit', function () {
-                                                                         return false;
-                                                                         });
-                                                }
-                                                });
-                         });
+            document.getElementById('EdgeWeight').value = handler.selectedObject.useWeight ? handler.selectedObject.weight : g_noWeight;
+            document.getElementById('EdgeWeightSlider').value = handler.selectedObject.useWeight ? handler.selectedObject.weight : 0;
 
-        $('#message').on('click', '#incCurvel', function(){
+            var edgePresets = handler.app.GetEdgePresets();
+            var presetsStr = "<span onClick=\"document.getElementById('EdgeWeight').value='" + g_DefaultWeightPreset + "'; document.getElementById('EdgeWeightSlider').value='" + g_DefaultWeightPreset + "';\" style=\"cursor: pointer\" class=\"defaultWeigth\">" + g_DefaultWeightPreset + "</span>";
+
+            for (var i = 0; i < edgePresets.length; i++) {
+                var edgePreset = edgePresets[i];
+                presetsStr += "<span onClick=\"document.getElementById('EdgeWeight').value='" + edgePreset + "'; document.getElementById('EdgeWeightSlider').value=" + edgePreset + ";\" style=\"cursor: pointer\" class=\"defaultWeigth\">" + edgePreset + "</span>";
+            }
+            document.getElementById("EdgesPresets").innerHTML = presetsStr;
+            document.getElementById('EdgeLable').value = handler.selectedObject.upText;
+
+            $("#addEdge").dialog({
+                resizable: false,
+                height: "auto",
+                width: "auto",
+                modal: true,
+                title: g_editWeight,
+                buttons: dialogButtons,
+                dialogClass: 'EdgeDialog',
+                open: function () {
+                    $(handler).off('submit').on('submit', function () {
+                        return false;
+                    });
+                }
+            });
+        });
+
+        $('#message').on('click', '#incCurvel', function () {
             handler.app.PushToStack("ChangeCurvelEdge");
 
             handler.selectedObject.model.ChangeCurvedValue(DefaultHandler.prototype.curvedValue);
@@ -3326,7 +3144,7 @@ DefaultHandler.prototype.MouseUp = function(pos)
             handler.app.redrawGraph();
             userAction("Edge.Bend");
         });
-        $('#message').on('click', '#decCurvel', function(){
+        $('#message').on('click', '#decCurvel', function () {
             handler.app.PushToStack("ChangeCurvelEdge");
 
             handler.selectedObject.model.ChangeCurvedValue(-DefaultHandler.prototype.curvedValue);
@@ -3334,34 +3152,30 @@ DefaultHandler.prototype.MouseUp = function(pos)
             handler.app.redrawGraph();
             userAction("Edge.Bend");
         });
-        $('#message').on('click', '#changeCommonStyle', function(){
+        $('#message').on('click', '#changeCommonStyle', function () {
             var selectedEdges = handler.app.GetSelectedEdges();
             var setupVertexStyle = new SetupEdgeStyle(handler.app);
             setupVertexStyle.show(0, selectedEdges);
         });
-        $('#message').on('click', '#changeSelectedStyle', function(){
+        $('#message').on('click', '#changeSelectedStyle', function () {
             var selectedEdges = handler.app.GetSelectedEdges();
             var setupVertexStyle = new SetupEdgeStyle(handler.app);
             setupVertexStyle.show(1, selectedEdges);
-        });          
+        });
     }
-    else if (this.selectedObjects.length > 0)
-    {
+    else if (this.selectedObjects.length > 0) {
         this.message = g_dragGroupText + " <span class=\"hidden-phone\">" + g_selectGroupText + "</span>";
 
         var hasVertexes = false;
         var hasEdges = false;
-        for(var i = 0; i < this.selectedObjects.length; i ++)
-        {
-          var object = this.selectedObjects[i];
-          if (object instanceof BaseVertex)
-          {
-            hasVertexes = true;
-          }
-          else if (object instanceof BaseEdge)
-          {
-            hasEdges = true;
-          }
+        for (var i = 0; i < this.selectedObjects.length; i++) {
+            var object = this.selectedObjects[i];
+            if (object instanceof BaseVertex) {
+                hasVertexes = true;
+            }
+            else if (object instanceof BaseEdge) {
+                hasEdges = true;
+            }
         }
 
         this.message = this.message + "<span style=\"float:right;position: relative;\">";
@@ -3373,101 +3187,93 @@ DefaultHandler.prototype.MouseUp = function(pos)
             + g_removeGroupeButton + "</button>"
 
         this.message = this.message
-            +  " &nbsp &nbsp <button type=\"button\" class=\"btn btn-default btn-xs dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
-            +  " " + g_action + " <span class=\"caret\"></span>"
-            +  " </button>"            
-            +  "<ul class=\"dropdown-menu dropdown-menu-right\" style=\"z-index:15; position: absolute;\">";
-     
+            + " &nbsp &nbsp <button type=\"button\" class=\"btn btn-default btn-xs dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">"
+            + " " + g_action + " <span class=\"caret\"></span>"
+            + " </button>"
+            + "<ul class=\"dropdown-menu dropdown-menu-right\" style=\"z-index:15; position: absolute;\">";
+
         if (hasEdges) {
-            this.message = this.message + " <li><a href=\"#\" id=\"changeCommonStyleEdge\">"   + g_commonEdgeStyle + "</a></li>";
-            this.message = this.message +  " <li><a href=\"#\" id=\"changeSelectedStyleEdge\">" + g_selectedEdgeStyle + "</a></li>";
+            this.message = this.message + " <li><a href=\"#\" id=\"changeCommonStyleEdge\">" + g_commonEdgeStyle + "</a></li>";
+            this.message = this.message + " <li><a href=\"#\" id=\"changeSelectedStyleEdge\">" + g_selectedEdgeStyle + "</a></li>";
         }
 
         if (hasVertexes) {
-            this.message = this.message +  " <li><a href=\"#\" id=\"changeCommonStyleVertex\">" + g_commonVertexStyle + "</a></li>";
-            this.message = this.message +  " <li><a href=\"#\" id=\"changeSelectedStyleVertex\">" + g_selectedVertexStyle + "</a></li>";
+            this.message = this.message + " <li><a href=\"#\" id=\"changeCommonStyleVertex\">" + g_commonVertexStyle + "</a></li>";
+            this.message = this.message + " <li><a href=\"#\" id=\"changeSelectedStyleVertex\">" + g_selectedVertexStyle + "</a></li>";
         }
 
         this.message = this.message
-        +  "</ul>"
-        +  "</span>";
-        
+            + "</ul>"
+            + "</span>";
+
         var handler = this;
         $('#message').unbind();
-        
-        $('#message').on('click', '#DublicateSelected', function(){
+
+        $('#message').on('click', '#DublicateSelected', function () {
             handler.app.PushToStack("DublicateSelection");
 
             userAction("GroupSelected.Dublicate");
-            
+
             var newSelected = [];
-            var copyVertex  = {};
-            
+            var copyVertex = {};
+
             // Copy vertex
-            for(var i = 0; i < handler.selectedObjects.length; i ++)
-            {
-              var object = handler.selectedObjects[i];
-              if (object instanceof BaseVertex)
-              {
-                var newObject   = new BaseVertex()
-                newObject.copyFrom(object);
-                newObject.vertexEnumType = null;
-                handler.app.AddNewVertex(newObject);
-                var vertex      = newObject;
-                var diameter    = (new VertexModel()).diameter;
-                vertex.position.offset(diameter, diameter);
-                newSelected.push(vertex);
-                copyVertex[object.id] = vertex;
-              }
+            for (var i = 0; i < handler.selectedObjects.length; i++) {
+                var object = handler.selectedObjects[i];
+                if (object instanceof BaseVertex) {
+                    var newObject = new BaseVertex()
+                    newObject.copyFrom(object);
+                    newObject.vertexEnumType = null;
+                    handler.app.AddNewVertex(newObject);
+                    var vertex = newObject;
+                    var diameter = (new VertexModel()).diameter;
+                    vertex.position.offset(diameter, diameter);
+                    newSelected.push(vertex);
+                    copyVertex[object.id] = vertex;
+                }
             }
-            
+
             // Copy edge
-            for (var i = 0; i < handler.selectedObjects.length; i ++)
-            {
-              var object = handler.selectedObjects[i];
-              if (object instanceof BaseEdge)
-              {
-                var newObject = new BaseEdge()
-                newObject.copyFrom(object);
-                  
-                var toNewVertex = false;
-                if (newObject.vertex1.id in copyVertex)
-                {
-                    newObject.vertex1 = copyVertex[newObject.vertex1.id];
-                    toNewVertex = true;
-                }
-                if (newObject.vertex2.id in copyVertex)
-                {
-                    newObject.vertex2 = copyVertex[newObject.vertex2.id];
-                    toNewVertex = true;
-                }
-                  
-                handler.app.AddNewEdge(newObject);
-                if (!toNewVertex)
-                {
-                    var neighbourEdges = handler.app.graph.getNeighbourEdges(newObject);
-                    if (neighbourEdges.length >= 1)
-                    {
-                        var cruvled = handler.app.GetAvalibleCruvledValue(neighbourEdges, newObject);
-                        newObject.model.SetCurvedValue(cruvled);
+            for (var i = 0; i < handler.selectedObjects.length; i++) {
+                var object = handler.selectedObjects[i];
+                if (object instanceof BaseEdge) {
+                    var newObject = new BaseEdge()
+                    newObject.copyFrom(object);
+
+                    var toNewVertex = false;
+                    if (newObject.vertex1.id in copyVertex) {
+                        newObject.vertex1 = copyVertex[newObject.vertex1.id];
+                        toNewVertex = true;
                     }
+                    if (newObject.vertex2.id in copyVertex) {
+                        newObject.vertex2 = copyVertex[newObject.vertex2.id];
+                        toNewVertex = true;
+                    }
+
+                    handler.app.AddNewEdge(newObject);
+                    if (!toNewVertex) {
+                        var neighbourEdges = handler.app.graph.getNeighbourEdges(newObject);
+                        if (neighbourEdges.length >= 1) {
+                            var cruvled = handler.app.GetAvalibleCruvledValue(neighbourEdges, newObject);
+                            newObject.model.SetCurvedValue(cruvled);
+                        }
+                    }
+                    newSelected.push(newObject);
                 }
-                newSelected.push(newObject);
-              }
             }
 
             handler.selectedObjects = newSelected;
-            handler.needRedraw      = true;
+            handler.needRedraw = true;
             handler.app.redrawGraph();
         });
-        
-        $('#message').on('click', '#RemoveSelected', function(){
+
+        $('#message').on('click', '#RemoveSelected', function () {
             handler.app.PushToStack("RemoveSelection");
 
             userAction("GroupSelected.Remove");
-            
-            for(var i = 0; i < handler.selectedObjects.length; i ++)
-              handler.app.DeleteObject(handler.selectedObjects[i]);
+
+            for (var i = 0; i < handler.selectedObjects.length; i++)
+                handler.app.DeleteObject(handler.selectedObjects[i]);
             handler.selectedObjects = [];
             handler.needRedraw = true;
             handler.app.redrawGraph();
@@ -3475,59 +3281,55 @@ DefaultHandler.prototype.MouseUp = function(pos)
         });
 
         if (hasEdges) {
-            $('#message').on('click', '#changeCommonStyleEdge', function(){
+            $('#message').on('click', '#changeCommonStyleEdge', function () {
                 var selectedEdges = handler.app.GetSelectedEdges();
                 var setupVertexStyle = new SetupEdgeStyle(handler.app);
                 setupVertexStyle.show(0, selectedEdges);
             });
-            $('#message').on('click', '#changeSelectedStyleEdge', function(){
+            $('#message').on('click', '#changeSelectedStyleEdge', function () {
                 var selectedEdges = handler.app.GetSelectedEdges();
                 var setupVertexStyle = new SetupEdgeStyle(handler.app);
                 setupVertexStyle.show(1, selectedEdges);
-            });    
+            });
         }
 
         if (hasVertexes) {
-            $('#message').on('click', '#changeCommonStyleVertex', function(){
+            $('#message').on('click', '#changeCommonStyleVertex', function () {
                 var selectedVertexes = handler.app.GetSelectedVertexes();
                 var setupVertexStyle = new SetupVertexStyle(handler.app);
                 setupVertexStyle.show(0, selectedVertexes);
             });
-            $('#message').on('click', '#changeSelectedStyleVertex', function(){
+            $('#message').on('click', '#changeSelectedStyleVertex', function () {
                 var selectedVertexes = handler.app.GetSelectedVertexes();
                 var setupVertexStyle = new SetupVertexStyle(handler.app);
                 setupVertexStyle.show(1, selectedVertexes);
-            });  
+            });
         }
     }
-    
+
     this.needRedraw = true;
 }
 
-DefaultHandler.prototype.GetSelectedGroup = function(object)
-{
-  return (object == this.dragObject) || (object == this.selectedObject) ? 1 : 0 || this.selectedObjects.includes(object);
+DefaultHandler.prototype.GetSelectedGroup = function (object) {
+    return (object == this.dragObject) || (object == this.selectedObject) ? 1 : 0 || this.selectedObjects.includes(object);
 }
 
-DefaultHandler.prototype.SelectObjectInRect = function (rect)
-{
+DefaultHandler.prototype.SelectObjectInRect = function (rect) {
     this.selectedObjects = [];
     var vertices = this.app.graph.vertices;
-    for (var i = 0; i < vertices.length; i ++)
-    {
-		if (rect.isIn(vertices[i].position) && !this.selectedObjects.includes(vertices[i]))
+    for (var i = 0; i < vertices.length; i++) {
+        if (rect.isIn(vertices[i].position) && !this.selectedObjects.includes(vertices[i]))
             this.selectedObjects.push(vertices[i]);
-	}
+    }
 
-	// Selected Arc.
+    // Selected Arc.
     var edges = this.app.graph.edges;
-    for (var i = 0; i < edges.length; i ++)
-    {
+    for (var i = 0; i < edges.length; i++) {
         var edge = edges[i];
-        
+
         if (rect.isIn(edge.vertex1.position) && rect.isIn(edge.vertex2.position) && !this.selectedObjects.includes(edge))
             this.selectedObjects.push(edge);
-	}
+    }
 }
 
 
@@ -3535,45 +3337,39 @@ DefaultHandler.prototype.SelectObjectInRect = function (rect)
  * Add Graph handler.
  * This adds a node
  */
-function AddGraphHandler(app)
-{
-  this.removeStack = true;
-  BaseHandler.apply(this, arguments); // extends BaseHandler
-  this.message = g_clickToAddVertex;	
-  this.addContextMenu();
+function AddGraphHandler(app) {
+    this.removeStack = true;
+    BaseHandler.apply(this, arguments); // extends BaseHandler
+    this.message = g_clickToAddVertex;
+    this.addContextMenu();
 }
 
 // inheritance.
 AddGraphHandler.prototype = Object.create(BaseHandler.prototype);
 
-AddGraphHandler.prototype.MouseDown = function(pos) 
-{
-    if(this.GetSelectedObject(pos)) return;
+AddGraphHandler.prototype.MouseDown = function (pos) {
+    if (this.GetSelectedObject(pos)) return;
     this.app.PushToStack("Add");
 
-	this.app.CreateNewGraph(pos.x, pos.y);
-	this.needRedraw = true;
-	this.inited = false;
+    this.app.CreateNewGraph(pos.x, pos.y);
+    this.needRedraw = true;
+    this.inited = false;
 }
 
-AddGraphHandler.prototype.InitControls = function() 
-{
+AddGraphHandler.prototype.InitControls = function () {
     var enumVertexsText = document.getElementById("enumVertexsText");
-    if (enumVertexsText)
-    {
+    if (enumVertexsText) {
         var enumsList = this.app.GetEnumVertexsList();
-        for (var i = 0; i < enumsList.length; i ++)
-        {
+        for (var i = 0; i < enumsList.length; i++) {
             var option = document.createElement('option');
-            option.text  = enumsList[i]["text"];
+            option.text = enumsList[i]["text"];
             option.value = enumsList[i]["value"];
             enumVertexsText.add(option, i);
-            if (enumsList[i]["select"])
-            {
+            if (enumsList[i]["select"]) {
                 enumVertexsText.selectedIndex = i;
             }
         }
-        
+
         var addGraphHandler = this;
         enumVertexsText.onchange = function () {
             addGraphHandler.ChangedType();
@@ -3581,11 +3377,10 @@ AddGraphHandler.prototype.InitControls = function()
     }
 }
 
-AddGraphHandler.prototype.ChangedType = function() 
-{
-	var enumVertexsText = document.getElementById("enumVertexsText");
+AddGraphHandler.prototype.ChangedType = function () {
+    var enumVertexsText = document.getElementById("enumVertexsText");
 
-	this.app.SetEnumVertexsType(enumVertexsText.options[enumVertexsText.selectedIndex].value);
+    this.app.SetEnumVertexsType(enumVertexsText.options[enumVertexsText.selectedIndex].value);
 }
 
 
@@ -3594,12 +3389,11 @@ AddGraphHandler.prototype.ChangedType = function()
  * Connection Graph handler.
  *
  */
-function ConnectionGraphHandler(app)
-{
-  this.removeStack = true;
-  BaseHandler.apply(this, arguments);
-  this.SelectFirst();
-  this.addContextMenu();	
+function ConnectionGraphHandler(app) {
+    this.removeStack = true;
+    BaseHandler.apply(this, arguments);
+    this.SelectFirst();
+    this.addContextMenu();
 }
 
 // inheritance.
@@ -3607,23 +3401,19 @@ ConnectionGraphHandler.prototype = Object.create(BaseHandler.prototype);
 // First selected.
 ConnectionGraphHandler.prototype.firstObject = null;
 
-ConnectionGraphHandler.prototype.GetSelectedVertex = function()
-{
+ConnectionGraphHandler.prototype.GetSelectedVertex = function () {
     return (this.firstObject instanceof BaseVertex) ? this.firstObject : null;
 }
 
-ConnectionGraphHandler.prototype.AddNewEdge = function(selectedObject, isDirect)
-{
-	this.app.CreateNewArc(this.firstObject, selectedObject, isDirect, document.getElementById('EdgeWeight').value, $("#RadiosReplaceEdge").prop("checked"), document.getElementById('EdgeLable').value);
-    
-	this.SelectFirst();					
-	this.app.NeedRedraw();
+ConnectionGraphHandler.prototype.AddNewEdge = function (selectedObject, isDirect) {
+    this.app.CreateNewArc(this.firstObject, selectedObject, isDirect, document.getElementById('EdgeWeight').value, $("#RadiosReplaceEdge").prop("checked"), document.getElementById('EdgeLable').value);
+
+    this.SelectFirst();
+    this.app.NeedRedraw();
 }
 
-ConnectionGraphHandler.prototype.SelectVertex = function(selectedObject) 
-{
-    if (this.firstObject)
-    {
+ConnectionGraphHandler.prototype.SelectVertex = function (selectedObject) {
+    if (this.firstObject) {
         var direct = false;
         var handler = this;
 
@@ -3631,104 +3421,89 @@ ConnectionGraphHandler.prototype.SelectVertex = function(selectedObject)
             handler.AddNewEdge(secondVertex, direct);
         });
     }
-    else
-    {
-        this.SelectSecond(selectedObject);	
+    else {
+        this.SelectSecond(selectedObject);
     }
     this.needRedraw = true;
 }
 
-ConnectionGraphHandler.prototype.MouseDown = function(pos) 
-{
-	var selectedObject = this.GetSelectedGraph(pos);
-    if(selectedObject == null){
+ConnectionGraphHandler.prototype.MouseDown = function (pos) {
+    var selectedObject = this.GetSelectedGraph(pos);
+    if (selectedObject == null) {
         application.SetHandlerMode('default')
         return;
     }
-	if (selectedObject && (selectedObject instanceof BaseVertex))
-	{
+    if (selectedObject && (selectedObject instanceof BaseVertex)) {
         this.SelectVertex(selectedObject);
-	}
-    else
-    {  
-      this.SelectFirst();
-      this.needRedraw = true;
+    }
+    else {
+        this.SelectFirst();
+        this.needRedraw = true;
     }
 }
 
-ConnectionGraphHandler.prototype.GetSelectedGroup = function(object)
-{
-	return (object == this.firstObject) ? 1 : 0;
+ConnectionGraphHandler.prototype.GetSelectedGroup = function (object) {
+    return (object == this.firstObject) ? 1 : 0;
 }
 
-ConnectionGraphHandler.prototype.SelectFirst = function()
-{
-	this.firstObject = null;
-	this.message     = g_selectFisrtVertexToConnect + this.GetSelect2VertexMenu();
+ConnectionGraphHandler.prototype.SelectFirst = function () {
+    this.firstObject = null;
+    this.message = g_selectFisrtVertexToConnect + this.GetSelect2VertexMenu();
 }
 
-ConnectionGraphHandler.prototype.SelectSecond = function(selectedObject)
-{
-	this.firstObject = selectedObject;
-	this.message     = g_selectSecondVertexToConnect + this.GetSelect2VertexMenu();						
+ConnectionGraphHandler.prototype.SelectSecond = function (selectedObject) {
+    this.firstObject = selectedObject;
+    this.message = g_selectSecondVertexToConnect + this.GetSelect2VertexMenu();
 }
 
-ConnectionGraphHandler.prototype.SelectFirstVertexMenu = function(vertex1Text, vertex)
-{
-   this.firstObject = null;
-   this.SelectVertex(vertex);
-}
-
-ConnectionGraphHandler.prototype.UpdateFirstVertexMenu = function(vertex1Text)
-{
-    if (this.firstObject)
-    {
-        vertex1Text.value = this.firstObject.mainText;        
-    }
-}
-
-ConnectionGraphHandler.prototype.SelectSecondVertexMenu = function(vertex2Text, vertex)
-{
+ConnectionGraphHandler.prototype.SelectFirstVertexMenu = function (vertex1Text, vertex) {
+    this.firstObject = null;
     this.SelectVertex(vertex);
 }
 
-ConnectionGraphHandler.prototype.UpdateSecondVertexMenu = function(vertex2Text)
-{
-    if (this.secondObject)
-    {
+ConnectionGraphHandler.prototype.UpdateFirstVertexMenu = function (vertex1Text) {
+    if (this.firstObject) {
+        vertex1Text.value = this.firstObject.mainText;
+    }
+}
+
+ConnectionGraphHandler.prototype.SelectSecondVertexMenu = function (vertex2Text, vertex) {
+    this.SelectVertex(vertex);
+}
+
+ConnectionGraphHandler.prototype.UpdateSecondVertexMenu = function (vertex2Text) {
+    if (this.secondObject) {
         vertex2Text.value = this.secondObject.mainText;
-    }   
+    }
 }
 
 /**
  * Delete Graph handler.
  *
  */
-function DeleteGraphHandler(app)
-{
-  this.removeStack = true;
-  BaseHandler.apply(this, arguments);
-  this.message = g_selectObjectToDelete;
-  this.addContextMenu();
+function DeleteGraphHandler(app) {
+    this.removeStack = true;
+    BaseHandler.apply(this, arguments);
+    this.message = g_selectObjectToDelete;
+    this.addContextMenu();
 }
 
 // inheritance.
 DeleteGraphHandler.prototype = Object.create(BaseHandler.prototype);
 
-DeleteGraphHandler.prototype.MouseDown = function(pos) 
-{
-	var selectedObject = this.GetSelectedObject(pos);
-    if(selectedObject == null){
+DeleteGraphHandler.prototype.MouseDown = function (pos) {
+    var selectedObject = this.GetSelectedObject(pos);
+    if (selectedObject == null) {
         application.SetHandlerMode('default')
         return;
     }
-        
+
     if (!this.app.IsCorrectObject(selectedObject))
         return;
-    
+
     this.app.PushToStack("Delete");
     this.app.DeleteObject(selectedObject);
-	this.needRedraw = true;
+    this.needRedraw = true;
 
 }
 
@@ -3736,20 +3511,18 @@ DeleteGraphHandler.prototype.MouseDown = function(pos)
  * Delete Graph handler.
  *
  */
-function DeleteAllHandler(app)
-{
-  BaseHandler.apply(this, arguments);  
+function DeleteAllHandler(app) {
+    BaseHandler.apply(this, arguments);
 }
 
 // inheritance.
 DeleteAllHandler.prototype = Object.create(BaseHandler.prototype);
 
-DeleteAllHandler.prototype.clear = function() 
-{	
+DeleteAllHandler.prototype.clear = function () {
     this.app.PushToStack("DeleteAll");
 
-	// Selected Graph.
-    this.app.graph = new Graph(); 
+    // Selected Graph.
+    this.app.graph = new Graph();
     this.app.savedGraphName = "";
     this.needRedraw = true;
 }
@@ -3759,10 +3532,9 @@ DeleteAllHandler.prototype.clear = function()
  * Save/Load graph from matrix.
  *
  */
-function ShowAdjacencyMatrix(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";	
+function ShowAdjacencyMatrix(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
@@ -3772,50 +3544,46 @@ ShowAdjacencyMatrix.prototype.firstObject = null;
 // Path
 ShowAdjacencyMatrix.prototype.pathObjects = null;
 
-ShowAdjacencyMatrix.prototype.show = function()
-{
-	var handler = this;
-	var dialogButtons = {};
+ShowAdjacencyMatrix.prototype.show = function () {
+    var handler = this;
+    var dialogButtons = {};
 
     $('#AdjacencyMatrixField').unbind();
-	$( "#AdjacencyMatrixField" ).on('keyup change', function (eventObject)
-		{
-			if (!handler.app.TestAdjacencyMatrix($( "#AdjacencyMatrixField" ).val(), [], []))
-			{
-				$( "#BadMatrixFormatMessage" ).show();
-			}
-			else
-			{
-				$( "#BadMatrixFormatMessage" ).hide();
-			}
-		});
+    $("#AdjacencyMatrixField").on('keyup change', function (eventObject) {
+        if (!handler.app.TestAdjacencyMatrix($("#AdjacencyMatrixField").val(), [], [])) {
+            $("#BadMatrixFormatMessage").show();
+        }
+        else {
+            $("#BadMatrixFormatMessage").hide();
+        }
+    });
 
-	dialogButtons[g_save] = function() {
-                handler.app.PushToStack("ChangeAdjacencyMatrix");
-				handler.app.SetAdjacencyMatrixSmart($( "#AdjacencyMatrixField" ).val());					
-				$( this ).dialog( "close" );					
-			};
-	dialogButtons[g_cancel] = function() {
-				$( this ).dialog( "close" );						
-			};
+    dialogButtons[g_save] = function () {
+        handler.app.PushToStack("ChangeAdjacencyMatrix");
+        handler.app.SetAdjacencyMatrixSmart($("#AdjacencyMatrixField").val());
+        $(this).dialog("close");
+    };
+    dialogButtons[g_cancel] = function () {
+        $(this).dialog("close");
+    };
 
-	$( "#AdjacencyMatrixField" ).val(this.app.GetAdjacencyMatrix());	
-	$( "#BadMatrixFormatMessage" ).hide();
-	
+    $("#AdjacencyMatrixField").val(this.app.GetAdjacencyMatrix());
+    $("#BadMatrixFormatMessage").hide();
+
     if (this.app.graph.isMulti())
-        $( "#AdjacencyMatrixMultiGraphDesc").show();
+        $("#AdjacencyMatrixMultiGraphDesc").show();
     else
-        $( "#AdjacencyMatrixMultiGraphDesc").hide();
-    
-	$( "#adjacencyMatrix" ).dialog({
-		resizable: false,
+        $("#AdjacencyMatrixMultiGraphDesc").hide();
+
+    $("#adjacencyMatrix").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_adjacencyMatrixText,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
+        width: "auto",
+        modal: true,
+        title: g_adjacencyMatrixText,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 }
 
 
@@ -3823,10 +3591,9 @@ ShowAdjacencyMatrix.prototype.show = function()
  * Save/Load graph from Incidence matrix.
  *
  */
-function ShowIncidenceMatrix(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";	
+function ShowIncidenceMatrix(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
@@ -3836,45 +3603,41 @@ ShowIncidenceMatrix.prototype.firstObject = null;
 // Path
 ShowIncidenceMatrix.prototype.pathObjects = null;
 
-ShowIncidenceMatrix.prototype.show = function()
-{
-	var handler = this;
-	var dialogButtons = {};
+ShowIncidenceMatrix.prototype.show = function () {
+    var handler = this;
+    var dialogButtons = {};
 
     $('#IncidenceMatrixField').unbind();
-	$( "#IncidenceMatrixField" ).on('keyup change', function (eventObject)
-		{
-			if (!handler.app.TestIncidenceMatrix($( "#IncidenceMatrixField" ).val(), [], []))
-			{
-				$( "#BadIncidenceMatrixFormatMessage" ).show();
-			}
-			else
-			{
-				$( "#BadIncidenceMatrixFormatMessage" ).hide();
-			}
-		});
+    $("#IncidenceMatrixField").on('keyup change', function (eventObject) {
+        if (!handler.app.TestIncidenceMatrix($("#IncidenceMatrixField").val(), [], [])) {
+            $("#BadIncidenceMatrixFormatMessage").show();
+        }
+        else {
+            $("#BadIncidenceMatrixFormatMessage").hide();
+        }
+    });
 
-	dialogButtons[g_save] = function() {
-                handler.app.PushToStack("IncidenceMatrixChanged");
-				handler.app.SetIncidenceMatrixSmart($( "#IncidenceMatrixField" ).val());
-				$( this ).dialog( "close" );					
-			};
-	dialogButtons[g_cancel] = function() {
-				$( this ).dialog( "close" );						
-			};
+    dialogButtons[g_save] = function () {
+        handler.app.PushToStack("IncidenceMatrixChanged");
+        handler.app.SetIncidenceMatrixSmart($("#IncidenceMatrixField").val());
+        $(this).dialog("close");
+    };
+    dialogButtons[g_cancel] = function () {
+        $(this).dialog("close");
+    };
 
-	$( "#IncidenceMatrixField" ).val(this.app.GetIncidenceMatrix());	
-	$( "#BadIncidenceMatrixFormatMessage" ).hide();
-				
-	$( "#incidenceMatrix" ).dialog({
-		resizable: false,
+    $("#IncidenceMatrixField").val(this.app.GetIncidenceMatrix());
+    $("#BadIncidenceMatrixFormatMessage").hide();
+
+    $("#incidenceMatrix").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_incidenceMatrixText,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
+        width: "auto",
+        modal: true,
+        title: g_incidenceMatrixText,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 }
 
 
@@ -3882,11 +3645,10 @@ ShowIncidenceMatrix.prototype.show = function()
  * Show distance matrix.
  *
  */
-function ShowDistanceMatrix(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.app = app;
-  this.message = "";	
+function ShowDistanceMatrix(app) {
+    BaseHandler.apply(this, arguments);
+    this.app = app;
+    this.message = "";
 }
 
 // inheritance.
@@ -3896,70 +3658,61 @@ ShowDistanceMatrix.prototype.firstObject = null;
 // Path
 ShowDistanceMatrix.prototype.pathObjects = null;
 
-ShowDistanceMatrix.prototype.GetIncidenceMatrix = function (rawMatrix)
-{
-	var matrix = "";
-	for (var i = 0; i < rawMatrix.length; i++)
-	{
-		for (var j = 0; j < rawMatrix[i].length; j++)
-		{	
-            if (i == j)
-            {
+ShowDistanceMatrix.prototype.GetIncidenceMatrix = function (rawMatrix) {
+    var matrix = "";
+    for (var i = 0; i < rawMatrix.length; i++) {
+        for (var j = 0; j < rawMatrix[i].length; j++) {
+            if (i == j) {
                 matrix += "0";
             }
-            else if ((new Graph()).infinity == rawMatrix[i][j])
-            {
+            else if ((new Graph()).infinity == rawMatrix[i][j]) {
                 matrix += '\u221E';
             }
-            else
-            {
-                matrix += rawMatrix[i][j];   
+            else {
+                matrix += rawMatrix[i][j];
             }
-            
-			if (j != rawMatrix[i].length - 1)
-			{
-				matrix += ", ";
-			}
-			
-		}
-		matrix = matrix + "\n";
-	}
-	
-	return matrix;
+
+            if (j != rawMatrix[i].length - 1) {
+                matrix += ", ";
+            }
+
+        }
+        matrix = matrix + "\n";
+    }
+
+    return matrix;
 }
 
-ShowDistanceMatrix.prototype.show = function()
-{
-	var handler = this;
-	var dialogButtons = {};
+ShowDistanceMatrix.prototype.show = function () {
+    var handler = this;
+    var dialogButtons = {};
 
-	dialogButtons[g_close] = function() {
-				$( this ).dialog( "close" );						
-			};
+    dialogButtons[g_close] = function () {
+        $(this).dialog("close");
+    };
 
     var handler = g_Algorithms[g_AlgorithmIds.indexOf("OlegSh.FloidAlgorithm")](this.app.graph, this.app);
-        
-	$( "#FloidMatrixField" ).val(this.GetIncidenceMatrix(handler.resultMatrix()));	
-				
-	$( "#floidMatrix" ).dialog({
-		resizable: false,
+
+    $("#FloidMatrixField").val(this.GetIncidenceMatrix(handler.resultMatrix()));
+
+    $("#floidMatrix").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_minDistMatrixText,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
+        width: "auto",
+        modal: true,
+        title: g_minDistMatrixText,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 }
 
 /**
  * Save dialog Graph handler.
  *
  */
-function SavedDialogGraphHandler(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";
+function SavedDialogGraphHandler(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
@@ -3969,35 +3722,34 @@ SavedDialogGraphHandler.prototype.firstObject = null;
 // Path
 SavedDialogGraphHandler.prototype.pathObjects = null;
 // Objects.
-SavedDialogGraphHandler.prototype.objects    = null;
+SavedDialogGraphHandler.prototype.objects = null;
 
-SavedDialogGraphHandler.prototype.show = function(object)
-{
-	this.app.SaveGraphOnDisk();
+SavedDialogGraphHandler.prototype.show = function (object) {
+    this.app.SaveGraphOnDisk();
 
-	var dialogButtons = {};
+    var dialogButtons = {};
 
-	dialogButtons[g_close] = function() {
-				$( this ).dialog( "close" );					
-			};
+    dialogButtons[g_close] = function () {
+        $(this).dialog("close");
+    };
 
-	document.getElementById('GraphName').value = "http://" + window.location.host + window.location.pathname + 
-							"?graph=" + this.app.GetGraphName();
+    document.getElementById('GraphName').value = "http://" + window.location.host + window.location.pathname +
+        "?graph=" + this.app.GetGraphName();
 
- 	document.getElementById('GraphName').select();
+    document.getElementById('GraphName').select();
 
-        document.getElementById("ShareSavedGraph").innerHTML = 
-		document.getElementById("ShareSavedGraph").innerHTML.replace(/graph=([A-Za-z]*)/g, "graph=" + this.app.GetGraphName());
+    document.getElementById("ShareSavedGraph").innerHTML =
+        document.getElementById("ShareSavedGraph").innerHTML.replace(/graph=([A-Za-z]*)/g, "graph=" + this.app.GetGraphName());
 
-	$( "#saveDialog" ).dialog({
-		resizable: false,
+    $("#saveDialog").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_save_dialog,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
+        width: "auto",
+        modal: true,
+        title: g_save_dialog,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 
 }
 
@@ -4005,8 +3757,7 @@ SavedDialogGraphHandler.prototype.show = function(object)
  * Save dialog Graph handler.
  *
  */
-function SavedDialogGraphImageHandler(app)
-{
+function SavedDialogGraphImageHandler(app) {
     BaseHandler.apply(this, arguments);
     this.message = "";
     this.imageName = "";
@@ -4019,66 +3770,62 @@ SavedDialogGraphImageHandler.prototype.firstObject = null;
 // Path
 SavedDialogGraphImageHandler.prototype.pathObjects = null;
 // Objects.
-SavedDialogGraphImageHandler.prototype.objects    = null;
+SavedDialogGraphImageHandler.prototype.objects = null;
 
-SavedDialogGraphImageHandler.prototype.showDialogCallback = function ()
-{
+SavedDialogGraphImageHandler.prototype.showDialogCallback = function () {
     var dialogButtons = {};
 
-    dialogButtons[g_close] = function() {
-        $( this ).dialog( "close" );
+    dialogButtons[g_close] = function () {
+        $(this).dialog("close");
     };
 
-    var fileLocation = "tmp/saved/" + this.imageName.substr(0, 2) + "/"+ this.imageName + ".png"
+    var fileLocation = "tmp/saved/" + this.imageName.substr(0, 2) + "/" + this.imageName + ".png"
 
-    document.getElementById("showSavedImageGraph").src     = "/" + fileLocation;
+    document.getElementById("showSavedImageGraph").src = "/" + fileLocation;
     document.getElementById("showSavedImageGraphRef").href = "/" + fileLocation;
     //document.getElementById("showSavedImageGraph").src = document.getElementById("showSavedImageGraph").src.replace(/tmp\/saved\/([A-Za-z]*)\/([A-Za-z]*).png/g, fileLocation);
     document.getElementById("ShareSavedImageGraph").innerHTML =
-    document.getElementById("ShareSavedImageGraph").innerHTML.replace(/tmp\/saved\/([A-Za-z]*)\/([A-Za-z]*).png/g, fileLocation);
+        document.getElementById("ShareSavedImageGraph").innerHTML.replace(/tmp\/saved\/([A-Za-z]*)\/([A-Za-z]*).png/g, fileLocation);
 
     document.getElementById("SaveImageLinks").innerHTML =
-    document.getElementById("SaveImageLinks").innerHTML.replace(/tmp\/saved\/([A-Za-z]*)\/([A-Za-z]*).png/g, fileLocation);
+        document.getElementById("SaveImageLinks").innerHTML.replace(/tmp\/saved\/([A-Za-z]*)\/([A-Za-z]*).png/g, fileLocation);
 
-    $( "#saveImageDialog" ).dialog({
-                              resizable: false,
-                              height: "auto",
-                              width:  "auto",
-                              modal: true,
-                              title: g_save_image_dialog,
-                              buttons: dialogButtons,
-                              dialogClass: 'EdgeDialog'
-                              });
+    $("#saveImageDialog").dialog({
+        resizable: false,
+        height: "auto",
+        width: "auto",
+        modal: true,
+        title: g_save_image_dialog,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 
 }
 
-SavedDialogGraphImageHandler.prototype.showWorkspace = function()
-{
+SavedDialogGraphImageHandler.prototype.showWorkspace = function () {
     var object = this;
-    var callback = function() {
-      object.showDialogCallback();
+    var callback = function () {
+        object.showDialogCallback();
     };
-    
+
     this.imageName = this.app.SaveGraphImageOnDisk(callback);
 }
 
-SavedDialogGraphImageHandler.prototype.showFullgraph = function()
-{
+SavedDialogGraphImageHandler.prototype.showFullgraph = function () {
     var object = this;
-    var callback = function() {
-      object.showDialogCallback();
+    var callback = function () {
+        object.showDialogCallback();
     };
-    
+
     this.imageName = this.app.SaveFullGraphImageOnDisk(callback, false);
 }
 
-SavedDialogGraphImageHandler.prototype.showPrint = function()
-{
+SavedDialogGraphImageHandler.prototype.showPrint = function () {
     var object = this;
-    var callback = function() {
-      object.showDialogCallback();
+    var callback = function () {
+        object.showDialogCallback();
     };
-    
+
     this.imageName = this.app.SaveFullGraphImageOnDisk(callback, true);
 }
 
@@ -4086,12 +3833,11 @@ SavedDialogGraphImageHandler.prototype.showPrint = function()
  * Algorithm Graph handler.
  *
  */
-function AlgorithmGraphHandler(app, algorithm)
-{
+function AlgorithmGraphHandler(app, algorithm) {
     BaseHandler.apply(this, arguments);
     this.algorithm = algorithm;
     this.SaveUpText();
-    
+
     this.UpdateResultAndMesasge();
 }
 
@@ -4099,41 +3845,32 @@ function AlgorithmGraphHandler(app, algorithm)
 AlgorithmGraphHandler.prototype = Object.create(BaseHandler.prototype);
 
 // Rest this handler.
-AlgorithmGraphHandler.prototype.MouseMove = function(pos) {}
+AlgorithmGraphHandler.prototype.MouseMove = function (pos) { }
 
-AlgorithmGraphHandler.prototype.MouseDown = function(pos)
-{
+AlgorithmGraphHandler.prototype.MouseDown = function (pos) {
     this.app.setRenderPath([]);
- 
-    if (this.algorithm.instance())
-    {
+
+    if (this.algorithm.instance()) {
         this.app.SetDefaultHandler();
     }
-    else
-    {
+    else {
         var selectedObject = this.GetSelectedGraph(pos);
-        if (selectedObject && (selectedObject instanceof BaseVertex))
-        {
-            if (this.algorithm.selectVertex(selectedObject))
-            {
+        if (selectedObject && (selectedObject instanceof BaseVertex)) {
+            if (this.algorithm.selectVertex(selectedObject)) {
                 this.needRedraw = true;
             }
-            
+
             this.UpdateResultAndMesasge();
         }
-        else  if (selectedObject && (selectedObject instanceof BaseEdge))
-        {
-            if (this.algorithm.selectEdge(selectedObject))
-            {
+        else if (selectedObject && (selectedObject instanceof BaseEdge)) {
+            if (this.algorithm.selectEdge(selectedObject)) {
                 this.needRedraw = true;
             }
-            
+
             this.UpdateResultAndMesasge();
         }
-        else
-        {
-            if (this.algorithm.deselectAll())
-            {
+        else {
+            if (this.algorithm.deselectAll()) {
                 this.needRedraw = true;
                 this.UpdateResultAndMesasge();
             }
@@ -4141,73 +3878,60 @@ AlgorithmGraphHandler.prototype.MouseDown = function(pos)
     }
 }
 
-AlgorithmGraphHandler.prototype.MouseUp   = function(pos) {}
+AlgorithmGraphHandler.prototype.MouseUp = function (pos) { }
 
-AlgorithmGraphHandler.prototype.GetSelectedGroup = function(object)
-{
-	return this.algorithm.getObjectSelectedGroup(object);
+AlgorithmGraphHandler.prototype.GetSelectedGroup = function (object) {
+    return this.algorithm.getObjectSelectedGroup(object);
 }
 
-AlgorithmGraphHandler.prototype.RestoreAll = function()
-{
+AlgorithmGraphHandler.prototype.RestoreAll = function () {
     this.app.setRenderPath([]);
- 
-    if (this.algorithm.needRestoreUpText())
-    {
+
+    if (this.algorithm.needRestoreUpText()) {
         this.RestoreUpText();
     }
-    
-    if (this.algorithm.wantRestore())
-    {
+
+    if (this.algorithm.wantRestore()) {
         this.algorithm.restore();
     }
 }
 
-AlgorithmGraphHandler.prototype.SaveUpText = function()
-{
+AlgorithmGraphHandler.prototype.SaveUpText = function () {
     this.vertexUpText = {};
     var graph = this.app.graph;
-    for (i = 0; i < graph.vertices.length; i ++)
-    {
+    for (i = 0; i < graph.vertices.length; i++) {
         this.vertexUpText[graph.vertices[i].id] = graph.vertices[i].upText;
     }
 }
 
-AlgorithmGraphHandler.prototype.RestoreUpText = function()
-{
+AlgorithmGraphHandler.prototype.RestoreUpText = function () {
     var graph = this.app.graph;
 
-    for (i = 0; i < graph.vertices.length; i ++)
-    {
-        if (graph.vertices[i].id in this.vertexUpText)
-        {
+    for (i = 0; i < graph.vertices.length; i++) {
+        if (graph.vertices[i].id in this.vertexUpText) {
             graph.vertices[i].upText = this.vertexUpText[graph.vertices[i].id];
         }
     }
 }
 
-AlgorithmGraphHandler.prototype.UpdateResultAndMesasge = function()
-{
+AlgorithmGraphHandler.prototype.UpdateResultAndMesasge = function () {
     var self = this;
-    result = this.algorithm.result(function (result)
-                                   {
-                                        self.message = self.algorithm.getMessage(g_language);
-                                        self.app.resultCallback(result);
-                                   });
-    
+    result = this.algorithm.result(function (result) {
+        self.message = self.algorithm.getMessage(g_language);
+        self.app.resultCallback(result);
+    });
+
     this.app.resultCallback(result);
-    
+
     this.message = this.algorithm.getMessage(g_language);
 }
 
-AlgorithmGraphHandler.prototype.InitControls = function()
-{
+AlgorithmGraphHandler.prototype.InitControls = function () {
     this.algorithm.messageWasChanged();
 }
 
-AlgorithmGraphHandler.prototype.GetMessage = function()
-{
-	return this.algorithm.getMessage(g_language);
+AlgorithmGraphHandler.prototype.GetMessage = function () {
+    return this.algorithm.getMessage(g_language);
 }
 
 
@@ -4215,10 +3939,9 @@ AlgorithmGraphHandler.prototype.GetMessage = function()
  * Groupe rename vertices.
  *
  */
-function GroupRenameVertices(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";	
+function GroupRenameVertices(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
@@ -4228,45 +3951,42 @@ GroupRenameVertices.prototype.firstObject = null;
 // Path
 GroupRenameVertices.prototype.pathObjects = null;
 
-GroupRenameVertices.prototype.show = function()
-{
-	var handler = this;
-	var dialogButtons = {};
+GroupRenameVertices.prototype.show = function () {
+    var handler = this;
+    var dialogButtons = {};
     var graph = this.app.graph;
     var app = this.app;
-    
-	dialogButtons[g_save] = function() {
-                app.PushToStack("Rename");
 
-                var titlesList = $( "#VertextTitleList" ).val().split('\n');
-                for (i = 0; i < Math.min(graph.vertices.length, titlesList.length); i ++)
-                {
-                    graph.vertices[i].mainText = titlesList[i];
-                }
-                app.redrawGraph();
-				$( this ).dialog( "close" );					
-			};
-	dialogButtons[g_cancel] = function() {
-				$( this ).dialog( "close" );						
-			};
+    dialogButtons[g_save] = function () {
+        app.PushToStack("Rename");
+
+        var titlesList = $("#VertextTitleList").val().split('\n');
+        for (i = 0; i < Math.min(graph.vertices.length, titlesList.length); i++) {
+            graph.vertices[i].mainText = titlesList[i];
+        }
+        app.redrawGraph();
+        $(this).dialog("close");
+    };
+    dialogButtons[g_cancel] = function () {
+        $(this).dialog("close");
+    };
 
     var titleList = "";
-    for (i = 0; i < graph.vertices.length; i ++)
-    {
+    for (i = 0; i < graph.vertices.length; i++) {
         titleList = titleList + graph.vertices[i].mainText + "\n";
     }
-    
-	$( "#VertextTitleList" ).val(titleList);
-		
-	$( "#GroupRenameDialog" ).dialog({
-		resizable: false,
+
+    $("#VertextTitleList").val(titleList);
+
+    $("#GroupRenameDialog").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_groupRename,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
+        width: "auto",
+        modal: true,
+        title: g_groupRename,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 }
 
 
@@ -4274,71 +3994,63 @@ GroupRenameVertices.prototype.show = function()
  * Setup Vertex Style rename vertices.
  *
  */
-function SetupVertexStyle(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";	
+function SetupVertexStyle(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
 SetupVertexStyle.prototype = Object.create(BaseHandler.prototype);
 
-SetupVertexStyle.prototype.show = function(index, selectedVertexes)
-{
-	var handler = this;
-	var dialogButtons = {};
+SetupVertexStyle.prototype.show = function (index, selectedVertexes) {
+    var handler = this;
+    var dialogButtons = {};
     var graph = this.app.graph;
-    var app   = this.app;
+    var app = this.app;
     this.forAll = selectedVertexes == null;
     var forAll = this.forAll;
     var sefl = this;
 
-    var applyIndex = function(index)
-    {
+    var applyIndex = function (index) {
         self.index = index;
         self.originStyle = (self.index == 0 ? app.vertexCommonStyle : app.vertexSelectedVertexStyles[self.index - 1]);
-        if (!forAll)
-        {
+        if (!forAll) {
             self.originStyle = selectedVertexes[0].getStyleFor(self.index);
         }
-        self.style = FullObjectCopy(self.originStyle);    
+        self.style = FullObjectCopy(self.originStyle);
     }
 
     applyIndex(index);
 
-    var fillFields = function()
-    {
+    var fillFields = function () {
         var fullStyle = self.style.GetStyle({}, forAll ? undefined : selectedVertexes[0]);
 
-        $( "#vertexFillColor" ).val(fullStyle.fillStyle);
-        $( "#vertexStrokeColor" ).val(fullStyle.strokeStyle);
-        $( "#vertexTextColor" ).val(fullStyle.mainTextColor);
-        $( "#upVertexTextColor" ).val(fullStyle.upTextColor);
-        $( "#vertexStrokeSize" ).val(fullStyle.lineWidth);
-        $( "#vertexShape" ).val(fullStyle.shape);
-        $( "#vertexSize" ).val(forAll ? app.GetDefaultVertexSize() : selectedVertexes[0].model.diameter);
-        $( "#commonTextPosition" ).val(fullStyle.commonTextPosition); 
-        
-        if (self.index > 0 || self.index == "all")
-        {
-            $( "#VertexSelectedIndexForm" ).show();
-            $( "#vertexSelectedIndex" ).val(self.index);        
+        $("#vertexFillColor").val(fullStyle.fillStyle);
+        $("#vertexStrokeColor").val(fullStyle.strokeStyle);
+        $("#vertexTextColor").val(fullStyle.mainTextColor);
+        $("#upVertexTextColor").val(fullStyle.upTextColor);
+        $("#vertexStrokeSize").val(fullStyle.lineWidth);
+        $("#vertexShape").val(fullStyle.shape);
+        $("#vertexSize").val(forAll ? app.GetDefaultVertexSize() : selectedVertexes[0].model.diameter);
+        $("#commonTextPosition").val(fullStyle.commonTextPosition);
+
+        if (self.index > 0 || self.index == "all") {
+            $("#VertexSelectedIndexForm").show();
+            $("#vertexSelectedIndex").val(self.index);
         }
-        else
-        {
-            $( "#VertexSelectedIndexForm" ).hide();        
+        else {
+            $("#VertexSelectedIndexForm").hide();
         }
 
         // Fill color presets.
         var stylesArray = [];
         stylesArray.push(app.vertexCommonStyle);
 
-        for (i = 0; i < app.vertexSelectedVertexStyles.length; i ++)
+        for (i = 0; i < app.vertexSelectedVertexStyles.length; i++)
             stylesArray.push(app.vertexSelectedVertexStyles[i]);
 
         var colorSet = {};
-        for (i = 0; i < stylesArray.length; i ++)
-        {
+        for (i = 0; i < stylesArray.length; i++) {
             var style = stylesArray[i];
             if (style.hasOwnProperty('strokeStyle'))
                 colorSet[style.strokeStyle] = 1;
@@ -4354,75 +4066,70 @@ SetupVertexStyle.prototype.show = function(index, selectedVertexes)
         $("#upVertexTextColorPreset").find('option').remove();
         $("#vertexTextColorPreset").find('option').remove();
         $("#vertexStrokeColorPreset").find('option').remove();
-        for (const property in colorSet)
-        {
+        for (const property in colorSet) {
             $("#vertexFillColorPreset").append(new Option(property));
             $("#upVertexTextColorPreset").append(new Option(property));
             $("#vertexTextColorPreset").append(new Option(property));
             $("#vertexStrokeColorPreset").append(new Option(property));
         }
     }
-    
-    var redrawVertex = function()
-    {
+
+    var redrawVertex = function () {
         var fullStyle = self.style.GetStyle({}, forAll ? undefined : selectedVertexes[0]);
 
-        if (fullStyle.fillStyle != $( "#vertexFillColor" ).val())
-            self.style.fillStyle     = $( "#vertexFillColor" ).val();
+        if (fullStyle.fillStyle != $("#vertexFillColor").val())
+            self.style.fillStyle = $("#vertexFillColor").val();
 
-        if (fullStyle.strokeStyle != $( "#vertexStrokeColor" ).val())
-            self.style.strokeStyle   = $( "#vertexStrokeColor" ).val();
+        if (fullStyle.strokeStyle != $("#vertexStrokeColor").val())
+            self.style.strokeStyle = $("#vertexStrokeColor").val();
 
-        if (fullStyle.mainTextColor != $( "#vertexTextColor" ).val())
-            self.style.mainTextColor = $( "#vertexTextColor" ).val();
+        if (fullStyle.mainTextColor != $("#vertexTextColor").val())
+            self.style.mainTextColor = $("#vertexTextColor").val();
 
-        if (fullStyle.lineWidth != $( "#vertexStrokeSize" ).val())
-            self.style.lineWidth     = parseInt($( "#vertexStrokeSize" ).val());
+        if (fullStyle.lineWidth != $("#vertexStrokeSize").val())
+            self.style.lineWidth = parseInt($("#vertexStrokeSize").val());
 
-        if (fullStyle.shape != $( "#vertexShape" ).val())
-            self.style.shape    = parseInt($( "#vertexShape" ).val());
+        if (fullStyle.shape != $("#vertexShape").val())
+            self.style.shape = parseInt($("#vertexShape").val());
 
-        if (fullStyle.upTextColor != $( "#upVertexTextColor" ).val())
-            self.style.upTextColor = $( "#upVertexTextColor" ).val(); 
+        if (fullStyle.upTextColor != $("#upVertexTextColor").val())
+            self.style.upTextColor = $("#upVertexTextColor").val();
 
-        if (fullStyle.commonTextPosition != $( "#commonTextPosition" ).val())
-            self.style.commonTextPosition = $( "#commonTextPosition" ).val(); 
+        if (fullStyle.commonTextPosition != $("#commonTextPosition").val())
+            self.style.commonTextPosition = $("#commonTextPosition").val();
 
-        var diameter = parseInt($( "#vertexSize" ).val());
-        
-        var canvas  = document.getElementById( "VertexPreview" );
-        var context = canvas.getContext('2d');    
-        
+        var diameter = parseInt($("#vertexSize").val());
+
+        var canvas = document.getElementById("VertexPreview");
+        var context = canvas.getContext('2d');
+
         context.save();
 
         var backgroundDrawer = new BaseBackgroundDrawer(context);
         backgroundDrawer.Draw(app.backgroundCommonStyle, canvas.width, canvas.height, new Point(0, 0), 1.0);
-        
+
         var graphDrawer = new BaseVertexDrawer(context);
-        var baseVertex  = new BaseVertex(canvas.width / 2, canvas.height / 2, new BaseEnumVertices(this));
+        var baseVertex = new BaseVertex(canvas.width / 2, canvas.height / 2, new BaseEnumVertices(this));
         baseVertex.mainText = "1";
-        baseVertex.upText   = "Up Text";
+        baseVertex.upText = "Up Text";
         baseVertex.model.diameter = diameter;
 
         if (!forAll)
             baseVertex.ownStyles = selectedVertexes[0].ownStyles;
-        
+
         graphDrawer.Draw(baseVertex, self.style.GetStyle({}, baseVertex));
-        
+
         context.restore();
     }
-    
-    var changeIndex = function()
-    {
-        var val   = $( "#vertexSelectedIndex" ).val();
-        if (val == "all")
-        {
+
+    var changeIndex = function () {
+        var val = $("#vertexSelectedIndex").val();
+        if (val == "all") {
             applyIndex(1);
             self.index = "all";
             fillFields();
         }
-        else
-        {
+        else {
             var index = parseInt(val);
             self.index = index;
             applyIndex(index);
@@ -4431,211 +4138,192 @@ SetupVertexStyle.prototype.show = function(index, selectedVertexes)
         redrawVertex();
     }
 
-    var applyDiameter = function(diameter)
-        {
-            if (forAll)
-            {
-                app.SetDefaultVertexSize(diameter);
+    var applyDiameter = function (diameter) {
+        if (forAll) {
+            app.SetDefaultVertexSize(diameter);
+        }
+        else {
+            selectedVertexes.forEach(function (vertex) {
+                vertex.model.diameter = diameter;
+            });
+        }
+    };
+
+    dialogButtons[g_default] =
+    {
+        text: g_default,
+        class: "MarginLeft",
+        click: function () {
+
+            app.PushToStack("ChangeStyle");
+
+            applyDiameter(forAll ? (new VertexModel()).diameter : app.GetDefaultVertexSize());
+
+            var indexes = [];
+            if (self.index == "all") {
+                for (i = 0; i < app.vertexSelectedVertexStyles.length; i++)
+                    indexes.push(i + 1);
             }
             else
-            {
-                selectedVertexes.forEach(function(vertex) {
-                    vertex.model.diameter = diameter;
+                indexes.push(self.index);
+
+
+            if (forAll) {
+                indexes.forEach(function (index) {
+                    app.ResetVertexStyle(index);
                 });
             }
-        };
-    
-	dialogButtons[g_default] = 
-           {
-               text    : g_default,
-               class   : "MarginLeft",
-               click   : function() {
-
-                    app.PushToStack("ChangeStyle");
-
-                    applyDiameter(forAll ? (new VertexModel()).diameter : app.GetDefaultVertexSize());
-
-                    var indexes = [];
-                    if (self.index == "all")
-                    {
-                        for (i = 0; i < app.vertexSelectedVertexStyles.length; i ++)
-                            indexes.push(i + 1);
-                    }
-                    else
-                        indexes.push(self.index);
-                    
-
-                    if (forAll)
-                    {
-                        indexes.forEach(function(index) {
-                        	app.ResetVertexStyle(index);
-                        });
-                    }
-                    else
-                    {
-                        selectedVertexes.forEach(function(vertex) {
-                        	indexes.forEach(function(index) {
-                            	vertex.resetOwnStyle(index);
-                            });
-                          });
-                    }
-                    app.redrawGraph();
-                    $( this ).dialog( "close" );
-               }
-           };
-    
-	dialogButtons[g_save] = function() {
-
-                app.PushToStack("ChangeStyle");
-
-                applyDiameter(parseInt($( "#vertexSize" ).val()));
-
-                var indexes = [];
-                if (self.index == "all")
-                {
-                    indexes.push({index : 1, style : self.style});
-                    for (i = 1; i < app.vertexSelectedVertexStyles.length; i ++)
-                    {
-                        var style = (new BaseVertexStyle());
-                        style.baseStyles.push("selected");
-                        indexes.push({index : i + 1, style : style});
-                    }
-
-                    self.style.baseStyles = [];
-                    self.style.baseStyles = self.style.baseStyles.concat((new SelectedVertexStyle0()).baseStyles);
-                }
-                else
-                    indexes.push({index : self.index, style : self.style});
-
-                if (forAll)
-                {
-                	indexes.forEach(function(index) {
-                    	app.SetVertexStyle(index.index, index.style);
+            else {
+                selectedVertexes.forEach(function (vertex) {
+                    indexes.forEach(function (index) {
+                        vertex.resetOwnStyle(index);
                     });
-                }
-                else
-                {
-                    if (JSON.stringify(self.originStyle) !== JSON.stringify(self.style))
-                    {
-                        selectedVertexes.forEach(function(vertex) {
-                        	indexes.forEach(function(index) {
-                            	vertex.setOwnStyle(index.index, index.style);
-                            });
-                        });
-                    }
-                }
-                app.redrawGraph();
-				$( this ).dialog( "close" );					
-			};
-	dialogButtons[g_cancel] = function() {
-				$( this ).dialog( "close" );						
-			};
-    
+                });
+            }
+            app.redrawGraph();
+            $(this).dialog("close");
+        }
+    };
+
+    dialogButtons[g_save] = function () {
+
+        app.PushToStack("ChangeStyle");
+
+        applyDiameter(parseInt($("#vertexSize").val()));
+
+        var indexes = [];
+        if (self.index == "all") {
+            indexes.push({ index: 1, style: self.style });
+            for (i = 1; i < app.vertexSelectedVertexStyles.length; i++) {
+                var style = (new BaseVertexStyle());
+                style.baseStyles.push("selected");
+                indexes.push({ index: i + 1, style: style });
+            }
+
+            self.style.baseStyles = [];
+            self.style.baseStyles = self.style.baseStyles.concat((new SelectedVertexStyle0()).baseStyles);
+        }
+        else
+            indexes.push({ index: self.index, style: self.style });
+
+        if (forAll) {
+            indexes.forEach(function (index) {
+                app.SetVertexStyle(index.index, index.style);
+            });
+        }
+        else {
+            if (JSON.stringify(self.originStyle) !== JSON.stringify(self.style)) {
+                selectedVertexes.forEach(function (vertex) {
+                    indexes.forEach(function (index) {
+                        vertex.setOwnStyle(index.index, index.style);
+                    });
+                });
+            }
+        }
+        app.redrawGraph();
+        $(this).dialog("close");
+    };
+    dialogButtons[g_cancel] = function () {
+        $(this).dialog("close");
+    };
+
     fillFields();
-        
-	$( "#SetupVertexStyleDialog" ).dialog({
-		resizable: false,
+
+    $("#SetupVertexStyleDialog").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_vertexDraw,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
-    
+        width: "auto",
+        modal: true,
+        title: g_vertexDraw,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
+
     redrawVertex();
 
-    $( "#vertexFillColor" ).unbind();
-    $( "#vertexStrokeColor" ).unbind();
-    $( "#vertexTextColor" ).unbind();
-    $( "#upVertexTextColor" ).unbind();
-    $( "#vertexStrokeSize" ).unbind();
-    $( "#vertexShape" ).unbind();
-    $( "#vertexSize" ).unbind();
-    $( "#commonTextPosition" ).unbind();
-    $( "#vertexSelectedIndex" ).unbind();
-    
-    $( "#vertexFillColor" ).change(redrawVertex);
-    $( "#vertexStrokeColor" ).change(redrawVertex);
-    $( "#vertexTextColor" ).change(redrawVertex);
-    $( "#vertexStrokeSize" ).change(redrawVertex);
-    $( "#vertexShape" ).change(redrawVertex);
-    $( "#vertexSize" ).change(redrawVertex);
-    $( "#upVertexTextColor" ).change(redrawVertex);
-    $( "#commonTextPosition" ).change(redrawVertex);
-    $( "#vertexSelectedIndex" ).change(changeIndex);
+    $("#vertexFillColor").unbind();
+    $("#vertexStrokeColor").unbind();
+    $("#vertexTextColor").unbind();
+    $("#upVertexTextColor").unbind();
+    $("#vertexStrokeSize").unbind();
+    $("#vertexShape").unbind();
+    $("#vertexSize").unbind();
+    $("#commonTextPosition").unbind();
+    $("#vertexSelectedIndex").unbind();
+
+    $("#vertexFillColor").change(redrawVertex);
+    $("#vertexStrokeColor").change(redrawVertex);
+    $("#vertexTextColor").change(redrawVertex);
+    $("#vertexStrokeSize").change(redrawVertex);
+    $("#vertexShape").change(redrawVertex);
+    $("#vertexSize").change(redrawVertex);
+    $("#upVertexTextColor").change(redrawVertex);
+    $("#commonTextPosition").change(redrawVertex);
+    $("#vertexSelectedIndex").change(changeIndex);
 }
 
 /**
  * Setup Vertex Style rename vertices.
  *
  */
-function SetupEdgeStyle(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";	
+function SetupEdgeStyle(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
 SetupEdgeStyle.prototype = Object.create(BaseHandler.prototype);
 
-SetupEdgeStyle.prototype.show = function(index, selectedEdges)
-{
-	var handler = this;
-	var dialogButtons = {};
+SetupEdgeStyle.prototype.show = function (index, selectedEdges) {
+    var handler = this;
+    var dialogButtons = {};
     var graph = this.app.graph;
-    var app   = this.app;
+    var app = this.app;
     this.forAll = selectedEdges == null;
     var forAll = this.forAll;
 
     var self = this;
 
-    var applyIndex = function(index)
-    {
+    var applyIndex = function (index) {
         self.index = index;
         var originStyle = (self.index == 0 ? app.edgeCommonStyle : app.edgeSelectedStyles[self.index - 1]);
-        if (!forAll)
-        {
+        if (!forAll) {
             originStyle = selectedEdges[0].getStyleFor(self.index);
         }
-        self.style = FullObjectCopy(originStyle);    
+        self.style = FullObjectCopy(originStyle);
     }
 
     applyIndex(index);
 
-    var fillFields = function()
-    {
+    var fillFields = function () {
         var fullStyle = self.style.GetStyle({}, forAll ? undefined : selectedEdges[0]);
 
-        $( "#edgeFillColor" ).val(fullStyle.fillStyle);
-        $( "#edgeStrokeColor" ).val(fullStyle.strokeStyle);
-        $( "#edgeTextColor" ).val(fullStyle.weightText);
-        $( "#edgeStyle" ).val(fullStyle.lineDash);
-        $( "#edgeWidth" ).val(forAll ? app.GetDefaultEdgeWidth() : selectedEdges[0].model.width);
+        $("#edgeFillColor").val(fullStyle.fillStyle);
+        $("#edgeStrokeColor").val(fullStyle.strokeStyle);
+        $("#edgeTextColor").val(fullStyle.weightText);
+        $("#edgeStyle").val(fullStyle.lineDash);
+        $("#edgeWidth").val(forAll ? app.GetDefaultEdgeWidth() : selectedEdges[0].model.width);
 
-        $( "#weightEdgeTextColor" ).val(fullStyle.additionalTextColor);
-        $( "#weightTextPosition" ).val(fullStyle.weightPosition);
+        $("#weightEdgeTextColor").val(fullStyle.additionalTextColor);
+        $("#weightTextPosition").val(fullStyle.weightPosition);
 
-        if (self.index > 0 || self.index == "all")
-        {
-            $( "#EdgeSelectedIndexForm" ).show();
-            $( "#edgeSelectedIndex" ).val(self.index);        
+        if (self.index > 0 || self.index == "all") {
+            $("#EdgeSelectedIndexForm").show();
+            $("#edgeSelectedIndex").val(self.index);
         }
-        else
-        {
-            $( "#EdgeSelectedIndexForm" ).hide();        
+        else {
+            $("#EdgeSelectedIndexForm").hide();
         }
 
         // Fill color presets.
         var stylesArray = [];
         stylesArray.push(app.edgeCommonStyle);
 
-        for (i = 0; i < app.edgeSelectedStyles.length; i ++)
+        for (i = 0; i < app.edgeSelectedStyles.length; i++)
             stylesArray.push(app.edgeSelectedStyles[i]);
 
         var colorSet = {};
-        for (i = 0; i < stylesArray.length; i ++)
-        {
+        for (i = 0; i < stylesArray.length; i++) {
             var style = stylesArray[i];
             if (style.hasOwnProperty('strokeStyle'))
                 colorSet[style.strokeStyle] = 1;
@@ -4649,301 +4337,282 @@ SetupEdgeStyle.prototype.show = function(index, selectedEdges)
         $("#weightEdgeTextColorPreset").find('option').remove();
         $("#edgeTextColorPreset").find('option').remove();
         $("#edgeStrokeColorPreset").find('option').remove();
-        for (const property in colorSet)
-        {
+        for (const property in colorSet) {
             $("#edgeFillColorPreset").append(new Option(property));
             $("#weightEdgeTextColorPreset").append(new Option(property));
             $("#edgeTextColorPreset").append(new Option(property));
             $("#edgeStrokeColorPreset").append(new Option(property));
-        }        
+        }
     }
-    
-    var redrawVertex = function()
-    {
+
+    var redrawVertex = function () {
         var fullStyle = self.style.GetStyle({}, forAll ? undefined : selectedEdges[0]);
 
-        if (fullStyle.fillStyle != $( "#edgeFillColor" ).val())
-            self.style.fillStyle     = $( "#edgeFillColor" ).val();
+        if (fullStyle.fillStyle != $("#edgeFillColor").val())
+            self.style.fillStyle = $("#edgeFillColor").val();
 
-        if (fullStyle.strokeStyle != $( "#edgeStrokeColor" ).val())
-            self.style.strokeStyle   = $( "#edgeStrokeColor" ).val();
+        if (fullStyle.strokeStyle != $("#edgeStrokeColor").val())
+            self.style.strokeStyle = $("#edgeStrokeColor").val();
 
-        if (fullStyle.weightText != $( "#edgeTextColor" ).val())
-            self.style.weightText    = $( "#edgeTextColor" ).val();
+        if (fullStyle.weightText != $("#edgeTextColor").val())
+            self.style.weightText = $("#edgeTextColor").val();
 
-        if (fullStyle.lineDash != $( "#edgeStyle" ).val())
-            self.style.lineDash    = $( "#edgeStyle" ).val();
+        if (fullStyle.lineDash != $("#edgeStyle").val())
+            self.style.lineDash = $("#edgeStyle").val();
 
-        if (fullStyle.additionalTextColor != $( "#weightEdgeTextColor" ).val())
-            self.style.additionalTextColor    = $( "#weightEdgeTextColor" ).val();
+        if (fullStyle.additionalTextColor != $("#weightEdgeTextColor").val())
+            self.style.additionalTextColor = $("#weightEdgeTextColor").val();
 
-        if (fullStyle.weightPosition != $( "#weightTextPosition" ).val())
-            self.style.weightPosition    = $( "#weightTextPosition" ).val();
+        if (fullStyle.weightPosition != $("#weightTextPosition").val())
+            self.style.weightPosition = $("#weightTextPosition").val();
 
-        var edgeWidth = parseInt($( "#edgeWidth" ).val());
-        
-        var canvas  = document.getElementById( "EdgePreview" );
-        var context = canvas.getContext('2d');    
-        
+        var edgeWidth = parseInt($("#edgeWidth").val());
+
+        var canvas = document.getElementById("EdgePreview");
+        var context = canvas.getContext('2d');
+
         context.save();
-        
+
         var backgroundDrawer = new BaseBackgroundDrawer(context);
         backgroundDrawer.Draw(app.backgroundCommonStyle, canvas.width, canvas.height, new Point(0, 0), 1.0);
-        
-        var graphDrawer  = new BaseEdgeDrawer(context);
-        var baseVertex1  = new BaseVertex(0, canvas.height / 2, new BaseEnumVertices(this));
-        var baseVertex2  = new BaseVertex(canvas.width, canvas.height / 2, new BaseEnumVertices(this));
+
+        var graphDrawer = new BaseEdgeDrawer(context);
+        var baseVertex1 = new BaseVertex(0, canvas.height / 2, new BaseEnumVertices(this));
+        var baseVertex2 = new BaseVertex(canvas.width, canvas.height / 2, new BaseEnumVertices(this));
 
         baseVertex1.currentStyle = baseVertex1.getStyleFor(0);
         baseVertex2.currentStyle = baseVertex2.getStyleFor(0);
 
-        var baseEdge     = new BaseEdge(baseVertex1, baseVertex2, true, 10, "Text");
-        
+        var baseEdge = new BaseEdge(baseVertex1, baseVertex2, true, 10, "Text");
+
         if (!forAll)
             baseEdge.ownStyles = selectedEdges[0].ownStyles;
 
         baseEdge.model.width = edgeWidth;
 
         graphDrawer.Draw(baseEdge, self.style.GetStyle({}, baseEdge));
-        
+
         context.restore();
     }
 
-    var changeIndex = function()
-    {
-        var val = $( "#edgeSelectedIndex" ).val();
-        if (val == "all")
-        {
+    var changeIndex = function () {
+        var val = $("#edgeSelectedIndex").val();
+        if (val == "all") {
             applyIndex(1);
             self.index = "all";
             fillFields();
         }
-        else
-        {
+        else {
             var index = parseInt(val);
             self.index = index;
             applyIndex(index);
-            fillFields();    
+            fillFields();
         }
 
         redrawVertex();
-    }    
-    
-    var applyWidth = function(width)
-        {
-            if (forAll)
-            {
-                app.SetDefaultEdgeWidth(width);
+    }
+
+    var applyWidth = function (width) {
+        if (forAll) {
+            app.SetDefaultEdgeWidth(width);
+        }
+        else {
+            selectedEdges.forEach(function (edge) {
+                edge.model.width = width;
+            });
+        }
+    };
+
+    dialogButtons[g_default] =
+    {
+        text: g_default,
+        class: "MarginLeft",
+        click: function () {
+            app.PushToStack("ChangeStyle");
+
+            applyWidth(forAll ? (new EdgeModel()).width : app.GetDefaultEdgeWidth());
+            var indexes = [];
+            if (self.index == "all") {
+                for (i = 0; i < app.edgeSelectedStyles.length; i++)
+                    indexes.push(i + 1);
             }
             else
-            {
-                selectedEdges.forEach(function(edge) {
-                        edge.model.width = width;
-                    });
+                indexes.push(self.index);
+
+            if (forAll) {
+                indexes.forEach(function (index) {
+                    app.ResetEdgeStyle(index);
+                });
             }
-        };    
-
-	dialogButtons[g_default] = 
-           {
-               text    : g_default,
-               class   : "MarginLeft",
-               click   : function() {
-                    app.PushToStack("ChangeStyle");
-
-                    applyWidth(forAll ? (new EdgeModel()).width : app.GetDefaultEdgeWidth());
-                    var indexes = [];
-                    if (self.index == "all")
-                    {
-                        for (i = 0; i < app.edgeSelectedStyles.length; i ++)
-                            indexes.push(i + 1);
-                    }
-                    else
-                        indexes.push(self.index);
-
-                    if (forAll)
-                    {                        
-                        indexes.forEach(function(index) {
-                                app.ResetEdgeStyle(index);
-                            });
-                    }
-                    else
-                    {
-                        selectedEdges.forEach(function(edge) {
-                            indexes.forEach(function(index) {
-                                edge.resetOwnStyle(index);
-                            });                            
-                        });
-                    }
-                    
-                    app.redrawGraph();
-                    $( this ).dialog( "close" );
-               }
-           };
-    
-	dialogButtons[g_save] = function() {
-
-                app.PushToStack("ChangeStyle");
-
-                applyWidth(parseInt($( "#edgeWidth" ).val()));
-
-                var indexes = [];
-                if (self.index == "all")
-                {
-                    indexes.push({index : 1, style : self.style});
-
-                    for (i = 1; i < app.edgeSelectedStyles.length; i ++)
-                    {
-                        var style = (new BaseEdgeStyle());
-                        style.baseStyles.push("selected");
-                        indexes.push({index : i + 1, style : style});
-                    }
-
-                    self.style.baseStyles = [];
-                    self.style.baseStyles = self.style.baseStyles.concat((new SelectedEdgeStyle0()).baseStyles);
-                }
-                else
-                    indexes.push({index : self.index, style : self.style});
-
-                if (forAll)
-                {
-                    indexes.forEach(function(index) {
-                        app.SetEdgeStyle(index.index, index.style);
+            else {
+                selectedEdges.forEach(function (edge) {
+                    indexes.forEach(function (index) {
+                        edge.resetOwnStyle(index);
                     });
-                }
-                else
-                {
-                    selectedEdges.forEach(function(edge) {
-                        indexes.forEach(function(index) {
-                                edge.setOwnStyle(index.index, index.style);
-                            });
-                    });
-                }                
-                app.redrawGraph();
-				$( this ).dialog( "close" );					
-			};
-	dialogButtons[g_cancel] = function() {
-				$( this ).dialog( "close" );						
-			};
-    
+                });
+            }
+
+            app.redrawGraph();
+            $(this).dialog("close");
+        }
+    };
+
+    dialogButtons[g_save] = function () {
+
+        app.PushToStack("ChangeStyle");
+
+        applyWidth(parseInt($("#edgeWidth").val()));
+
+        var indexes = [];
+        if (self.index == "all") {
+            indexes.push({ index: 1, style: self.style });
+
+            for (i = 1; i < app.edgeSelectedStyles.length; i++) {
+                var style = (new BaseEdgeStyle());
+                style.baseStyles.push("selected");
+                indexes.push({ index: i + 1, style: style });
+            }
+
+            self.style.baseStyles = [];
+            self.style.baseStyles = self.style.baseStyles.concat((new SelectedEdgeStyle0()).baseStyles);
+        }
+        else
+            indexes.push({ index: self.index, style: self.style });
+
+        if (forAll) {
+            indexes.forEach(function (index) {
+                app.SetEdgeStyle(index.index, index.style);
+            });
+        }
+        else {
+            selectedEdges.forEach(function (edge) {
+                indexes.forEach(function (index) {
+                    edge.setOwnStyle(index.index, index.style);
+                });
+            });
+        }
+        app.redrawGraph();
+        $(this).dialog("close");
+    };
+    dialogButtons[g_cancel] = function () {
+        $(this).dialog("close");
+    };
+
     fillFields();
-        
-	$( "#SetupEdgeStyleDialog" ).dialog({
-		resizable: false,
+
+    $("#SetupEdgeStyleDialog").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_edgeDraw,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
+        width: "auto",
+        modal: true,
+        title: g_edgeDraw,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
 
     redrawVertex();
 
-    $( "#edgeFillColor" ).unbind();
-    $( "#edgeStrokeColor" ).unbind();
-    $( "#edgeTextColor" ).unbind();
-    $( "#edgeStyle" ).unbind();
-    $( "#edgeWidth" ).unbind();
-    $( "#weightEdgeTextColor" ).unbind();
-    $( "#weightTextPosition" ).unbind();
-    $( "#edgeSelectedIndex" ).unbind();    
-    
-    $( "#edgeFillColor" ).change(redrawVertex);
-    $( "#edgeStrokeColor" ).change(redrawVertex);
-    $( "#edgeTextColor" ).change(redrawVertex);
-    $( "#edgeStyle" ).change(redrawVertex);
-    $( "#edgeWidth" ).change(redrawVertex);
-    $( "#weightEdgeTextColor" ).change(redrawVertex);
-    $( "#weightTextPosition" ).change(redrawVertex);    
-    $( "#edgeSelectedIndex" ).change(changeIndex);        
+    $("#edgeFillColor").unbind();
+    $("#edgeStrokeColor").unbind();
+    $("#edgeTextColor").unbind();
+    $("#edgeStyle").unbind();
+    $("#edgeWidth").unbind();
+    $("#weightEdgeTextColor").unbind();
+    $("#weightTextPosition").unbind();
+    $("#edgeSelectedIndex").unbind();
+
+    $("#edgeFillColor").change(redrawVertex);
+    $("#edgeStrokeColor").change(redrawVertex);
+    $("#edgeTextColor").change(redrawVertex);
+    $("#edgeStyle").change(redrawVertex);
+    $("#edgeWidth").change(redrawVertex);
+    $("#weightEdgeTextColor").change(redrawVertex);
+    $("#weightTextPosition").change(redrawVertex);
+    $("#edgeSelectedIndex").change(changeIndex);
 }
 
 /**
  * Setup Background Style rename vertices.
  *
  */
-function SetupBackgroundStyle(app)
-{
-  BaseHandler.apply(this, arguments);
-  this.message = "";	
+function SetupBackgroundStyle(app) {
+    BaseHandler.apply(this, arguments);
+    this.message = "";
 }
 
 // inheritance.
 SetupBackgroundStyle.prototype = Object.create(BaseHandler.prototype);
 
-SetupBackgroundStyle.prototype.show = function()
-{
-	var handler = this;
-	var dialogButtons = {};
+SetupBackgroundStyle.prototype.show = function () {
+    var handler = this;
+    var dialogButtons = {};
     var graph = this.app.graph;
-    var app   = this.app;
+    var app = this.app;
     var style = FullObjectCopy(app.backgroundCommonStyle);
-    
-    var fillFields = function()
-    {
-        $( "#backgroundColor" ).val(style.commonColor);
-        $( "#backgroundTransporent" ).val(style.commonOpacity);
+
+    var fillFields = function () {
+        $("#backgroundColor").val(style.commonColor);
+        $("#backgroundTransporent").val(style.commonOpacity);
     }
-    
-    var redrawVertex = function()
-    {
-        style.commonColor     = $( "#backgroundColor" ).val();
-        style.commonOpacity   = $( "#backgroundTransporent" ).val();
-        
-        var canvas  = document.getElementById( "BackgroundPreview" );
-        var context = canvas.getContext('2d');    
-        
+
+    var redrawVertex = function () {
+        style.commonColor = $("#backgroundColor").val();
+        style.commonOpacity = $("#backgroundTransporent").val();
+
+        var canvas = document.getElementById("BackgroundPreview");
+        var context = canvas.getContext('2d');
+
         context.save();
 
         var backgroundDrawer = new BaseBackgroundDrawer(context);
         backgroundDrawer.Draw(style, canvas.width, canvas.height, new Point(0, 0), 1.0);
-        
+
         context.restore();
     }
-    
-	dialogButtons[g_default] = 
-           {
-               text    : g_default,
-               class   : "MarginLeft",
-               click   : function() {
 
-                    app.PushToStack("ChangeBackground");
+    dialogButtons[g_default] =
+    {
+        text: g_default,
+        class: "MarginLeft",
+        click: function () {
 
-                    app.ResetBackgroundStyle();
-                    app.redrawGraph();
-                    $( this ).dialog( "close" );
-               }
-           };
-    
-	dialogButtons[g_save] = function() {
-                app.PushToStack("ChangeBackground");
-                app.SetBackgroundStyle(style);    
-                app.redrawGraph();
-				$( this ).dialog( "close" );
-			};
-	dialogButtons[g_cancel] = function() {
-				$( this ).dialog( "close" );
-			};
-    
+            app.PushToStack("ChangeBackground");
+
+            app.ResetBackgroundStyle();
+            app.redrawGraph();
+            $(this).dialog("close");
+        }
+    };
+
+    dialogButtons[g_save] = function () {
+        app.PushToStack("ChangeBackground");
+        app.SetBackgroundStyle(style);
+        app.redrawGraph();
+        $(this).dialog("close");
+    };
+    dialogButtons[g_cancel] = function () {
+        $(this).dialog("close");
+    };
+
     fillFields();
-        
-	$( "#SetupBackgroundStyleDialog" ).dialog({
-		resizable: false,
+
+    $("#SetupBackgroundStyleDialog").dialog({
+        resizable: false,
         height: "auto",
-        width:  "auto",
-		modal: true,
-		title: g_backgroundStyle,
-		buttons: dialogButtons,
-		dialogClass: 'EdgeDialog'
-	});
-    
+        width: "auto",
+        modal: true,
+        title: g_backgroundStyle,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog'
+    });
+
     redrawVertex();
 
-    $( "#backgroundColor" ).unbind();
-    $( "#backgroundTransporent" ).unbind();
-    
-    $( "#backgroundColor" ).change(redrawVertex);
-    $( "#backgroundTransporent" ).change(redrawVertex);
+    $("#backgroundColor").unbind();
+    $("#backgroundTransporent").unbind();
+
+    $("#backgroundColor").change(redrawVertex);
+    $("#backgroundTransporent").change(redrawVertex);
 }
 /**
  *  This class creates GraphML xml.
@@ -4951,80 +4620,72 @@ SetupBackgroundStyle.prototype.show = function()
  */
 
 
-function GraphMLCreater(nodes, arcs, ignoreNodes = {})
-{
-	this.nodes = nodes;
-	this.arcs = arcs;
-	this.ignoreNodes = ignoreNodes;	
+function GraphMLCreater(nodes, arcs, ignoreNodes = {}) {
+    this.nodes = nodes;
+    this.arcs = arcs;
+    this.ignoreNodes = ignoreNodes;
 }
 
 
-GraphMLCreater.prototype.GetXMLString = function()
-{
-	var mainHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><graphml>";
-	var directedHeader   = "<graph id=\"Graph\" edgedefault=\"directed\">";	
-	var undirectedHeader = "<graph id=\"Graph\" edgedefault=\"undirected\">";
-	
-	var defaultWeight = 1.0;
-	var weightKeyId  = "\"d0\"";
-	var weightNode = "<key id="+ weightKeyId + " for=\"node\" attr.name=\"weight\" attr.type=\"double\">" +
-			"<default>" + defaultWeight + "</default>" +
-			"</key>";
-	
-	var xmlBoby = "";
-	  
-	for (var i = 0; i < this.nodes.length; i++)
-	{
-		if (!this.ignoreNodes.hasOwnProperty(this.nodes[i].id))
-			xmlBoby = xmlBoby + "<node id=\"" + this.nodes[i].id + "\"/>";
-	}
-	var hasDirected = false;
-	for (var i = 0; i < this.arcs.length; i++)
-	{
-		if (this.arcs[i].isDirect)
-		{
-			hasDirected = true;
-			break;
-		}
-	}		
-	for (var i = 0; i < this.arcs.length; i++)
-	{
-	    var weightData = "";
-	    var arc = this.arcs[i];
+GraphMLCreater.prototype.GetXMLString = function () {
+    var mainHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><graphml>";
+    var directedHeader = "<graph id=\"Graph\" edgedefault=\"directed\">";
+    var undirectedHeader = "<graph id=\"Graph\" edgedefault=\"undirected\">";
 
-		if (this.arcs[i].weight != defaultWeight)
-		{
-		    weightData = "<data key=" + weightKeyId + ">" + arc.weight + "</data>";
-		}
+    var defaultWeight = 1.0;
+    var weightKeyId = "\"d0\"";
+    var weightNode = "<key id=" + weightKeyId + " for=\"node\" attr.name=\"weight\" attr.type=\"double\">" +
+        "<default>" + defaultWeight + "</default>" +
+        "</key>";
 
-		xmlBoby = xmlBoby + "<edge source=\"" + arc.vertex1.id + "\" target=\""
-			+ arc.vertex2.id + "\" " +
-			(arc.isDirect != hasDirected ? (hasDirected ? "directed=\"false\"" : "directed=\"true\"") : "") +
-		    " id=\"" + arc.id + "\"";
-			
-		xmlBoby = xmlBoby +	((weightData != "") ? ">" + weightData + "</edge>" : "/>")
-	}	
-	xml = mainHeader + weightNode + (hasDirected ? directedHeader : undirectedHeader) + xmlBoby + "</graph></graphml>"
-	return xml;
+    var xmlBoby = "";
+
+    for (var i = 0; i < this.nodes.length; i++) {
+        if (!this.ignoreNodes.hasOwnProperty(this.nodes[i].id))
+            xmlBoby = xmlBoby + "<node id=\"" + this.nodes[i].id + "\"/>";
+    }
+    var hasDirected = false;
+    for (var i = 0; i < this.arcs.length; i++) {
+        if (this.arcs[i].isDirect) {
+            hasDirected = true;
+            break;
+        }
+    }
+    for (var i = 0; i < this.arcs.length; i++) {
+        var weightData = "";
+        var arc = this.arcs[i];
+
+        if (this.arcs[i].weight != defaultWeight) {
+            weightData = "<data key=" + weightKeyId + ">" + arc.weight + "</data>";
+        }
+
+        xmlBoby = xmlBoby + "<edge source=\"" + arc.vertex1.id + "\" target=\""
+            + arc.vertex2.id + "\" " +
+            (arc.isDirect != hasDirected ? (hasDirected ? "directed=\"false\"" : "directed=\"true\"") : "") +
+            " id=\"" + arc.id + "\"";
+
+        xmlBoby = xmlBoby + ((weightData != "") ? ">" + weightData + "</edge>" : "/>")
+    }
+    xml = mainHeader + weightNode + (hasDirected ? directedHeader : undirectedHeader) + xmlBoby + "</graph></graphml>"
+    return xml;
 }
 /**
  * Graph class.
  *
  */
 
- 
-function Graph()
-{
-	// List of vertex.
-	this.vertices = [];
-	// List of arcs.
-	this.edges   = [];
-	// Unique Id of new graph.
-	this.uidGraph = 0;
-	// Unique Id of new edge.
-	this.uidEdge = 10000;
-	// Has direction edge.
-	this.hasDirect = false;
+
+function Graph() {
+    // List of vertex.
+    this.vertices = [];
+    // List of arcs.
+    this.edges = [];
+    // Unique Id of new graph.
+    this.uidGraph = 0;
+    // Unique Id of new edge.
+    this.uidEdge = 10000;
+    // Has direction edge.
+    this.hasDirect = false;
     // Is graph multi
     this.isMultiGraph = false;
 };
@@ -5036,876 +4697,736 @@ Graph.prototype.maxVertexes = 1000;
 // Offset for edges ids.
 Graph.prototype.edgesOffset = 10000;
 
-Graph.prototype.AddNewVertex = function(vertex)
-{
-	if (this.vertices.length <= this.maxVertexes)
-	{
-		vertex.SetId (this.uidGraph);
-		this.uidGraph = this.uidGraph + 1;
+Graph.prototype.AddNewVertex = function (vertex) {
+    if (this.vertices.length <= this.maxVertexes) {
+        vertex.SetId(this.uidGraph);
+        this.uidGraph = this.uidGraph + 1;
         vertex.nodeInfo.title = this.uidGraph;
         vertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.uidGraph))
-		this.vertices.push(vertex);
-	}
-	return this.vertices.length - 1;
+        this.vertices.push(vertex);
+    }
+    return this.vertices.length - 1;
 }
 
-Graph.prototype.AddNewEdgeSafe = function(graph1, graph2, isDirect, weight, replaceIfExists = true)
-{
-	return this.AddNewEdge(new BaseEdge(graph1, graph2, isDirect, weight), replaceIfExists);
+Graph.prototype.AddNewEdgeSafe = function (graph1, graph2, isDirect, weight, replaceIfExists = true) {
+    return this.AddNewEdge(new BaseEdge(graph1, graph2, isDirect, weight), replaceIfExists);
 }
 
-Graph.prototype.AddNewEdge = function(edge, replaceIfExists)
-{
+Graph.prototype.AddNewEdge = function (edge, replaceIfExists) {
     edge.id = this.uidEdge;
     this.uidEdge = this.uidEdge + 1;
-    
-	var edge1      = this.FindEdgeAny(edge.vertex1.id, edge.vertex2.id);
-	var edgeRevert = this.FindEdgeAny(edge.vertex2.id, edge.vertex1.id);
-	if (!edge.isDirect)
-	{
-		if (edge1 != null && replaceIfExists)
-			this.DeleteEdge(edge1);
-		if (edgeRevert != null && replaceIfExists)
-			this.DeleteEdge(edgeRevert);
-        
-		this.edges.push(edge);
-	}
-	else
-	{
-		if (edge1 != null && replaceIfExists)
-			this.DeleteEdge(edge1);
-		if (edgeRevert != null && !edgeRevert.isDirect && replaceIfExists)
-			this.DeleteEdge(edgeRevert);
-		
-		this.edges.push(edge);
-	}
-    
+
+    var edge1 = this.FindEdgeAny(edge.vertex1.id, edge.vertex2.id);
+    var edgeRevert = this.FindEdgeAny(edge.vertex2.id, edge.vertex1.id);
+    if (!edge.isDirect) {
+        if (edge1 != null && replaceIfExists)
+            this.DeleteEdge(edge1);
+        if (edgeRevert != null && replaceIfExists)
+            this.DeleteEdge(edgeRevert);
+
+        this.edges.push(edge);
+    }
+    else {
+        if (edge1 != null && replaceIfExists)
+            this.DeleteEdge(edge1);
+        if (edgeRevert != null && !edgeRevert.isDirect && replaceIfExists)
+            this.DeleteEdge(edgeRevert);
+
+        this.edges.push(edge);
+    }
+
     this.isMultiGraph = this.checkMutiGraph();
-	
-	return this.edges.length - 1;
+
+    return this.edges.length - 1;
 }
 
 
-Graph.prototype.DeleteEdge = function(edgeObject)
-{
-	var index = this.edges.indexOf(edgeObject);
-	if (index > -1) 
-	{
-		this.edges.splice(index, 1);
-	}
-    
+Graph.prototype.DeleteEdge = function (edgeObject) {
+    var index = this.edges.indexOf(edgeObject);
+    if (index > -1) {
+        this.edges.splice(index, 1);
+    }
+
     this.isMultiGraph = this.checkMutiGraph();
 }
 
-Graph.prototype.DeleteVertex = function(vertexObject)
-{
-	var index = this.vertices.indexOf(vertexObject);
-	if (index > -1) 
-	{
- 		for (var i = 0; i < this.edges.length; i++)
-		{
-			if (this.edges[i].vertex1 == vertexObject || this.edges[i].vertex2 == vertexObject)
-			{
-				this.DeleteEdge(this.edges[i]);
-				i--;
-			}
-		}
-		this.vertices.splice(index, 1);
-	}
+Graph.prototype.DeleteVertex = function (vertexObject) {
+    var index = this.vertices.indexOf(vertexObject);
+    if (index > -1) {
+        for (var i = 0; i < this.edges.length; i++) {
+            if (this.edges[i].vertex1 == vertexObject || this.edges[i].vertex2 == vertexObject) {
+                this.DeleteEdge(this.edges[i]);
+                i--;
+            }
+        }
+        this.vertices.splice(index, 1);
+    }
 }
 
-Graph.prototype.HasConnectedNodes = function(vertexObject)
-{
-	var res = false;
+Graph.prototype.HasConnectedNodes = function (vertexObject) {
+    var res = false;
 
-	var index = this.vertices.indexOf(vertexObject);
-	if (index > -1) 
-	{
- 		for (var i = 0; i < this.edges.length; i++)
-		{
-			if (this.edges[i].vertex1 == vertexObject || this.edges[i].vertex2 == vertexObject)
-			{
-				res = true;
-				break;
-			}
-		}
-	}
+    var index = this.vertices.indexOf(vertexObject);
+    if (index > -1) {
+        for (var i = 0; i < this.edges.length; i++) {
+            if (this.edges[i].vertex1 == vertexObject || this.edges[i].vertex2 == vertexObject) {
+                res = true;
+                break;
+            }
+        }
+    }
 
-	return res;
+    return res;
 }
 
-Graph.prototype.FindVertex = function(id)
-{
-	var res = null;
-	for (var i = 0; i < this.vertices.length; i++)
-	{
-		if (this.vertices[i].id == id)
-		{
-			res = this.vertices[i];
-			break;
-		}
-	}
-	
-	return res;
+Graph.prototype.FindVertex = function (id) {
+    var res = null;
+    for (var i = 0; i < this.vertices.length; i++) {
+        if (this.vertices[i].id == id) {
+            res = this.vertices[i];
+            break;
+        }
+    }
+
+    return res;
 }
 
 // depricated
-Graph.prototype.FindEdge = function(id1, id2)
-{
-	return this.FindEdgeAny(id1, id2);
+Graph.prototype.FindEdge = function (id1, id2) {
+    return this.FindEdgeAny(id1, id2);
 }
 
-Graph.prototype.FindEdgeById = function(edgeId)
-{
+Graph.prototype.FindEdgeById = function (edgeId) {
     var res = null;
-    for (var i = 0; i < this.edges.length; i++)
-    {
-        if (this.edges[i].id == edgeId)
-        {
+    for (var i = 0; i < this.edges.length; i++) {
+        if (this.edges[i].id == edgeId) {
             res = this.edges[i];
             break;
         }
     }
-	
+
     return res;
 }
 
-Graph.prototype.FindEdgeAny = function(id1, id2)
-{
-	var res = null;
-	for (var i = 0; i < this.edges.length; i++)
-	{
-		if ((this.edges[i].vertex1.id == id1 && this.edges[i].vertex2.id == id2)
-		     || (!this.edges[i].isDirect && this.edges[i].vertex1.id == id2 && this.edges[i].vertex2.id == id1))
-		{
-			res = this.edges[i];
-			break;
-		}
-	}
-	
-	return res;
+Graph.prototype.FindEdgeAny = function (id1, id2) {
+    var res = null;
+    for (var i = 0; i < this.edges.length; i++) {
+        if ((this.edges[i].vertex1.id == id1 && this.edges[i].vertex2.id == id2)
+            || (!this.edges[i].isDirect && this.edges[i].vertex1.id == id2 && this.edges[i].vertex2.id == id1)) {
+            res = this.edges[i];
+            break;
+        }
+    }
+
+    return res;
 }
 
-Graph.prototype.FindEdgeMin = function(id1, id2)
-{
-	var res       = null;
+Graph.prototype.FindEdgeMin = function (id1, id2) {
+    var res = null;
     var minWeight = this.infinity;
-	for (var i = 0; i < this.edges.length; i++)
-	{
+    for (var i = 0; i < this.edges.length; i++) {
         var edge = this.edges[i];
-		if ((edge.vertex1.id == id1 && edge.vertex2.id == id2)
-		     || (!edge.isDirect && edge.vertex1.id == id2 && edge.vertex2.id == id1))
-		{
-            if (edge.weight < minWeight)
-            {
-                res       = edge;
+        if ((edge.vertex1.id == id1 && edge.vertex2.id == id2)
+            || (!edge.isDirect && edge.vertex1.id == id2 && edge.vertex2.id == id1)) {
+            if (edge.weight < minWeight) {
+                res = edge;
                 minWeight = edge.weight;
-            }
-		}
-	}
-	
-	return res;
-}
-
-Graph.prototype.FindEdgeMinIgnoreDirection = function(id1, id2)
-{
-	var res       = null;
-    var minWeight = this.infinity;
-	for (var i = 0; i < this.edges.length; i++)
-	{
-        var edge = this.edges[i];
-		if ((edge.vertex1.id == id1 && edge.vertex2.id == id2)
-		     || (edge.vertex1.id == id2 && edge.vertex2.id == id1))
-		{
-            if (edge.weight < minWeight)
-            {
-                res       = edge;
-                minWeight = edge.weight;
-            }
-		}
-	}
-	
-	return res;
-}
-
-Graph.prototype.FindAllEdges = function(id1, id2)
-{
-	var res       = [];
-	for (var i = 0; i < this.edges.length; i++)
-	{
-        var edge = this.edges[i];
-		if ((edge.vertex1.id == id1 && edge.vertex2.id == id2)
-		     || (!edge.isDirect && edge.vertex1.id == id2 && edge.vertex2.id == id1))
-		{
-			res.push(edge);
-		}
-	}
-	
-	return res;
-}
-
-Graph.prototype.GetAdjacencyMatrixStr = function ()
-{
-	var matrix = "";
-	for (var i = 0; i < this.vertices.length; i++)
-	{
-		for (var j = 0; j < this.vertices.length; j++)
-		{	
-			var edge = this.FindEdgeMin (this.vertices[i].id, this.vertices[j].id);
-			if (edge != null)
-			{
-				matrix += edge.weight;
-			}
-			else
-			{
-				matrix += "0";
-			}
-			
-			if (j != this.vertices.length)
-			{
-				matrix += ", ";
-			}
-			
-		}
-		matrix = matrix + "\n";
-	}
-	
-	return matrix;
-}
-
-Graph.prototype.GetAdjacencyMatrix = function ()
-{
-    var matrix = [];
-    
-    for (var i = 0; i < this.vertices.length; i ++)
-    {
-        matrix.push([]);
-        var v1 = this.vertices[i];
-        for (var j = 0; j < this.vertices.length; j ++)
-        {
-            var v2 = this.vertices[j];
-            var edge = this.FindEdgeMin(v1.id, v2.id);
-            if (edge != null)
-            {
-                matrix[i][j] = edge.GetWeight();
-            }
-            else
-            {
-                matrix[i][j] = this.infinity;               
             }
         }
     }
-    
+
+    return res;
+}
+
+Graph.prototype.FindEdgeMinIgnoreDirection = function (id1, id2) {
+    var res = null;
+    var minWeight = this.infinity;
+    for (var i = 0; i < this.edges.length; i++) {
+        var edge = this.edges[i];
+        if ((edge.vertex1.id == id1 && edge.vertex2.id == id2)
+            || (edge.vertex1.id == id2 && edge.vertex2.id == id1)) {
+            if (edge.weight < minWeight) {
+                res = edge;
+                minWeight = edge.weight;
+            }
+        }
+    }
+
+    return res;
+}
+
+Graph.prototype.FindAllEdges = function (id1, id2) {
+    var res = [];
+    for (var i = 0; i < this.edges.length; i++) {
+        var edge = this.edges[i];
+        if ((edge.vertex1.id == id1 && edge.vertex2.id == id2)
+            || (!edge.isDirect && edge.vertex1.id == id2 && edge.vertex2.id == id1)) {
+            res.push(edge);
+        }
+    }
+
+    return res;
+}
+
+Graph.prototype.GetAdjacencyMatrixStr = function () {
+    var matrix = "";
+    for (var i = 0; i < this.vertices.length; i++) {
+        for (var j = 0; j < this.vertices.length; j++) {
+            var edge = this.FindEdgeMin(this.vertices[i].id, this.vertices[j].id);
+            if (edge != null) {
+                matrix += edge.weight;
+            }
+            else {
+                matrix += "0";
+            }
+
+            if (j != this.vertices.length) {
+                matrix += ", ";
+            }
+
+        }
+        matrix = matrix + "\n";
+    }
+
     return matrix;
 }
 
-Graph.prototype.TestAdjacencyMatrix = function (matrix, rowsObj, colsObj, separator)
-{
-    if(separator === undefined) 
-    {
-      separator = ",";
+Graph.prototype.GetAdjacencyMatrix = function () {
+    var matrix = [];
+
+    for (var i = 0; i < this.vertices.length; i++) {
+        matrix.push([]);
+        var v1 = this.vertices[i];
+        for (var j = 0; j < this.vertices.length; j++) {
+            var v2 = this.vertices[j];
+            var edge = this.FindEdgeMin(v1.id, v2.id);
+            if (edge != null) {
+                matrix[i][j] = edge.GetWeight();
+            }
+            else {
+                matrix[i][j] = this.infinity;
+            }
+        }
     }
-    
-	var bGoodFormat = true;
-	rowsObj.rows = [];
-	rowsObj.rows = matrix.split ("\n");
-	for (j = 0; j < rowsObj.rows.length; ++j)
-	{
-		//rowsObj.rows[j] = rowsObj.rows[j].replace(/ /g,'');
-		if (rowsObj.rows[j] === "")
-		{
-			rowsObj.rows.splice(j--, 1);
-		}
-	}
-	
-	colsObj.cols = [];
-	for (var i = 0; i < rowsObj.rows.length; i++)
-	{
-		colsObj.cols[i] = this.SplitMatrixString(rowsObj.rows[i], separator);//rowsObj.rows[i].split (",");
-		for (j = 0; j < colsObj.cols[i].length; ++j)
-		{
-			if (colsObj.cols[i][j] === "")
-			{
-				colsObj.cols[i].splice(j--, 1);
-			}
-		}
-		if (colsObj.cols[i].length != rowsObj.rows.length)
-		{
-			bGoodFormat = false;
-			break;
-		}
-	}
 
-	return bGoodFormat;
+    return matrix;
+}
+
+Graph.prototype.TestAdjacencyMatrix = function (matrix, rowsObj, colsObj, separator) {
+    if (separator === undefined) {
+        separator = ",";
+    }
+
+    var bGoodFormat = true;
+    rowsObj.rows = [];
+    rowsObj.rows = matrix.split("\n");
+    for (j = 0; j < rowsObj.rows.length; ++j) {
+        //rowsObj.rows[j] = rowsObj.rows[j].replace(/ /g,'');
+        if (rowsObj.rows[j] === "") {
+            rowsObj.rows.splice(j--, 1);
+        }
+    }
+
+    colsObj.cols = [];
+    for (var i = 0; i < rowsObj.rows.length; i++) {
+        colsObj.cols[i] = this.SplitMatrixString(rowsObj.rows[i], separator);//rowsObj.rows[i].split (",");
+        for (j = 0; j < colsObj.cols[i].length; ++j) {
+            if (colsObj.cols[i][j] === "") {
+                colsObj.cols[i].splice(j--, 1);
+            }
+        }
+        if (colsObj.cols[i].length != rowsObj.rows.length) {
+            bGoodFormat = false;
+            break;
+        }
+    }
+
+    return bGoodFormat;
 }
 
 
-Graph.prototype.IsVertexesHasSamePosition = function (position, vertexCount)
-{
-	var res = false;
+Graph.prototype.IsVertexesHasSamePosition = function (position, vertexCount) {
+    var res = false;
 
-	for (var j = 0; j < Math.min(this.vertices.length, vertexCount); j++)
-	{
-		if (position.distance(this.vertices[j].position) < this.vertices[j].model.diameter * 2)
-		{
-			res = true;
-			break;
-		}
-	}
+    for (var j = 0; j < Math.min(this.vertices.length, vertexCount); j++) {
+        if (position.distance(this.vertices[j].position) < this.vertices[j].model.diameter * 2) {
+            res = true;
+            break;
+        }
+    }
 
-	return res;
+    return res;
 }
 
-Graph.prototype.GetRandomPositionOfVertex = function (matrix, vertexIndex, viewportSize)
-{
-	var point = new Point(0, 0);
+Graph.prototype.GetRandomPositionOfVertex = function (matrix, vertexIndex, viewportSize) {
+    var point = new Point(0, 0);
 
-	var relatedVertex = [];
+    var relatedVertex = [];
 
-	for (var j = 0; j < matrix.length; j++)
-	{
-		if (j < this.vertices.length && (cols[vertexIndex][j] > 0 || cols[j][vertexIndex] > 0) && j != vertexIndex)
-		{
-			relatedVertex.push(this.vertices[j]);
-		}
-	}
+    for (var j = 0; j < matrix.length; j++) {
+        if (j < this.vertices.length && (cols[vertexIndex][j] > 0 || cols[j][vertexIndex] > 0) && j != vertexIndex) {
+            relatedVertex.push(this.vertices[j]);
+        }
+    }
 
 
-	var diameter = (new VertexModel()).diameter;
+    var diameter = (new VertexModel()).diameter;
 
-	if (relatedVertex.length > 1)
-	{
-		for (var j = 0; j < relatedVertex.length; j++)
-		{
-			point = point.add(relatedVertex[j].position);
-		}
+    if (relatedVertex.length > 1) {
+        for (var j = 0; j < relatedVertex.length; j++) {
+            point = point.add(relatedVertex[j].position);
+        }
 
-		point = point.multiply(1 / relatedVertex.length);
+        point = point.multiply(1 / relatedVertex.length);
 
-		point.offset (Math.random() * diameter + (Math.random() ? -1 : 1) * 2 * diameter, Math.random() * diameter + (Math.random() ? -1 : 1) * 2 * diameter);
-	}
-	else
-	{
-		point = new Point(Math.random() * viewportSize.x, Math.random() * viewportSize.y);
-	}
+        point.offset(Math.random() * diameter + (Math.random() ? -1 : 1) * 2 * diameter, Math.random() * diameter + (Math.random() ? -1 : 1) * 2 * diameter);
+    }
+    else {
+        point = new Point(Math.random() * viewportSize.x, Math.random() * viewportSize.y);
+    }
 
-	if (this.IsVertexesHasSamePosition (point, matrix.length))
-	{ 
-		point.offset (Math.random() * diameter + + (Math.random() ? -1 : 1) * 4 * diameter, 
-			Math.random() * diameter + + (Math.random() ? -1 : 1) * 4 * diameter);
-	}
+    if (this.IsVertexesHasSamePosition(point, matrix.length)) {
+        point.offset(Math.random() * diameter + + (Math.random() ? -1 : 1) * 4 * diameter,
+            Math.random() * diameter + + (Math.random() ? -1 : 1) * 4 * diameter);
+    }
 
-	// Clamp
-	point.x = Math.min(Math.max(point.x, diameter), viewportSize.x);
-	point.y = Math.min(Math.max(point.y, diameter), viewportSize.y);
+    // Clamp
+    point.x = Math.min(Math.max(point.x, diameter), viewportSize.x);
+    point.y = Math.min(Math.max(point.y, diameter), viewportSize.y);
 
-	return point;
+    return point;
 }
 
-Graph.prototype.VertexesReposition = function (viewportSize, newVertexes)
-{
-   var maxGravityDistanceSqr = Math.max(viewportSize.x, viewportSize.y) / 5.0;
-   maxGravityDistanceSqr  = maxGravityDistanceSqr * maxGravityDistanceSqr;
-   //Math.min(viewportSize.x, viewportSize.y) / 2.0;
-   var velocityDamping    = 0.85;
-   var diameter = (new VertexModel()).diameter;
-   var maxDistance = diameter * 3;
-   var gravityDistanceSqr =  10  * (maxDistance * maxDistance);
-   var edgeGravityKof     =  10  / (maxDistance);
-   var kCenterForce       =  10  / (maxDistance * 10);
-   var centerPoint = viewportSize.multiply(0.5);
-   var velocityMax = maxDistance * 10;
-    
-   var edgesMatrix = {};   
-   for (var i = 0; i < this.edges.length; i++)
-   {  
+Graph.prototype.VertexesReposition = function (viewportSize, newVertexes) {
+    var maxGravityDistanceSqr = Math.max(viewportSize.x, viewportSize.y) / 5.0;
+    maxGravityDistanceSqr = maxGravityDistanceSqr * maxGravityDistanceSqr;
+    //Math.min(viewportSize.x, viewportSize.y) / 2.0;
+    var velocityDamping = 0.85;
+    var diameter = (new VertexModel()).diameter;
+    var maxDistance = diameter * 3;
+    var gravityDistanceSqr = 10 * (maxDistance * maxDistance);
+    var edgeGravityKof = 10 / (maxDistance);
+    var kCenterForce = 10 / (maxDistance * 10);
+    var centerPoint = viewportSize.multiply(0.5);
+    var velocityMax = maxDistance * 10;
+
+    var edgesMatrix = {};
+    for (var i = 0; i < this.edges.length; i++) {
         edgesMatrix[this.edges[i].vertex1.id + this.edges[i].vertex2.id * 1000] = 1;
         edgesMatrix[this.edges[i].vertex2.id + this.edges[i].vertex1.id * 1000] = 1;
-   }
-   
-   var startAngel = Math.random() * 180.0;
-   for(i = 0; i < newVertexes.length; i++) // loop through vertices
-   {
-      newVertexes[i].position.orbit(new Point(viewportSize.x / 2, viewportSize.y / 2), (viewportSize.x - diameter * 2) / 2, 
-					(viewportSize.y - diameter * 2) / 2, 360 * i / newVertexes.length + startAngel);
-   }
-    
-   var k = 0;
-   var bChanged = true;
-   while (k < 1000 && bChanged)
-   {
-      var vertexData = [];
-      for(i = 0; i < newVertexes.length; i++) // loop through vertices
-      {
-         // Has no in newVertexes.
-         var currentVertex = {};
-         currentVertex.object    = newVertexes[i];
-         currentVertex.net_force = new Point (0, 0);
-         currentVertex.velocity   = new Point (0, 0);
-         vertexData.push(currentVertex);
+    }
 
-         for(j = 0; j < this.vertices.length; j++) // loop through other vertices
-         {
-            otherVertex = this.vertices[j];
-      
-            if (otherVertex == currentVertex.object) continue;
-             
-            // squared distance between "u" and "v" in 2D space
-            var rsq = currentVertex.object.position.distanceSqr(otherVertex.position);
-            
-            
-            {
-              // counting the repulsion between two vertices
-              var force = (currentVertex.object.position.subtract(otherVertex.position)).normalize(gravityDistanceSqr / rsq);
-              currentVertex.net_force = currentVertex.net_force.add(force);
-            }
-         }
+    var startAngel = Math.random() * 180.0;
+    for (i = 0; i < newVertexes.length; i++) // loop through vertices
+    {
+        newVertexes[i].position.orbit(new Point(viewportSize.x / 2, viewportSize.y / 2), (viewportSize.x - diameter * 2) / 2,
+            (viewportSize.y - diameter * 2) / 2, 360 * i / newVertexes.length + startAngel);
+    }
 
-         for(j = 0; j < this.vertices.length; j++) // loop through edges
-         {
-            otherVertex = this.vertices[j];
-            if (edgesMatrix.hasOwnProperty(currentVertex.object.id + 1000 * otherVertex.id))
+    var k = 0;
+    var bChanged = true;
+    while (k < 1000 && bChanged) {
+        var vertexData = [];
+        for (i = 0; i < newVertexes.length; i++) // loop through vertices
+        {
+            // Has no in newVertexes.
+            var currentVertex = {};
+            currentVertex.object = newVertexes[i];
+            currentVertex.net_force = new Point(0, 0);
+            currentVertex.velocity = new Point(0, 0);
+            vertexData.push(currentVertex);
+
+            for (j = 0; j < this.vertices.length; j++) // loop through other vertices
             {
-                var distance = currentVertex.object.position.distance(otherVertex.position);
-                
-                if (distance > maxDistance)
+                otherVertex = this.vertices[j];
+
+                if (otherVertex == currentVertex.object) continue;
+
+                // squared distance between "u" and "v" in 2D space
+                var rsq = currentVertex.object.position.distanceSqr(otherVertex.position);
+
+
                 {
-                    // countin the attraction
-                    var force = (otherVertex.position.subtract(currentVertex.object.position)).normalize(edgeGravityKof * (distance - maxDistance));
+                    // counting the repulsion between two vertices
+                    var force = (currentVertex.object.position.subtract(otherVertex.position)).normalize(gravityDistanceSqr / rsq);
                     currentVertex.net_force = currentVertex.net_force.add(force);
                 }
             }
-         }
-          
-         // Calculate force to center of world.
-         var distanceToCenter = centerPoint.distance(currentVertex.object.position);
-         var force = centerPoint.subtract(currentVertex.object.position).normalize(distanceToCenter * kCenterForce);
-         currentVertex.net_force = currentVertex.net_force.add(force);
-          
-         // counting the velocity (with damping 0.85)
-         currentVertex.velocity = currentVertex.velocity.add(currentVertex.net_force);
-     }
 
-     bChanged = false;
+            for (j = 0; j < this.vertices.length; j++) // loop through edges
+            {
+                otherVertex = this.vertices[j];
+                if (edgesMatrix.hasOwnProperty(currentVertex.object.id + 1000 * otherVertex.id)) {
+                    var distance = currentVertex.object.position.distance(otherVertex.position);
 
-     for(i = 0; i < vertexData.length; i++) // set new positions
-     {
-        var v = vertexData[i];
-        var velocity = v.velocity;
-        if (velocity.length() > velocityMax)
-        {
-            velocity = velocity.normalize(velocityMax);
+                    if (distance > maxDistance) {
+                        // countin the attraction
+                        var force = (otherVertex.position.subtract(currentVertex.object.position)).normalize(edgeGravityKof * (distance - maxDistance));
+                        currentVertex.net_force = currentVertex.net_force.add(force);
+                    }
+                }
+            }
+
+            // Calculate force to center of world.
+            var distanceToCenter = centerPoint.distance(currentVertex.object.position);
+            var force = centerPoint.subtract(currentVertex.object.position).normalize(distanceToCenter * kCenterForce);
+            currentVertex.net_force = currentVertex.net_force.add(force);
+
+            // counting the velocity (with damping 0.85)
+            currentVertex.velocity = currentVertex.velocity.add(currentVertex.net_force);
         }
-        v.object.position = v.object.position.add(velocity);
-        if (velocity.length() >= 1)
+
+        bChanged = false;
+
+        for (i = 0; i < vertexData.length; i++) // set new positions
         {
-		  bChanged = true;
+            var v = vertexData[i];
+            var velocity = v.velocity;
+            if (velocity.length() > velocityMax) {
+                velocity = velocity.normalize(velocityMax);
+            }
+            v.object.position = v.object.position.add(velocity);
+            if (velocity.length() >= 1) {
+                bChanged = true;
+            }
         }
-     }
-     k++;
-   }
-    
-    
-   // Looks like somthing going wrong and will use circle algorithm for reposition.
-   var bbox = this.getGraphBBox();
-   if (bbox.size().length() > viewportSize.length() * 1000)
-   {
-       for(i = 0; i < newVertexes.length; i++) // loop through vertices
-       {
-           newVertexes[i].position.orbit(new Point(viewportSize.x / 2, viewportSize.y / 2), (viewportSize.x - diameter * 2) / 2,
-                                         (viewportSize.y - diameter * 2) / 2, 360 * i / newVertexes.length + startAngel);
-       }
-   }
-   else
-   {
-       // Try to rotate graph to fill small area.
-       var count = 10;
-       var agnle  = 360.0 / count;
-       var viewportAspect = viewportSize.x / viewportSize.y;
-       var bestIndex = 0;
-       var graphSize  = bbox.size();
-       var bestAspect = graphSize.x / graphSize.y;
-       var center     = bbox.center();
-       
-       for (var i = 1; i < count; i++)
-       {
-           for(j = 0; j < newVertexes.length; j++) // loop through vertices
-           {
-               newVertexes[j].position.rotate(center, agnle);
-           }
-           
-           var newBBox   = this.getGraphBBox();
-           var newAspect = newBBox.size().x / newBBox.size().y;
-           if (Math.abs(newAspect - viewportAspect) < Math.abs(bestAspect - viewportAspect))
-           {
-               bestAspect = newAspect;
-               bestIndex = i;
-           }
-       }
-       
-       // Rotate to best aspect.
-       for(j = 0; j < newVertexes.length; j++) // loop through vertices
-       {
-           newVertexes[j].position.rotate(center, - agnle * (count - bestIndex - 1));
-       }
-   }
+        k++;
+    }
+
+
+    // Looks like somthing going wrong and will use circle algorithm for reposition.
+    var bbox = this.getGraphBBox();
+    if (bbox.size().length() > viewportSize.length() * 1000) {
+        for (i = 0; i < newVertexes.length; i++) // loop through vertices
+        {
+            newVertexes[i].position.orbit(new Point(viewportSize.x / 2, viewportSize.y / 2), (viewportSize.x - diameter * 2) / 2,
+                (viewportSize.y - diameter * 2) / 2, 360 * i / newVertexes.length + startAngel);
+        }
+    }
+    else {
+        // Try to rotate graph to fill small area.
+        var count = 10;
+        var agnle = 360.0 / count;
+        var viewportAspect = viewportSize.x / viewportSize.y;
+        var bestIndex = 0;
+        var graphSize = bbox.size();
+        var bestAspect = graphSize.x / graphSize.y;
+        var center = bbox.center();
+
+        for (var i = 1; i < count; i++) {
+            for (j = 0; j < newVertexes.length; j++) // loop through vertices
+            {
+                newVertexes[j].position.rotate(center, agnle);
+            }
+
+            var newBBox = this.getGraphBBox();
+            var newAspect = newBBox.size().x / newBBox.size().y;
+            if (Math.abs(newAspect - viewportAspect) < Math.abs(bestAspect - viewportAspect)) {
+                bestAspect = newAspect;
+                bestIndex = i;
+            }
+        }
+
+        // Rotate to best aspect.
+        for (j = 0; j < newVertexes.length; j++) // loop through vertices
+        {
+            newVertexes[j].position.rotate(center, - agnle * (count - bestIndex - 1));
+        }
+    }
 }
 
-Graph.prototype.SetAdjacencyMatrix = function (matrix, viewportSize, currentEnumVertesType, separator)
-{
-    if (separator === undefined) 
-    {
-      separator = ",";
+Graph.prototype.SetAdjacencyMatrix = function (matrix, viewportSize, currentEnumVertesType, separator) {
+    if (separator === undefined) {
+        separator = ",";
     }
-    
-	var rowsObj = {};
-	var colsObj = {};
 
-	//ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
+    var rowsObj = {};
+    var colsObj = {};
 
-	if (this.TestAdjacencyMatrix(matrix, rowsObj, colsObj, separator))
-	{
-		rows = rowsObj.rows;
-		cols = colsObj.cols;
-        
+    //ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
+
+    if (this.TestAdjacencyMatrix(matrix, rowsObj, colsObj, separator)) {
+        rows = rowsObj.rows;
+        cols = colsObj.cols;
+
         var clonedEdge = this.edges.slice(0);
-		for (var i = 0; i < clonedEdge.length; i++)
-		{
-			this.DeleteEdge (clonedEdge[i]);
-		}
-		
-		var newVertexes = [];
+        for (var i = 0; i < clonedEdge.length; i++) {
+            this.DeleteEdge(clonedEdge[i]);
+        }
+
+        var newVertexes = [];
         var bWeightGraph = false;
-        
-		for (var i = 0; i < rows.length; i++)
-		{
-			for (var j = 0; j < rows.length; j++)
-			{
-				if (j >= this.vertices.length)
-				{
-					var newPos = this.GetRandomPositionOfVertex (matrix, j, viewportSize);
+
+        for (var i = 0; i < rows.length; i++) {
+            for (var j = 0; j < rows.length; j++) {
+                if (j >= this.vertices.length) {
+                    var newPos = this.GetRandomPositionOfVertex(matrix, j, viewportSize);
                     newVertexes.push(new BaseVertex(newPos.x, newPos.y, currentEnumVertesType));
-					this.AddNewVertex(newVertexes[newVertexes.length - 1]);
-				}
-				
-				if (cols[i][j] > 0)
-				{
-					var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[i], this.vertices[j], cols[i][j] != cols[j][i], cols[i][j], true);
-					this.FixEdgeCurved(nEdgeIndex);
-                    if (nEdgeIndex >= 0)
-                    {
+                    this.AddNewVertex(newVertexes[newVertexes.length - 1]);
+                }
+
+                if (cols[i][j] > 0) {
+                    var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[i], this.vertices[j], cols[i][j] != cols[j][i], cols[i][j], true);
+                    this.FixEdgeCurved(nEdgeIndex);
+                    if (nEdgeIndex >= 0) {
                         bWeightGraph = bWeightGraph || this.edges[nEdgeIndex].weight != 1;
                     }
-				}
-			}
-		}
-        
-        // Set use weight false, because we have unwieghts graph.
-        if (!bWeightGraph)
-        {
-            this.edges.forEach(function(part, index, theArray) {
-                               theArray[index].useWeight = false;
-                               });
+                }
+            }
         }
 
-		for (var i = rows.length; i < Math.max(this.vertices.length, rows.length); i++)
-		{
-			this.DeleteVertex(this.vertices[i]);
-			i--;
-		}                        
+        // Set use weight false, because we have unwieghts graph.
+        if (!bWeightGraph) {
+            this.edges.forEach(function (part, index, theArray) {
+                theArray[index].useWeight = false;
+            });
+        }
+
+        for (var i = rows.length; i < Math.max(this.vertices.length, rows.length); i++) {
+            this.DeleteVertex(this.vertices[i]);
+            i--;
+        }
 
         this.VertexesReposition(viewportSize, newVertexes);
-	}	
-}
-
-
-Graph.prototype.TestIncidenceMatrix = function (matrix, rowsObj, colsObj, separator)
-{
-    if (separator === undefined) 
-    {
-      separator = ",";
     }
-    
-	var bGoodFormat = true;
-	rowsObj.rows = [];
-	rowsObj.rows = matrix.split ("\n");
-	for (j = 0; j < rowsObj.rows.length; ++j)
-	{
-		if (rowsObj.rows[j] === "")
-		{
-			rowsObj.rows.splice(j--, 1);
-		}
-	}
-	colsObj.cols = [];
-	var columnCount = 0;
-	for (var i = 0; i < rowsObj.rows.length; i++)
-	{
-		colsObj.cols[i] = this.SplitMatrixString(rowsObj.rows[i], separator);//rowsObj.rows[i].split (",");
-		for (j = 0; j < colsObj.cols[i].length; ++j)
-		{
-			if (colsObj.cols[i][j] === "")
-			{
-				colsObj.cols[i].splice(j--, 1);
-			}
-		}
-		if (i == 0)
-		{
-			columnCount = colsObj.cols[i].length;
-		}
-		if (colsObj.cols[i].length != columnCount)
-		{
-			bGoodFormat = false;
-			break;
-		}
-	}
-
-
-	if (bGoodFormat)
-	{
-		for (var i = 0; i < colsObj.cols[0].length; i++)
-		{
-			var values = [];
-			for (j = 0; j < colsObj.cols.length; ++j)
-			{
-				if (colsObj.cols[j][i] != 0)
-				{
-					values.push(colsObj.cols[j][i]);
-				}
-			}
-
-			if (!(values.length <= 1 ||  (values.length == 2 && (values[0] == values[1] || values[0] == -values[1]))))
-			{
-				bGoodFormat = false;
-				break;
-			}
-		}
-	}
-
-	return bGoodFormat;
 }
 
-Graph.prototype.SetIncidenceMatrix = function (matrix, viewportSize, currentEnumVertesType)
-{
-	var rowsObj = {};
-	var colsObj = {};
 
-	//ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
-	if (this.TestIncidenceMatrix(matrix, rowsObj, colsObj))
-	{
-		rows = rowsObj.rows;
-		cols = colsObj.cols;
+Graph.prototype.TestIncidenceMatrix = function (matrix, rowsObj, colsObj, separator) {
+    if (separator === undefined) {
+        separator = ",";
+    }
+
+    var bGoodFormat = true;
+    rowsObj.rows = [];
+    rowsObj.rows = matrix.split("\n");
+    for (j = 0; j < rowsObj.rows.length; ++j) {
+        if (rowsObj.rows[j] === "") {
+            rowsObj.rows.splice(j--, 1);
+        }
+    }
+    colsObj.cols = [];
+    var columnCount = 0;
+    for (var i = 0; i < rowsObj.rows.length; i++) {
+        colsObj.cols[i] = this.SplitMatrixString(rowsObj.rows[i], separator);//rowsObj.rows[i].split (",");
+        for (j = 0; j < colsObj.cols[i].length; ++j) {
+            if (colsObj.cols[i][j] === "") {
+                colsObj.cols[i].splice(j--, 1);
+            }
+        }
+        if (i == 0) {
+            columnCount = colsObj.cols[i].length;
+        }
+        if (colsObj.cols[i].length != columnCount) {
+            bGoodFormat = false;
+            break;
+        }
+    }
+
+
+    if (bGoodFormat) {
+        for (var i = 0; i < colsObj.cols[0].length; i++) {
+            var values = [];
+            for (j = 0; j < colsObj.cols.length; ++j) {
+                if (colsObj.cols[j][i] != 0) {
+                    values.push(colsObj.cols[j][i]);
+                }
+            }
+
+            if (!(values.length <= 1 || (values.length == 2 && (values[0] == values[1] || values[0] == -values[1])))) {
+                bGoodFormat = false;
+                break;
+            }
+        }
+    }
+
+    return bGoodFormat;
+}
+
+Graph.prototype.SetIncidenceMatrix = function (matrix, viewportSize, currentEnumVertesType) {
+    var rowsObj = {};
+    var colsObj = {};
+
+    //ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
+    if (this.TestIncidenceMatrix(matrix, rowsObj, colsObj)) {
+        rows = rowsObj.rows;
+        cols = colsObj.cols;
         var clonedEdge = this.edges.slice(0);
-		for (var i = 0; i < clonedEdge.length; i++)
-		{
-			this.DeleteEdge (clonedEdge[i]);
-		}
-		var newVertexes = [];
+        for (var i = 0; i < clonedEdge.length; i++) {
+            this.DeleteEdge(clonedEdge[i]);
+        }
+        var newVertexes = [];
         var bWeightGraph = false;
-		for (var i = 0; i < cols[0].length; i++)
-		{
-			var edgeValue = [];
-			var edgeIndex = [];
-			for (var j = 0; j < cols.length; j++)
-			{
-				if (j >= this.vertices.length)
-				{
+        for (var i = 0; i < cols[0].length; i++) {
+            var edgeValue = [];
+            var edgeIndex = [];
+            for (var j = 0; j < cols.length; j++) {
+                if (j >= this.vertices.length) {
 
-					var newPos = new Point(0, 0);//this.GetRandomPositionOfVertex (matrix, j, viewportSize);
+                    var newPos = new Point(0, 0);//this.GetRandomPositionOfVertex (matrix, j, viewportSize);
                     newVertexes.push(new BaseVertex(newPos.x, newPos.y, currentEnumVertesType));
-					this.AddNewVertex(newVertexes[newVertexes.length - 1]);
-				}				
+                    this.AddNewVertex(newVertexes[newVertexes.length - 1]);
+                }
 
-				if (cols[j][i] != 0)
-				{
-				  edgeValue.push(cols[j][i]);
-				  edgeIndex.push(j);
-				}
-			}
+                if (cols[j][i] != 0) {
+                    edgeValue.push(cols[j][i]);
+                    edgeIndex.push(j);
+                }
+            }
 
-			if (edgeIndex.length == 1)
-			{
-				edgeValue.push(edgeValue[0]);
-				edgeIndex.push(edgeIndex[0]);
-			}
+            if (edgeIndex.length == 1) {
+                edgeValue.push(edgeValue[0]);
+                edgeIndex.push(edgeIndex[0]);
+            }
 
-			if (edgeIndex.length == 2)
-			{       
-				if (edgeValue[0] != edgeValue[1])
-				{
-					if (edgeValue[1] > 0)
-					{
-						edgeValue = edgeValue.swap(0, 1);
-						edgeIndex = edgeIndex.swap(0, 1);
-                	}
-				}
-                
+            if (edgeIndex.length == 2) {
+                if (edgeValue[0] != edgeValue[1]) {
+                    if (edgeValue[1] > 0) {
+                        edgeValue = edgeValue.swap(0, 1);
+                        edgeIndex = edgeIndex.swap(0, 1);
+                    }
+                }
+
                 var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[edgeIndex[0]], this.vertices[edgeIndex[1]],
-                                                     edgeValue[0] != edgeValue[1], Math.abs(edgeValue[1]), false);
+                    edgeValue[0] != edgeValue[1], Math.abs(edgeValue[1]), false);
 
                 this.FixEdgeCurved(nEdgeIndex);
-                if (nEdgeIndex >= 0)
-                {
+                if (nEdgeIndex >= 0) {
                     bWeightGraph = bWeightGraph || this.edges[nEdgeIndex].weight != 1;
                 }
-			}
-		}
-        
+            }
+        }
+
         // Set use weight false, because we have unwieghts graph.
-        if (!bWeightGraph)
-        {
-            this.edges.forEach(function(part, index, theArray) {
-                               theArray[index].useWeight = false;
-                               });
+        if (!bWeightGraph) {
+            this.edges.forEach(function (part, index, theArray) {
+                theArray[index].useWeight = false;
+            });
         }
 
-		for (var i = cols.length; i < Math.max(this.vertices.length, cols.length); i++)
-		{
-			this.DeleteVertex(this.vertices[i]);
-			i--;             
-		}                        
+        for (var i = cols.length; i < Math.max(this.vertices.length, cols.length); i++) {
+            this.DeleteVertex(this.vertices[i]);
+            i--;
+        }
 
-          	this.VertexesReposition(viewportSize, newVertexes);
-	}	
+        this.VertexesReposition(viewportSize, newVertexes);
+    }
 }
 
-Graph.prototype.GetIncidenceMatrix = function ()
-{
-	var matrix = "";
-	for (var i = 0; i < this.vertices.length; i++)
-	{
-		for (var j = 0; j < this.edges.length; j++)
-		{	
-			if (this.edges[j].vertex1 == this.vertices[i])
-			{
-				matrix += this.edges[j].weight;
-			}
-			else if (this.edges[j].vertex2 == this.vertices[i] && !this.edges[j].isDirect)
-			{
-				matrix += this.edges[j].weight;
-			}
-			else if (this.edges[j].vertex2 == this.vertices[i] && this.edges[j].isDirect)
-			{
-				matrix += -this.edges[j].weight;
-			}
-			else
-			{
-				matrix += "0";
-			}
-			
-			if (j != this.edges.length - 1)
-			{
-				matrix += ", ";
-			}
-			
-		}
-		matrix = matrix + "\n";
-	}
-	
-	return matrix;
+Graph.prototype.GetIncidenceMatrix = function () {
+    var matrix = "";
+    for (var i = 0; i < this.vertices.length; i++) {
+        for (var j = 0; j < this.edges.length; j++) {
+            if (this.edges[j].vertex1 == this.vertices[i]) {
+                matrix += this.edges[j].weight;
+            }
+            else if (this.edges[j].vertex2 == this.vertices[i] && !this.edges[j].isDirect) {
+                matrix += this.edges[j].weight;
+            }
+            else if (this.edges[j].vertex2 == this.vertices[i] && this.edges[j].isDirect) {
+                matrix += -this.edges[j].weight;
+            }
+            else {
+                matrix += "0";
+            }
+
+            if (j != this.edges.length - 1) {
+                matrix += ", ";
+            }
+
+        }
+        matrix = matrix + "\n";
+    }
+
+    return matrix;
 }
 
-Graph.prototype.SplitMatrixString = function (line, separator)
-{
-   (separator === undefined) 
-  {
-    separator = ",";
-  }
-    
-  var res = [];
-  var i = 0;
-
-  // For case: 00110101101
-  var isZeroOneLine = true;
-
-  for (i = 0; i < line.length; i++)
-  {
-    if (line.charAt(i) != '0' && line.charAt(i) != '1')
+Graph.prototype.SplitMatrixString = function (line, separator) {
+    (separator === undefined)
     {
-      isZeroOneLine = false;
-      break;
+        separator = ",";
     }
-  } 
 
-  if (!isZeroOneLine)
-  {
-    if (separator != ",")
-    {
-        line = line.replace(/,/g, ".");
-    }
-    for (i = 0; i < line.length; i++)
-    {
-      // add , if we use space as separator
-      if (("0123456789.-e").indexOf(line.charAt(i)) < 0 )
-      {
-        if (i > 0)
-        { 
-          res.push(line.substr(0, i));
+    var res = [];
+    var i = 0;
+
+    // For case: 00110101101
+    var isZeroOneLine = true;
+
+    for (i = 0; i < line.length; i++) {
+        if (line.charAt(i) != '0' && line.charAt(i) != '1') {
+            isZeroOneLine = false;
+            break;
         }
-        if (i == 0) 
-        {
-          i = 1;
-        }
-        line = line.substr(i, line.length - i);
-        i = -1;
-      }
     }
-    if (line.length > 0)
-    {
-      res.push(line);
-    }
-  }
-  else
-  {
-    for (i = 0; i < line.length; i++)
-    {
-      res.push(line.charAt(i));
-    }
-  }
 
-  console.log(res);
-  return res;
+    if (!isZeroOneLine) {
+        if (separator != ",") {
+            line = line.replace(/,/g, ".");
+        }
+        for (i = 0; i < line.length; i++) {
+            // add , if we use space as separator
+            if (("0123456789.-e").indexOf(line.charAt(i)) < 0) {
+                if (i > 0) {
+                    res.push(line.substr(0, i));
+                }
+                if (i == 0) {
+                    i = 1;
+                }
+                line = line.substr(i, line.length - i);
+                i = -1;
+            }
+        }
+        if (line.length > 0) {
+            res.push(line);
+        }
+    }
+    else {
+        for (i = 0; i < line.length; i++) {
+            res.push(line.charAt(i));
+        }
+    }
+
+    console.log(res);
+    return res;
 }
 
 
-Graph.prototype.SaveToXML = function (additionalData)
-{
-	var mainHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<graphml>\n";
-	var header   = "<graph id=\"Graph\" uidGraph=\"" + this.uidGraph + "\"" + " uidEdge=\"" + this.uidEdge + "\">\n";
+Graph.prototype.SaveToXML = function (additionalData) {
+    var mainHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<graphml>\n";
+    var header = "<graph id=\"Graph\" uidGraph=\"" + this.uidGraph + "\"" + " uidEdge=\"" + this.uidEdge + "\">\n";
 
-	var xmlBoby = "";
-	  
-	for (var i = 0; i < this.vertices.length; i++)
-	{
-		xmlBoby = xmlBoby + this.vertices[i].SaveToXML();
-	}
+    var xmlBoby = "";
 
-	xmlBoby = xmlBoby + "";
+    for (var i = 0; i < this.vertices.length; i++) {
+        xmlBoby = xmlBoby + this.vertices[i].SaveToXML();
+    }
 
-	for (var i = 0; i < this.edges.length; i++)
-	{
-		xmlBoby = xmlBoby + this.edges[i].SaveToXML();
-	}
+    xmlBoby = xmlBoby + "";
+
+    for (var i = 0; i < this.edges.length; i++) {
+        xmlBoby = xmlBoby + this.edges[i].SaveToXML();
+    }
 
     additionalField = "";
-    if (additionalData.length > 0)
-    {
+    if (additionalData.length > 0) {
         additionalField = "<additional data=\"" + additionalData + "\"/>"
     }
 
-	return mainHeader + header + xmlBoby + "</graph>\n" + additionalField + "</graphml>";
+    return mainHeader + header + xmlBoby + "</graph>\n" + additionalField + "</graphml>";
 }
 
-function boldSearchTerm(text, searchTerm){
+function boldSearchTerm(text, searchTerm) {
     return text.replaceAll(searchTerm, `<span style='color: #ff0000'>${searchTerm}</span>`)
 }
 
-function createSearchResult(node, from, searchTerm){
+function createSearchResult(node, from, searchTerm) {
     var sr;
     var title = document.createElement('h5')
-    if(from instanceof NodeInfo){
+    if (from instanceof NodeInfo) {
         sr = $("<div class='nodeInfoSearchResult'></div>")
         title.innerHTML = boldSearchTerm(from.title, searchTerm)
-    }else if(from instanceof Resource){
+    } else if (from instanceof Resource) {
         sr = $("<div class='resourceSearchResult'></div>")
         title.innerHTML = boldSearchTerm(from.link, searchTerm)
     }
@@ -5914,41 +5435,41 @@ function createSearchResult(node, from, searchTerm){
     var description = document.createElement('h5')
     description.innerHTML = boldSearchTerm(from.description, searchTerm)
     sr.append(description)
-    sr.hover(function(e){
-        this.classList.add("searchResultBorder")        
+    sr.hover(function (e) {
+        this.classList.add("searchResultBorder")
     });
-    sr.mouseleave(function(e){
+    sr.mouseleave(function (e) {
         this.classList.remove("searchResultBorder")
     });
-    sr.click(function(e){
+    sr.click(function (e) {
         toggleRightSection(true);
         focusOnNode(node);
-		application.handler.RestRedraw();
-		application.redrawGraph();
+        application.handler.RestRedraw();
+        application.redrawGraph();
     })
     return sr[0]
 }
 
-function updateSearchResults(e){
+function updateSearchResults(e) {
     e.value = e.value.toLowerCase();
-    if(e.value.length < 3) return;
+    if (e.value.length < 3) return;
     toggleRightSection(false);
     var resultsDiv = document.getElementById('search-results-div')
     resultsDiv.innerHTML = ''
-    
-    for(const node of application.graph.vertices){
-        if( node.nodeInfo.title.toLowerCase().indexOf(e.value) != -1 ||
-            node.nodeInfo.description.toLowerCase().indexOf(e.value) != -1 )
+
+    for (const node of application.graph.vertices) {
+        if (node.nodeInfo.title.toLowerCase().indexOf(e.value) != -1 ||
+            node.nodeInfo.description.toLowerCase().indexOf(e.value) != -1)
             resultsDiv.append(createSearchResult(node, node.nodeInfo, e.value))
-        for(const res of node.nodeInfo.resources){
-            if( res.description.toLowerCase().indexOf(e.value) != -1 )
+        for (const res of node.nodeInfo.resources) {
+            if (res.description.toLowerCase().indexOf(e.value) != -1)
                 resultsDiv.append(createSearchResult(node, res, e.value))
         }
     }
-    document.getElementById('search-results-title').textContent = "Showing " + resultsDiv.childElementCount + " results for: \n" + e.value; 
+    document.getElementById('search-results-title').textContent = "Showing " + resultsDiv.childElementCount + " results for: \n" + e.value;
 }
 
-function saveToXML(){
+function saveToXML() {
     var xml = application.graph.SaveToXML([]);
     localStorage.setItem('xml', xml);
     var element = document.createElement('a');
@@ -5963,12 +5484,12 @@ function saveToXML(){
 
     document.body.removeChild(element);
 }
-function autosaveXML(){
-    if(!document.getElementById('autosave').checked) return;
+function autosaveXML() {
+    if (!document.getElementById('autosave').checked) return;
     var xml = application.graph.SaveToXML([]);
     localStorage.setItem('xml', xml);
 }
-function loadFromXML(files){
+function loadFromXML(files) {
 
     var graphFileToLoad = files[0];
 
@@ -5979,274 +5500,239 @@ function loadFromXML(files){
         application.LoadGraphFromString(textFromFileLoaded);
     };
 
-    if(graphFileToLoad) fileReader.readAsText(graphFileToLoad, "UTF-8");
+    if (graphFileToLoad) fileReader.readAsText(graphFileToLoad, "UTF-8");
     // console.log(localStorage.getItem('xml'))
     // application.LoadGraphFromString(locarlStorage.getItem('xml'))
 }
-Graph.prototype.LoadFromXML = function (xmlText, additionalData)
-{
-	xmlDoc = $.parseXML( xmlText );
-	var $xml = $( xmlDoc );
+Graph.prototype.LoadFromXML = function (xmlText, additionalData) {
+    xmlDoc = $.parseXML(xmlText);
+    var $xml = $(xmlDoc);
 
-	$graphs = $xml.find( "graph" );	
+    $graphs = $xml.find("graph");
 
-	var loadedGraphId = 0;
-	var loadedEdgeId = 0;
-    
-	$graphs.each(function(){
-		loadedGraphId = parseInt($(this).attr('uidGraph'));
-		loadedEdgeId  = parseInt($(this).attr('uidEdge'));
-	});
-    
+    var loadedGraphId = 0;
+    var loadedEdgeId = 0;
+
+    $graphs.each(function () {
+        loadedGraphId = parseInt($(this).attr('uidGraph'));
+        loadedEdgeId = parseInt($(this).attr('uidEdge'));
+    });
+
     // Back comportebility.
-    if (isNaN(loadedEdgeId))
-    {
+    if (isNaN(loadedEdgeId)) {
         loadedEdgeId = this.edgesOffset;
-    } else if (loadedEdgeId < this.edgesOffset)
-	{
-		loadedEdgeId = this.edgesOffset;
-	}
+    } else if (loadedEdgeId < this.edgesOffset) {
+        loadedEdgeId = this.edgesOffset;
+    }
 
-	this.uidGraph = loadedGraphId;
-	this.uidEdge  = loadedEdgeId;
+    this.uidGraph = loadedGraphId;
+    this.uidEdge = loadedEdgeId;
 
-	$nodes = $xml.find( "node" );	
+    $nodes = $xml.find("node");
 
-	var vertexs = [];
-    
-	$nodes.each(function(){
-		var vertex = new BaseVertex();
-		vertex.LoadFromXML($(this));
+    var vertexs = [];
+
+    $nodes.each(function () {
+        var vertex = new BaseVertex();
+        vertex.LoadFromXML($(this));
         vertexs.push(vertex);
         var nodeInfo = new NodeInfo();
         nodeInfo.LoadFromXML($(this).find('topic'))
         vertex.nodeInfo = nodeInfo;
-	});
-	this.vertices = vertexs;
+    });
+    this.vertices = vertexs;
 
-	$edges = $xml.find( "edge" );
+    $edges = $xml.find("edge");
 
-	var edges = [];	
-	var graph = this;
-	$edges.each(function(){
-		var edge = new BaseEdge();
-		edge.LoadFromXML($(this), graph);
-		// Fix case with wrong id.
-		if (edge.id < graph.uidEdge) {
-			edge.id = graph.uidEdge;
-			graph.uidEdge++;
-		}
-		edges.push(edge);
-	});
+    var edges = [];
+    var graph = this;
+    $edges.each(function () {
+        var edge = new BaseEdge();
+        edge.LoadFromXML($(this), graph);
+        // Fix case with wrong id.
+        if (edge.id < graph.uidEdge) {
+            edge.id = graph.uidEdge;
+            graph.uidEdge++;
+        }
+        edges.push(edge);
+    });
 
-	this.edges = edges;
-    
-    $additional = $xml.find( "additional" );
-    if ($additional.length != 0 && additionalData != null)
-    {
+    this.edges = edges;
+
+    $additional = $xml.find("additional");
+    if ($additional.length != 0 && additionalData != null) {
         additionalData["data"] = $additional.attr('data');
     }
-    
+
     this.isMultiGraph = this.checkMutiGraph();
 }
 
-Graph.prototype.hasDirectEdge = function ()
-{
-	var res = false;
-	for (var i = 0; i < this.edges.length; i++)
-	{
-		if(this.edges[i].isDirect)
-		{
-			res = true;
-			break;
-		}
-	}
-	
-	return res;
+Graph.prototype.hasDirectEdge = function () {
+    var res = false;
+    for (var i = 0; i < this.edges.length; i++) {
+        if (this.edges[i].isDirect) {
+            res = true;
+            break;
+        }
+    }
+
+    return res;
 }
 
-Graph.prototype.clampPositions = function (viewportSize)
-{
-	var diameter = (new VertexModel()).diameter;
+Graph.prototype.clampPositions = function (viewportSize) {
+    var diameter = (new VertexModel()).diameter;
 
-     	for(i = 0; i < this.vertices.length; i++) // set new positions
-     	{
-       		this.vertices[i].position.x = Math.min(Math.max(this.vertices[i].position.x, diameter), viewportSize.x - diameter);
-        	this.vertices[i].position.y = Math.min(Math.max(this.vertices[i].position.y, diameter), viewportSize.y - diameter);
-        }
+    for (i = 0; i < this.vertices.length; i++) // set new positions
+    {
+        this.vertices[i].position.x = Math.min(Math.max(this.vertices[i].position.x, diameter), viewportSize.x - diameter);
+        this.vertices[i].position.y = Math.min(Math.max(this.vertices[i].position.y, diameter), viewportSize.y - diameter);
+    }
 }
 
 // Use to setup scaling.
-Graph.prototype.getGraphBBox = function (viewportSize)
-{
+Graph.prototype.getGraphBBox = function (viewportSize) {
     var pointMin = new Point(1e5, 1e5);
     var pointMax = new Point(-1e5, -1e5);
     var diameter = (new VertexModel()).diameter;
-    
-    for(i = 0; i < this.vertices.length; i++)
-    {
+
+    for (i = 0; i < this.vertices.length; i++) {
         var vertex = this.vertices[i];
-		var factor = vertex.diameterFactor();
+        var factor = vertex.diameterFactor();
         var deltaVector = new Point(factor.x * diameter, factor.y * diameter);
         pointMin = pointMin.min(vertex.position.subtract(deltaVector));
         pointMax = pointMax.max(vertex.position.add(deltaVector));
     }
-    
+
     var max_cruvled_length = 32;
-    
-    for(i = 0; i < this.edges.length; i++)
-    {
+
+    for (i = 0; i < this.edges.length; i++) {
         var edge = this.edges[i];
-        
-        if (edge.model.type == EdgeModels.cruvled)
-        {
+
+        if (edge.model.type == EdgeModels.cruvled) {
             var max_cruvled = edge.vertex2.position.subtract(edge.vertex1.position).length() / max_cruvled_length;
-            
-            for (j = 0; j < max_cruvled; j++)
-            {
-              var point = edge.model.GetCurvedPoint(edge.vertex1.position, edge.vertex2.position, j / max_cruvled);
-              var deltaVector = new Point(max_cruvled_length, max_cruvled_length);
-              pointMin = pointMin.min(point.subtract(deltaVector));
-              pointMax = pointMax.max(point.add(deltaVector));
+
+            for (j = 0; j < max_cruvled; j++) {
+                var point = edge.model.GetCurvedPoint(edge.vertex1.position, edge.vertex2.position, j / max_cruvled);
+                var deltaVector = new Point(max_cruvled_length, max_cruvled_length);
+                pointMin = pointMin.min(point.subtract(deltaVector));
+                pointMax = pointMax.max(point.add(deltaVector));
             }
         }
     }
-    
+
     return new Rect(pointMin, pointMax);
 }
 
-Graph.prototype.hasPair = function (edge)
-{
-	return this.FindPairFor(edge) != null;
+Graph.prototype.hasPair = function (edge) {
+    return this.FindPairFor(edge) != null;
 }
 
-Graph.prototype.FindPairFor = function (edge)
-{
+Graph.prototype.FindPairFor = function (edge) {
     var res = this.getNeighbourEdges(edge);
-	
-	return res.length == 1 ? res[0] : null;
+
+    return res.length == 1 ? res[0] : null;
 }
 
-Graph.prototype.getNeighbourEdges = function (edge)
-{
-	var res = [];
-    
-	for (var i = 0; i < this.edges.length; i++)
-	{
+Graph.prototype.getNeighbourEdges = function (edge) {
+    var res = [];
+
+    for (var i = 0; i < this.edges.length; i++) {
         var curEdge = this.edges[i];
         if (curEdge == edge)
             continue;
-            
-		if ((curEdge.vertex1.id == edge.vertex1.id  && 
-             curEdge.vertex2.id == edge.vertex2.id) ||
-            (curEdge.vertex1.id == edge.vertex2.id  && 
-             curEdge.vertex2.id == edge.vertex1.id))
-		{
-			res.push(curEdge);
-		}
-	}
-	
-	return res;
-}
 
-Graph.prototype.checkMutiGraph = function ()
-{
-	var res = false;
-    
-    var start  = {};
-    
-	for (var i = 0; i < this.edges.length; i++)
-	{
-        var edge = this.edges[i];
-        if (start.hasOwnProperty(edge.vertex1.id) && 
-            start[edge.vertex1.id] == edge.vertex2.id)
-        {
-            res = true;
-            break;
+        if ((curEdge.vertex1.id == edge.vertex1.id &&
+            curEdge.vertex2.id == edge.vertex2.id) ||
+            (curEdge.vertex1.id == edge.vertex2.id &&
+                curEdge.vertex2.id == edge.vertex1.id)) {
+            res.push(curEdge);
         }
-        
-        start[edge.vertex1.id] = edge.vertex2.id;
-        if (!edge.isDirect)
-        {
-            if (start.hasOwnProperty(edge.vertex2.id) && 
-                start[edge.vertex2.id] == edge.vertex1.id)
-            {
-                res = true;
-                break;
-            }
-            
-            start[edge.vertex2.id] = edge.vertex1.id;
-        }
-	}
-	
-	return res;
-}
+    }
 
-Graph.prototype.isMulti = function ()
-{
-	return this.isMultiGraph;
-}
-
-Graph.prototype.isNeedReposition = function ()
-{
-    var res = false;
-	for (var i = 0; i < this.vertices.length; i++)
-	{
-		res = res || this.vertices[i].IsUndefinedPosition();
-	}
     return res;
 }
 
-Graph.prototype.FixEdgeCurved = function (edgeIndex)
-{
+Graph.prototype.checkMutiGraph = function () {
+    var res = false;
+
+    var start = {};
+
+    for (var i = 0; i < this.edges.length; i++) {
+        var edge = this.edges[i];
+        if (start.hasOwnProperty(edge.vertex1.id) &&
+            start[edge.vertex1.id] == edge.vertex2.id) {
+            res = true;
+            break;
+        }
+
+        start[edge.vertex1.id] = edge.vertex2.id;
+        if (!edge.isDirect) {
+            if (start.hasOwnProperty(edge.vertex2.id) &&
+                start[edge.vertex2.id] == edge.vertex1.id) {
+                res = true;
+                break;
+            }
+
+            start[edge.vertex2.id] = edge.vertex1.id;
+        }
+    }
+
+    return res;
+}
+
+Graph.prototype.isMulti = function () {
+    return this.isMultiGraph;
+}
+
+Graph.prototype.isNeedReposition = function () {
+    var res = false;
+    for (var i = 0; i < this.vertices.length; i++) {
+        res = res || this.vertices[i].IsUndefinedPosition();
+    }
+    return res;
+}
+
+Graph.prototype.FixEdgeCurved = function (edgeIndex) {
     var edgeObject = this.edges[edgeIndex];
-    var hasPair    = this.hasPair(edgeObject);
+    var hasPair = this.hasPair(edgeObject);
     var neighbourEdges = this.getNeighbourEdges(edgeObject);
-    
-    if (hasPair)
-    {
+
+    if (hasPair) {
         if (edgeObject.model.default)
-            edgeObject.model.type = EdgeModels.cruvled; 
-        
+            edgeObject.model.type = EdgeModels.cruvled;
+
         var pairEdge = this.FindPairFor(edgeObject);
-        if (pairEdge.model.default)
-        {
+        if (pairEdge.model.default) {
             pairEdge.model.type = EdgeModels.cruvled;
             if (pairEdge.vertex1 == edgeObject.vertex1 && pairEdge.vertex2 == edgeObject.vertex2)
                 pairEdge.model.curvedValue = -pairEdge.model.curvedValue;
         }
     }
-    else if (neighbourEdges.length >= 2)
-    {
+    else if (neighbourEdges.length >= 2) {
         var cruvled = this.GetAvalibleCruvledValue(neighbourEdges, edgeObject);
-        if (edgeObject.model.default)
-        {
-            edgeObject.model.type        = EdgeModels.cruvled;
+        if (edgeObject.model.default) {
+            edgeObject.model.type = EdgeModels.cruvled;
             edgeObject.model.curvedValue = cruvled;
         }
     }
 }
 
-Graph.prototype.GetAvalibleCruvledValue = function(neighbourEdges, originalEdge)
-{
+Graph.prototype.GetAvalibleCruvledValue = function (neighbourEdges, originalEdge) {
     var values = [];
-    
-    for (var i = 0; i < neighbourEdges.length; i ++)
-    {
-      var edge          = neighbourEdges[i];
-      var sameDirection = (originalEdge.vertex1.id == edge.vertex1.id);
-      if (edge.model.type == EdgeModels.cruvled)
-      {
-        values[(sameDirection ? edge.model.curvedValue : -edge.model.curvedValue)] = true;
-      }
+
+    for (var i = 0; i < neighbourEdges.length; i++) {
+        var edge = neighbourEdges[i];
+        var sameDirection = (originalEdge.vertex1.id == edge.vertex1.id);
+        if (edge.model.type == EdgeModels.cruvled) {
+            values[(sameDirection ? edge.model.curvedValue : -edge.model.curvedValue)] = true;
+        }
     }
-    
-    var changeValue  = DefaultHandler.prototype.curvedValue;
+
+    var changeValue = DefaultHandler.prototype.curvedValue;
     var defaultValue = 0.0;
-    var maxSearch    = 10;
-    
-    for (var i = 1; i < maxSearch; i ++)
-    {
+    var maxSearch = 10;
+
+    for (var i = 1; i < maxSearch; i++) {
         value = i * changeValue;
         if (!values.hasOwnProperty(value))
             return value;
@@ -6255,7 +5741,7 @@ Graph.prototype.GetAvalibleCruvledValue = function(neighbourEdges, originalEdge)
         if (!values.hasOwnProperty(value))
             return value;
     }
-    
+
     return defaultValue;
 }/*
   Classes for create text for vertexs.
@@ -6265,35 +5751,29 @@ Graph.prototype.GetAvalibleCruvledValue = function(neighbourEdges, originalEdge)
 /**
  * Base Enum Vertexs.
  *
- */ 
-function BaseEnumVertices(app, startNumber)
-{
+ */
+function BaseEnumVertices(app, startNumber) {
     this.app = app;
     this.startNumber = startNumber;
 }
 
-BaseEnumVertices.prototype.GetVertexText = function(id)
-{
-	return this.startNumber + id;
+BaseEnumVertices.prototype.GetVertexText = function (id) {
+    return this.startNumber + id;
 }
 
-BaseEnumVertices.prototype.GetVertexTextAsync = function(callback)
-{
-    callback (this);
+BaseEnumVertices.prototype.GetVertexTextAsync = function (callback) {
+    callback(this);
 }
 
-BaseEnumVertices.prototype.GetText = function()
-{
-	return this.startNumber + ", " + (this.startNumber + 1) + ", " + (this.startNumber + 2) + "...";
+BaseEnumVertices.prototype.GetText = function () {
+    return this.startNumber + ", " + (this.startNumber + 1) + ", " + (this.startNumber + 2) + "...";
 }
 
-BaseEnumVertices.prototype.GetValue = function()
-{
-	return "Numbers" + this.startNumber;
+BaseEnumVertices.prototype.GetValue = function () {
+    return "Numbers" + this.startNumber;
 }
 
-function TextEnumTitle(app, title)
-{
+function TextEnumTitle(app, title) {
     BaseEnumVertices.apply(this, arguments);
     this.pattern = "";
     this.title = title;
@@ -6303,8 +5783,7 @@ function TextEnumTitle(app, title)
 // inheritance.
 TextEnumTitle.prototype = Object.create(BaseEnumVertices.prototype);
 
-TextEnumTitle.prototype.GetVertexText = function(id)
-{
+TextEnumTitle.prototype.GetVertexText = function (id) {
     return this.title;
 }
 
@@ -6314,64 +5793,56 @@ TextEnumTitle.prototype.GetVertexText = function(id)
  * Text Enum
  *
  */
-function TextEnumVertexs(app)
-{
-	BaseEnumVertices.apply(this, arguments);
-	this.pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function TextEnumVertexs(app) {
+    BaseEnumVertices.apply(this, arguments);
+    this.pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 }
 
 
 // inheritance.
 TextEnumVertexs.prototype = Object.create(BaseEnumVertices.prototype);
 
-TextEnumVertexs.prototype.GetVertexText = function(id)
-{
-	var res = "";
+TextEnumVertexs.prototype.GetVertexText = function (id) {
+    var res = "";
 
     res = this.pattern[id % this.pattern.length] + res;
 
-	while (id >= this.pattern.length)
-	{
-	   id  = Math.floor(id / this.pattern.length) - 1;
-	   res = this.pattern[id % this.pattern.length] + res;
-	}
+    while (id >= this.pattern.length) {
+        id = Math.floor(id / this.pattern.length) - 1;
+        res = this.pattern[id % this.pattern.length] + res;
+    }
 
-	return res;
+    return res;
 }
 
 
-TextEnumVertexs.prototype.GetText = function()
-{
-	return "A, B, ... Z";
+TextEnumVertexs.prototype.GetText = function () {
+    return "A, B, ... Z";
 }
 
-TextEnumVertexs.prototype.GetValue = function()
-{
-	return "Latin";
+TextEnumVertexs.prototype.GetValue = function () {
+    return "Latin";
 }
 
 /**
  * Text Enum
  *
  */
-function TextEnumVertexsCyr(app)
-{
-	TextEnumVertexs.apply(this, arguments);
-	this.pattern = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+function TextEnumVertexsCyr(app) {
+    TextEnumVertexs.apply(this, arguments);
+    this.pattern = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 }
 
 
 // inheritance.
 TextEnumVertexsCyr.prototype = Object.create(TextEnumVertexs.prototype);
 
-TextEnumVertexsCyr.prototype.GetText = function()
-{
-	return "А, Б, ... Я";
+TextEnumVertexsCyr.prototype.GetText = function () {
+    return "А, Б, ... Я";
 }
 
-TextEnumVertexsCyr.prototype.GetValue = function()
-{
-	return "Cyrillic";
+TextEnumVertexsCyr.prototype.GetValue = function () {
+    return "Cyrillic";
 }
 
 
@@ -6379,32 +5850,28 @@ TextEnumVertexsCyr.prototype.GetValue = function()
  * Text Enum
  *
  */
-function TextEnumVertexsGreek(app)
-{
-	TextEnumVertexs.apply(this, arguments);
-	this.pattern = "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ";
+function TextEnumVertexsGreek(app) {
+    TextEnumVertexs.apply(this, arguments);
+    this.pattern = "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ";
 }
 
 
 // inheritance.
 TextEnumVertexsGreek.prototype = Object.create(TextEnumVertexs.prototype);
 
-TextEnumVertexsGreek.prototype.GetText = function()
-{
-	return "Α, Β, ... Ω";
+TextEnumVertexsGreek.prototype.GetText = function () {
+    return "Α, Β, ... Ω";
 }
 
-TextEnumVertexsGreek.prototype.GetValue = function()
-{
-	return "Greek";
+TextEnumVertexsGreek.prototype.GetValue = function () {
+    return "Greek";
 }
 
 /**
  * Text Enum
  *
  */
-function TextEnumVertexsCustom(app)
-{
+function TextEnumVertexsCustom(app) {
     BaseEnumVertices.apply(this, arguments);
     this.pattern = "";
 }
@@ -6414,102 +5881,97 @@ function TextEnumVertexsCustom(app)
 // inheritance.
 TextEnumVertexsCustom.prototype = Object.create(BaseEnumVertices.prototype);
 
-TextEnumVertexsCustom.prototype.GetText = function()
-{
+TextEnumVertexsCustom.prototype.GetText = function () {
     return g_customEnumVertex;
 }
 
-TextEnumVertexsCustom.prototype.GetValue = function()
-{
+TextEnumVertexsCustom.prototype.GetValue = function () {
     return "Custom";
 }
 
-TextEnumVertexsCustom.prototype.GetVertexTextAsync = function(callback)
-{
+TextEnumVertexsCustom.prototype.GetVertexTextAsync = function (callback) {
     this.ShowDialog(callback, g_addVertex, g_addVertex, "A");
 }
 
 
-TextEnumVertexsCustom.prototype.ShowDialog = function(callback, buttonText, titleTitle, title)
-{
+TextEnumVertexsCustom.prototype.ShowDialog = function (callback, buttonText, titleTitle, title) {
     var dialogButtons = {};
     app = this.app;
-    dialogButtons[buttonText] = function() {
+    dialogButtons[buttonText] = function () {
         app.PushToStack("RenameVertex");
 
         callback(new TextEnumTitle(app, $("#VertexTitle").val()));
-        $( this ).dialog( "close" );
+        $(this).dialog("close");
     };
-    
-    $( "#addVertex" ).dialog({
-                             resizable: false,
-                             height: "auto",
-                             width:  "auto",
-                             modal: true,
-                             title: titleTitle,
-                             buttons: dialogButtons,
-                             dialogClass: 'EdgeDialog',
-                             open: function () {
-                                        $(this).off('submit').on('submit', function () {
-                                                      return false;
-                                                      });
-                                        $("#VertexTitle").val(title);
-                                        $("#VertexTitle").focus();
-                                }
-                             });
+
+    $("#addVertex").dialog({
+        resizable: false,
+        height: "auto",
+        width: "auto",
+        modal: true,
+        title: titleTitle,
+        buttons: dialogButtons,
+        dialogClass: 'EdgeDialog',
+        open: function () {
+            $(this).off('submit').on('submit', function () {
+                return false;
+            });
+            $("#VertexTitle").val(title);
+            $("#VertexTitle").focus();
+        }
+    });
 }
 /**
  * This is main application class.
  *
  */
- 
+
 var globalApplication = null;
- 
-function Application(document, window)
-{
+
+function Application(document, window) {
     this.document = document;
-    this.canvas  = this.document.getElementById('canvas');
+    this.canvas = this.document.getElementById('canvas');
     this.handler = new DefaultHandler(this);
     this.savedGraphName = "";
     this.currentEnumVertesType = new BaseEnumVertices(this, 1);//this.enumVertexesTextList[0];
     this.findPathReport = 1;
     this.isTimerRender = false;
-    globalApplication  = this;
+    globalApplication = this;
     this.renderPath = [];
     this.renderTimer = 0;
-    this.renderPathLength  = 0;
+    this.renderPathLength = 0;
     this.renderPathCounter = 0;
     this.renderPathLoops = 0;
     this.enumVertexesTextList = [new BaseEnumVertices(this, 1), new BaseEnumVertices(this, 0), new TextEnumVertexs(this), new TextEnumVertexsCyr(this), new TextEnumVertexsGreek(this), new TextEnumVertexsCustom(this)];
     this.SetDefaultTransformations();
     this.algorithmsValues = {};
-    this.userAction = function(){};
-    this.undoStack  = [];
-    
-    this.edgeCommonStyle         = new CommonEdgeStyle();
+    this.userAction = function () { };
+    this.undoStack = [];
+
+    this.edgeCommonStyle = new CommonEdgeStyle();
     this.isEdgeCommonStyleCustom = false;
-    this.edgeSelectedStyles      = FullArrayCopy(DefaultSelectedEdgeStyles);
+    this.edgeSelectedStyles = FullArrayCopy(DefaultSelectedEdgeStyles);
     this.isEdgeSelectedStylesCustom = false;
-    
-    this.edgePrintCommonStyle      = new CommonPrintEdgeStyle();
-    this.edgePrintSelectedStyles   = FullArrayCopy(DefaultPrintSelectedEdgeStyles);
-    
-    this.vertexCommonStyle          = new CommonVertexStyle();
-    this.isVertexCommonStyleCustom  = false;
+
+    this.edgePrintCommonStyle = new CommonPrintEdgeStyle();
+    this.edgePrintSelectedStyles = FullArrayCopy(DefaultPrintSelectedEdgeStyles);
+
+    this.vertexCommonStyle = new CommonVertexStyle();
+    this.isVertexCommonStyleCustom = false;
     this.vertexSelectedVertexStyles = FullArrayCopy(DefaultSelectedGraphStyles);
-    this.isVertexSelectedVertexStylesCustom  = false;
-    
-    this.vertexPrintCommonStyle          = new CommonPrintVertexStyle(); 
+    this.isVertexSelectedVertexStylesCustom = false;
+
+    this.vertexPrintCommonStyle = new CommonPrintVertexStyle();
     this.vertexPrintSelectedVertexStyles = FullArrayCopy(DefaultPrintSelectedGraphStyles);
-    
+
     this.backgroundCommonStyle = new CommonBackgroundStyle();
-    this.backgroundPrintStyle  = new PrintBackgroundStyle(); 
-    this.isBackgroundCommonStyleCustom  = false;
+    this.backgroundPrintStyle = new PrintBackgroundStyle();
+    this.isBackgroundCommonStyleCustom = false;
     this.renderPathWithEdges = false;
-    
+
     this.edgePresets = [1, 3, 5, 7, 11, 42];
     this.maxEdgePresets = 6;
-    this.selectionRect  = null;
+    this.selectionRect = null;
 
     this.defaultVertexSize = null;
     this.defaultEdgeWidth = null;
@@ -6532,71 +5994,59 @@ Application.prototype.graphNameLength = 16;
 // Max undo stack size
 Application.prototype.maxUndoStackSize = 8;
 
-Application.prototype.getMousePos = function(canvas, e)
-{
+Application.prototype.getMousePos = function (canvas, e) {
     /// getBoundingClientRect is supported in most browsers and gives you
     /// the absolute geometry of an element
     var rect = canvas.getBoundingClientRect();
 
     /// as mouse event coords are relative to document you need to
     /// subtract the element's left and top position:
-    return {x: (e.clientX - rect.left) / this.canvasScale - this.canvasPosition.x, y: (e.clientY - rect.top) / this.canvasScale - this.canvasPosition.y};
+    return { x: (e.clientX - rect.left) / this.canvasScale - this.canvasPosition.x, y: (e.clientY - rect.top) / this.canvasScale - this.canvasPosition.y };
 }
 
-Application.prototype.redrawGraph = function()
-{
-    if (!this.isTimerRender)
-    {
+Application.prototype.redrawGraph = function () {
+    if (!this.isTimerRender) {
         this._redrawGraphInWindow();
-        
+
         this.GraphTypeChanged();
     }
 }
 
-Application.prototype.redrawGraphTimer = function()
-{
-    if (this.isTimerRender)
-    {
+Application.prototype.redrawGraphTimer = function () {
+    if (this.isTimerRender) {
         var context = this._redrawGraphInWindow();
-        
+
         // Render path
-        if (this.renderPath.length > 1)
-        {
+        if (this.renderPath.length > 1) {
             context.save();
             context.scale(this.canvasScale, this.canvasScale);
             context.translate(this.canvasPosition.x, this.canvasPosition.y);
-            
+
             var movePixelStep = 16;
             var currentLength = 0;
-            
+
             var i = 0
-            for (i = 0; i < this.renderPath.length - 1; i++)
-            {
+            for (i = 0; i < this.renderPath.length - 1; i++) {
                 var edge = null;
-                if (this.renderPathWithEdges)
-                {
+                if (this.renderPathWithEdges) {
                     edge = this.graph.FindEdgeById(this.renderPath[i + 1]);
                     i++;
                 }
-                else if (this.renderMinPath)
-                {
+                else if (this.renderMinPath) {
                     edge = this.graph.FindEdgeMin(this.renderPath[i], this.renderPath[i + 1]);
                 }
-                else
-                {
+                else {
                     edge = this.graph.FindEdge(this.renderPath[i], this.renderPath[i + 1]);
                 }
-                    
+
                 currentLength += edge.GetPixelLength();
-                if (currentLength > this.renderPathCounter)
-                {
+                if (currentLength > this.renderPathCounter) {
                     currentLength -= edge.GetPixelLength();
                     break;
                 }
             }
-            
-            if (i >= this.renderPath.length - 1)
-            {
+
+            if (i >= this.renderPath.length - 1) {
                 i = 0;
                 if (this.renderPathWithEdges)
                     i = 1;
@@ -6604,111 +6054,99 @@ Application.prototype.redrawGraphTimer = function()
                 currentLength = 0;
                 this.renderPathLoops += 1;
             }
-            
+
             var edge = null;
             var currentVertexId = this.renderPath[i];
-            if (this.renderPathWithEdges)
-            {
+            if (this.renderPathWithEdges) {
                 edge = this.graph.FindEdgeById(this.renderPath[i]);
                 currentVertexId = this.renderPath[i - 1];
             }
-            else if (this.renderMinPath)
-            {
+            else if (this.renderMinPath) {
                 edge = this.graph.FindEdgeMin(this.renderPath[i], this.renderPath[i + 1]);
             }
-            else
-            {
+            else {
                 edge = this.graph.FindEdge(this.renderPath[i], this.renderPath[i + 1]);
             }
-            
+
             var progress = (this.renderPathCounter - currentLength) / edge.GetPixelLength();
-            
+
             this.RedrawEdgeProgress(context, edge, edge.vertex1.id == currentVertexId ? progress : 1.0 - progress);
 
             this.renderPathCounter += movePixelStep;
-            
+
             context.restore();
         }
     }
-    
-    if (this.renderPathLoops >= 5)
-    {
+
+    if (this.renderPathLoops >= 5) {
         this.stopRenderTimer();
     }
 }
 
-Application.prototype._redrawGraphInWindow = function()
-{
+Application.prototype._redrawGraphInWindow = function () {
     var context = this.canvas.getContext('2d');
-    
+
     context.save();
-    
+
     context.scale(this.canvasScale, this.canvasScale);
     context.translate(this.canvasPosition.x, this.canvasPosition.y);
-    
+
     this._RedrawGraph(context, this.canvasPosition, this.backgroundCommonStyle, true);
 
     context.restore();
-    
+
     return context;
 }
 
-Application.prototype._OffscreenRedrawGraph = function()
-{
+Application.prototype._OffscreenRedrawGraph = function () {
     var bbox = this.graph.getGraphBBox();
     var canvas = document.createElement('canvas');
-    canvas.width  = bbox.size().x;
+    canvas.width = bbox.size().x;
     canvas.height = bbox.size().y;
     var context = canvas.getContext('2d');
-    
+
     context.save();
 
     context.translate(bbox.minPoint.inverse().x, bbox.minPoint.inverse().y);
-    
+
     this._RedrawGraph(context, bbox.minPoint.inverse(), this.backgroundCommonStyle, false);
-    
+
     context.restore();
-    
+
     return canvas;
 }
 
-Application.prototype._PrintRedrawGraph = function()
-{
+Application.prototype._PrintRedrawGraph = function () {
     var bbox = this.graph.getGraphBBox();
     var canvas = document.createElement('canvas');
-    canvas.width  = bbox.size().x;
+    canvas.width = bbox.size().x;
     canvas.height = bbox.size().y;
     var context = canvas.getContext('2d');
-    
+
     context.save();
-    
+
     context.translate(bbox.minPoint.inverse().x, bbox.minPoint.inverse().y);
-    
-    this._RedrawGraph(context, bbox.minPoint.inverse(), this.backgroundPrintStyle, false, 
-        this.vertexPrintCommonStyle, this.vertexPrintSelectedVertexStyles, 
-        this.edgePrintCommonStyle,   this.edgePrintSelectedStyles);
-    
+
+    this._RedrawGraph(context, bbox.minPoint.inverse(), this.backgroundPrintStyle, false,
+        this.vertexPrintCommonStyle, this.vertexPrintSelectedVertexStyles,
+        this.edgePrintCommonStyle, this.edgePrintSelectedStyles);
+
     context.restore();
-    
+
     return canvas;
 }
 
-Application.prototype.updateRenderPathLength = function()
-{
+Application.prototype.updateRenderPathLength = function () {
     this.renderPathLength = 0;
     this.renderPathCounter = 0;
-    if (this.renderPath.length > 1)
-    {
-        for (var i = 0; i < this.renderPath.length - 1; i++)
-        {
+    if (this.renderPath.length > 1) {
+        for (var i = 0; i < this.renderPath.length - 1; i++) {
             var edge = null;
-            if (this.renderPathWithEdges)
-            {
+            if (this.renderPathWithEdges) {
                 edge = this.graph.FindEdgeById(this.renderPath[i + 1]);
                 i++;
             }
-            else
-            {
+            else {
                 edge = this.graph.FindEdge(this.renderPath[i], this.renderPath[i + 1]);
             }
             this.renderPathLength += edge.GetPixelLength();
@@ -6716,87 +6154,74 @@ Application.prototype.updateRenderPathLength = function()
     }
 }
 
-Application.prototype.startRenderTimer = function()
-{
+Application.prototype.startRenderTimer = function () {
     this.updateRenderPathLength();
-    this.renderTimer = window.setInterval(function(){globalApplication.redrawGraphTimer();}, 50);
+    this.renderTimer = window.setInterval(function () { globalApplication.redrawGraphTimer(); }, 50);
     this.isTimerRender = true;
     this.renderPathLoops = 0;
 }
 
-Application.prototype.stopRenderTimer = function()
-{
-    if (this.isTimerRender)
-    {
+Application.prototype.stopRenderTimer = function () {
+    if (this.isTimerRender) {
         window.clearInterval(this.renderTimer);
         this.isTimerRender = false;
         this.renderPathLoops = 0;
     }
 }
 
-Application.prototype.setRenderPath = function(renderPath, renderMinPath)
-{
-    this.renderPath    = renderPath;
+Application.prototype.setRenderPath = function (renderPath, renderMinPath) {
+    this.renderPath = renderPath;
     this.renderMinPath = renderMinPath;
     this.renderPathWithEdges = false;
-    
-    if (this.renderPath.length > 0)
-    {
+
+    if (this.renderPath.length > 0) {
         this.startRenderTimer();
     }
-    else
-    {
+    else {
         this.stopRenderTimer();
     }
 }
 
-Application.prototype.setRenderPathWithEdges = function(renderPath)
-{
-    this.renderPath    = renderPath;
+Application.prototype.setRenderPathWithEdges = function (renderPath) {
+    this.renderPath = renderPath;
     this.renderMinPath = false;
     this.renderPathWithEdges = true;
-    
-    if (this.renderPath.length > 0)
-    {
+
+    if (this.renderPath.length > 0) {
         this.startRenderTimer();
     }
-    else
-    {
+    else {
         this.stopRenderTimer();
     }
 }
 
-Application.prototype.GetBaseArcDrawer = function(context, edge)
-{
+Application.prototype.GetBaseArcDrawer = function (context, edge) {
     var arcDrawer = new BaseEdgeDrawer(context);
-    
-    if (edge.model.type == EdgeModels.cruvled)
-    {
+
+    if (edge.model.type == EdgeModels.cruvled) {
         var curvedArcDrawer = new CurvedArcDrawer(context, edge.model);
 
-        arcDrawer = new BaseEdgeDrawer(context, 
-                                        {
-                                            drawArc             : curvedArcDrawer, 
-                                            startArrowDiretion  : curvedArcDrawer,
-                                            finishArrowDiretion : curvedArcDrawer,
-                                            textCenterObject    : curvedArcDrawer,
-                                            getPointOnArc       : curvedArcDrawer
-                                        }
-                                      );
+        arcDrawer = new BaseEdgeDrawer(context,
+            {
+                drawArc: curvedArcDrawer,
+                startArrowDiretion: curvedArcDrawer,
+                finishArrowDiretion: curvedArcDrawer,
+                textCenterObject: curvedArcDrawer,
+                getPointOnArc: curvedArcDrawer
+            }
+        );
     }
-    
+
     return arcDrawer;
 }
 
-Application.prototype.UpdateEdgeCurrentStyle = function(edge, ForceCommonStyle, ForceSelectedStyle)
-{
-    var commonStyle    = (ForceCommonStyle === undefined) ? this.edgeCommonStyle : ForceCommonStyle;
-    var selectedStyle  = (ForceSelectedStyle === undefined) ? this.edgeSelectedStyles : ForceSelectedStyle;
+Application.prototype.UpdateEdgeCurrentStyle = function (edge, ForceCommonStyle, ForceSelectedStyle) {
+    var commonStyle = (ForceCommonStyle === undefined) ? this.edgeCommonStyle : ForceCommonStyle;
+    var selectedStyle = (ForceSelectedStyle === undefined) ? this.edgeSelectedStyles : ForceSelectedStyle;
 
     var selectedGroup = this.handler.GetSelectedGroup(edge);
     var selected = false;
-    if (selectedGroup > 0)
-    {
+    if (selectedGroup > 0) {
         selectedGroup = (selectedGroup - 1) % selectedStyle.length;
         selected = true;
     }
@@ -6810,77 +6235,64 @@ Application.prototype.UpdateEdgeCurrentStyle = function(edge, ForceCommonStyle, 
     edge.currentStyle = currentStyle;
 }
 
-Application.prototype.RedrawEdge = function(context, edge)
-{
+Application.prototype.RedrawEdge = function (context, edge) {
     var curvedArcDrawer = new CurvedArcDrawer(context, edge.model)
-    var arcDrawer       = this.GetBaseArcDrawer(context, edge);
-    
+    var arcDrawer = this.GetBaseArcDrawer(context, edge);
+
     this._RedrawEdge(edge, arcDrawer);
 }
 
-Application.prototype._RedrawEdge = function(edge, arcDrawer, commonStyle, selectedStyles)
-{
+Application.prototype._RedrawEdge = function (edge, arcDrawer, commonStyle, selectedStyles) {
     this._RedrawEdgeWithStyle(edge, edge.currentStyle, arcDrawer, commonStyle, selectedStyles);
 }
 
-Application.prototype._RedrawEdgeWithStyle = function(edge, style, arcDrawer, commonStyle, selectedStyles)
-{
+Application.prototype._RedrawEdgeWithStyle = function (edge, style, arcDrawer, commonStyle, selectedStyles) {
     arcDrawer.Draw(edge, style.GetStyle({}, edge));
 }
 
-Application.prototype.RedrawEdgeProgress = function(context, edge, progress)
-{
-    var progressDraw     = new ProgressArcDrawer(context, this.GetBaseArcDrawer(context, edge), progress);
-    var arcDrawer        = new BaseEdgeDrawer(context, {drawObject : progressDraw});
+Application.prototype.RedrawEdgeProgress = function (context, edge, progress) {
+    var progressDraw = new ProgressArcDrawer(context, this.GetBaseArcDrawer(context, edge), progress);
+    var arcDrawer = new BaseEdgeDrawer(context, { drawObject: progressDraw });
 
     this._RedrawEdge(edge, arcDrawer, this.edgeCommonStyle, this.edgeSelectedStyles);
 }
 
-Application.prototype.UpdateEdgesCurrentStyle = function(ForceCommonStyle, ForceSelectedStyle)
-{
-    for (i = 0; i < this.graph.edges.length; i ++)
-    {
+Application.prototype.UpdateEdgesCurrentStyle = function (ForceCommonStyle, ForceSelectedStyle) {
+    for (i = 0; i < this.graph.edges.length; i++) {
         this.UpdateEdgeCurrentStyle(this.graph.edges[i], ForceCommonStyle, ForceSelectedStyle);
     }
 }
 
-Application.prototype.RedrawEdges = function(context)
-{
-    for (i = 0; i < this.graph.edges.length; i ++)
-    {
+Application.prototype.RedrawEdges = function (context) {
+    for (i = 0; i < this.graph.edges.length; i++) {
         this.RedrawEdge(context, this.graph.edges[i]);
     }
 }
 
-Application.prototype.RedrawNodes = function(context)
-{
-    var graphDrawer   = new BaseVertexDrawer(context);
+Application.prototype.RedrawNodes = function (context) {
+    var graphDrawer = new BaseVertexDrawer(context);
 
-    for (i = 0; i < this.graph.vertices.length; i ++)
-    {
-		graphDrawer.Draw(this.graph.vertices[i], this.graph.vertices[i].currentStyle.GetStyle({}, this.graph.vertices[i]));
-    }	
+    for (i = 0; i < this.graph.vertices.length; i++) {
+        graphDrawer.Draw(this.graph.vertices[i], this.graph.vertices[i].currentStyle.GetStyle({}, this.graph.vertices[i]));
+    }
 }
 
-Application.prototype.UpdateNodesCurrentStyle = function(ForceCommonStyle, ForceSelectedStyle)
-{
-    var force         = ForceCommonStyle !== undefined || ForceSelectedStyle !== undefined;
-    var commonStyle   = (ForceCommonStyle === undefined) ? this.vertexCommonStyle : ForceCommonStyle;
+Application.prototype.UpdateNodesCurrentStyle = function (ForceCommonStyle, ForceSelectedStyle) {
+    var force = ForceCommonStyle !== undefined || ForceSelectedStyle !== undefined;
+    var commonStyle = (ForceCommonStyle === undefined) ? this.vertexCommonStyle : ForceCommonStyle;
     var selectedStyle = (ForceSelectedStyle === undefined) ? this.vertexSelectedVertexStyles : ForceSelectedStyle;
 
-    for (i = 0; i < this.graph.vertices.length; i ++)
-    {
-		var selectedGroup = this.handler.GetSelectedGroup(this.graph.vertices[i]);
+    for (i = 0; i < this.graph.vertices.length; i++) {
+        var selectedGroup = this.handler.GetSelectedGroup(this.graph.vertices[i]);
         var selected = false;
-        if (selectedGroup > 0)
-        {
+        if (selectedGroup > 0) {
             selectedGroup = (selectedGroup - 1) % selectedStyle.length;
             selected = true;
         }
 
         var currentStyle = null;
         if (this.graph.vertices[i].hasOwnStyleFor((selected ? 1 : 0) + selectedGroup) && !force)
-		    currentStyle = this.graph.vertices[i].getStyleFor((selected ? 1 : 0) + selectedGroup);
+            currentStyle = this.graph.vertices[i].getStyleFor((selected ? 1 : 0) + selectedGroup);
         else
             currentStyle = selected ? selectedStyle[selectedGroup] : commonStyle;
 
@@ -6890,55 +6302,62 @@ Application.prototype.UpdateNodesCurrentStyle = function(ForceCommonStyle, Force
         //   // TODO find out of this is the best practice
         // }
 
-        if(this.graph.vertices[i].currentStyle){
-        }else{
+        if (this.graph.vertices[i].currentStyle) {
+        } else {
             this.graph.vertices[i].currentStyle = currentStyle;
-        } 
+        }
     }
 }
 
-Application.prototype.RedrawSelectionRect = function(context)
-{
-  context.lineWidth    = 1.0 / this.canvasScale;
-      
-  context.strokeStyle  = this.edgeSelectedStyles[0].strokeStyle;	
-  context.setLineDash([6, 3]);
-  context.beginPath();
-  context.rect(this.selectionRect.left(), this.selectionRect.top(), 
-               this.selectionRect.size().x, this.selectionRect.size().y);
-  context.closePath();
-  context.stroke();
-    
-  context.setLineDash([]);
+Application.prototype.RedrawSelectionRect = function (context) {
+    context.lineWidth = 1.0 / this.canvasScale;
+
+    context.strokeStyle = this.edgeSelectedStyles[0].strokeStyle;
+    context.setLineDash([6, 3]);
+    context.beginPath();
+    context.rect(this.selectionRect.left(), this.selectionRect.top(),
+        this.selectionRect.size().x, this.selectionRect.size().y);
+    context.closePath();
+    context.stroke();
+
+    context.setLineDash([]);
 }
 
-Application.prototype.updateMessage = function()
-{
-	this.handler.InitControls();
+Application.prototype.updateMessage = function () {
+    this.handler.InitControls();
 }
 
-Application.prototype.UndoColoring = function(){
-    if(this.globalHoverObject instanceof BaseVertex){
+Application.prototype.UndoColoring = function () {
+    if (this.globalHoverObject instanceof BaseVertex) {
         this.globalHoverObject.currentStyle = new CommonVertexStyle();
-    }else if(this.globalHoverObject instanceof BaseEdge){
+    } else if (this.globalHoverObject instanceof BaseEdge) {
         this.globalHoverObject.vertex1.currentStyle = new CommonVertexStyle();
         this.globalHoverObject.vertex2.currentStyle = new CommonVertexStyle();
     }
     this.needRedraw = true;
 }
 
-function toggleRightSection(showResources){
+function toggleRightSection(showResources) {
     var resourcesSection = document.getElementById('resources-section');
     resourcesSection.style.display = 'none';
     var resultsSection = document.getElementById('search-results-section');
     resultsSection.style.display = 'none';
-    if(showResources){
+    if (showResources) {
         resourcesSection.style.display = 'block';
-    }else{
+    } else {
         resultsSection.style.display = 'block';
     }
 }
 function focusOnNode(mouseoverObject) {
+    var infoTitle = document.getElementById('info-title');
+    var infoUid = document.getElementById('info-uid')
+ 
+    infoTitle.value = mouseoverObject.nodeInfo.title;
+    infoTitle.onchange = function (ev) {
+        mouseoverObject.nodeInfo.title = infoTitle.value;
+        autosaveXML();
+    }
+    infoUid.textContent = mouseoverObject.nodeInfo.uid;
     listResoures(mouseoverObject);
 
     // change node style
@@ -6947,166 +6366,144 @@ function focusOnNode(mouseoverObject) {
     application.globalHoverObject.currentStyle = new HoverVertexStyle();
     application.handler.needRedraw = true;
 }
-Application.prototype.MouseMove = function(pos){
+Application.prototype.MouseMove = function (pos) {
     var mouseoverObject = this.handler.GetSelectedObject(pos);
-    if(this.lock && !this.objectChanged) return;
+    if (this.lock && !this.objectChanged) return;
     this.objectChanged = false;
 
-    var infoTitle = document.getElementById('info-title');
-    var infoUid = document.getElementById('info-uid')
     var infoResources = document.getElementById('info-resources')
     var addResourceButton = document.getElementById('add-resource-button')
-    
-    if(mouseoverObject instanceof BaseVertex){
+
+    if (mouseoverObject instanceof BaseVertex) {
         toggleRightSection(true);
 
         addResourceButton.disabled = false;
-        addResourceButton.onclick = function addResource(e){
+        addResourceButton.onclick = function addResource(e) {
             mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
             listResoures(mouseoverObject)
             autosaveXML();
         };
-        infoTitle.value = mouseoverObject.nodeInfo.title;
-        infoTitle.onchange = function(ev){
-            mouseoverObject.nodeInfo.title = infoTitle.value;
-            autosaveXML();
-        }
-        infoUid.textContent = mouseoverObject.nodeInfo.uid;
+
         focusOnNode(mouseoverObject);
-    }else if(mouseoverObject instanceof BaseEdge){
+    } else if (mouseoverObject instanceof BaseEdge) {
         return;
     }
 }
 
-Application.prototype.CanvasOnMouseMove  = function(e)
-{
-	// X,Y position.
-	var pos = this.getMousePos(this.canvas, e);
+Application.prototype.CanvasOnMouseMove = function (e) {
+    // X,Y position.
+    var pos = this.getMousePos(this.canvas, e);
 
     this.MouseMove(pos);
     this.handler.MouseMove(pos);
-	if (this.handler.IsNeedRedraw())
-	{
-		this.handler.RestRedraw();
-		this.redrawGraph();
-	}
+    if (this.handler.IsNeedRedraw()) {
+        this.handler.RestRedraw();
+        this.redrawGraph();
+    }
 
     this.updateMessage();
 }
 
-Application.prototype.MouseDown = function(pos){
+Application.prototype.MouseDown = function (pos) {
     var selected = this.handler.GetSelectedObject(pos);
-    if(selected){
+    if (selected) {
         this.lock = true;
-        if(selected != this.globalHoverObject) this.objectChanged = true;
+        if (selected != this.globalHoverObject) this.objectChanged = true;
         else this.globalChanged = false;
-    }else{
+    } else {
         this.lock = false;
         this.objectChanged = false;
     }
     this.MouseMove(pos)
 }
-Application.prototype.CanvasOnMouseDown = function(e)
-{
+Application.prototype.CanvasOnMouseDown = function (e) {
     // Skip non left button.
-    if(e.which !== 1) return;
+    if (e.which !== 1) return;
 
     var pos = this.getMousePos(this.canvas, e); /// provide this canvas and event
 
-	this.handler.MouseDown(pos);
+    this.handler.MouseDown(pos);
     this.MouseDown(pos);
-	if (this.handler.IsNeedRedraw())
-	{
-		this.handler.RestRedraw();
-		this.redrawGraph();
-	}
+    if (this.handler.IsNeedRedraw()) {
+        this.handler.RestRedraw();
+        this.redrawGraph();
+    }
 
     this.updateMessage();
 }
 
-Application.prototype.CanvasOnMouseUp = function(e)
-{
+Application.prototype.CanvasOnMouseUp = function (e) {
     // Skip non left button.
-    if(e.which !== 1) return;
+    if (e.which !== 1) return;
 
-//	this.dragObject = -1;
-	var pos = this.getMousePos(this.canvas, e);
+    //	this.dragObject = -1;
+    var pos = this.getMousePos(this.canvas, e);
 
-	this.handler.MouseUp(pos);
-	if (this.handler.IsNeedRedraw())
-	{
-		this.handler.RestRedraw();
-		this.redrawGraph();
-	}
+    this.handler.MouseUp(pos);
+    if (this.handler.IsNeedRedraw()) {
+        this.handler.RestRedraw();
+        this.redrawGraph();
+    }
 
     this.updateMessage();
 
     autosaveXML();
 }
 
-Application.prototype.multCanvasScale = function(factor)
-{
+Application.prototype.multCanvasScale = function (factor) {
     var oldRealWidth = this.GetRealWidth();
     var oldRealHeight = this.GetRealHeight();
-    
+
     this.canvasScale *= factor;
-    
-    this.canvasPosition = this.canvasPosition.add(new Point((this.GetRealWidth()  - oldRealWidth) / 2.0,
-                                                            (this.GetRealHeight() - oldRealHeight) / 2.0));
-    
+
+    this.canvasPosition = this.canvasPosition.add(new Point((this.GetRealWidth() - oldRealWidth) / 2.0,
+        (this.GetRealHeight() - oldRealHeight) / 2.0));
+
     this.redrawGraph();
 }
 
-Application.prototype.setCanvasScale = function(factor)
-{
+Application.prototype.setCanvasScale = function (factor) {
     var oldRealWidth = this.GetRealWidth();
     var oldRealHeight = this.GetRealHeight();
-    
+
     this.canvasScale = factor;
-    
-    this.canvasPosition = this.canvasPosition.add(new Point((this.GetRealWidth()  - oldRealWidth) / 2.0,
-                                                            (this.GetRealHeight() - oldRealHeight) / 2.0));
-    
+
+    this.canvasPosition = this.canvasPosition.add(new Point((this.GetRealWidth() - oldRealWidth) / 2.0,
+        (this.GetRealHeight() - oldRealHeight) / 2.0));
+
     this.redrawGraph();
 }
 
-Application.prototype.onCanvasMove = function(point)
-{
+Application.prototype.onCanvasMove = function (point) {
     this.canvasPosition = this.canvasPosition.add(point.multiply(1 / this.canvasScale));
     this.redrawGraph();
 }
 
-Application.prototype.AddNewVertex = function(vertex)
-{
-	return this.graph.AddNewVertex(vertex);
+Application.prototype.AddNewVertex = function (vertex) {
+    return this.graph.AddNewVertex(vertex);
 }
 
-Application.prototype.AddNewEdge = function(edge, replaceIfExists)
-{
-	return this.graph.AddNewEdge(edge, replaceIfExists);
+Application.prototype.AddNewEdge = function (edge, replaceIfExists) {
+    return this.graph.AddNewEdge(edge, replaceIfExists);
 }
 
-Application.prototype.CreateNewGraph = function(x, y)
-{
+Application.prototype.CreateNewGraph = function (x, y) {
     var app = this;
-    
+
     this.currentEnumVertesType.GetVertexTextAsync(
-                        function (enumType)
-                        {
-                            app.graph.AddNewVertex(new BaseVertex(x, y, enumType));
-                            console.log(x,y)
-                            app.redrawGraph();
-                                                  });
+        function (enumType) {
+            app.graph.AddNewVertex(new BaseVertex(x, y, enumType));
+            console.log(x, y)
+            app.redrawGraph();
+        });
 }
 
-Application.prototype.CreateNewGraphEx = function(x, y, vertexEnume)
-{
+Application.prototype.CreateNewGraphEx = function (x, y, vertexEnume) {
     return this.graph.AddNewVertex(new BaseVertex(x, y, vertexEnume));
 }
 
-Application.prototype.CreateNewArc = function(graph1, graph2, isDirect, weight, replaceIfExist, upText)
-{
-	var edge = this.AddNewEdge(new BaseEdge(graph1, graph2, isDirect, weight, upText), replaceIfExist);
+Application.prototype.CreateNewArc = function (graph1, graph2, isDirect, weight, replaceIfExist, upText) {
+    var edge = this.AddNewEdge(new BaseEdge(graph1, graph2, isDirect, weight, upText), replaceIfExist);
 
     this.graph.FixEdgeCurved(edge);
 
@@ -7114,272 +6511,225 @@ Application.prototype.CreateNewArc = function(graph1, graph2, isDirect, weight, 
 
     if (edgeObject.useWeight)
         this.UpdateEdgePresets(edgeObject.weight);
-    
+
     return edge;
 }
 
-Application.prototype.DeleteEdge = function(edgeObject)
-{
+Application.prototype.DeleteEdge = function (edgeObject) {
     var vertex1 = edgeObject.vertex1;
     var vertex2 = edgeObject.vertex2;
-    
+
     var hasPair = this.graph.hasPair(edgeObject);
-    
-	this.graph.DeleteEdge(edgeObject);
-    
+
+    this.graph.DeleteEdge(edgeObject);
+
     // Make line for pair.
-    if (hasPair)
-    {
+    if (hasPair) {
         var pairEdges = this.FindAllEdges(vertex2.id, vertex1.id);
-        
+
         if (pairEdges.length == 1 && pairEdges[0].model.default)
             pairEdges[0].model.type = EdgeModels.line;
     }
 }
 
-Application.prototype.DeleteVertex = function(graphObject)
-{
-	this.graph.DeleteVertex(graphObject);
+Application.prototype.DeleteVertex = function (graphObject) {
+    this.graph.DeleteVertex(graphObject);
 }
 
-Application.prototype.DeleteObject = function(object)
-{
-	if (object instanceof BaseVertex)
-	{
-		this.DeleteVertex(object);
-	}
-	else if (object instanceof BaseEdge)
-	{
-		this.DeleteEdge(object);
-	}
+Application.prototype.DeleteObject = function (object) {
+    if (object instanceof BaseVertex) {
+        this.DeleteVertex(object);
+    }
+    else if (object instanceof BaseEdge) {
+        this.DeleteEdge(object);
+    }
 }
 
-Application.prototype.IsCorrectObject = function(object)
-{
-	return (object instanceof BaseVertex) || 
-           (object instanceof BaseEdge);
+Application.prototype.IsCorrectObject = function (object) {
+    return (object instanceof BaseVertex) ||
+        (object instanceof BaseEdge);
 }
 
-Application.prototype.FindVertex = function(id)
-{
-	return this.graph.FindVertex(id);
+Application.prototype.FindVertex = function (id) {
+    return this.graph.FindVertex(id);
 }
 
-Application.prototype.FindEdge = function(id1, id2)
-{
-	return this.graph.FindEdge(id1, id2);
+Application.prototype.FindEdge = function (id1, id2) {
+    return this.graph.FindEdge(id1, id2);
 }
 
-Application.prototype.FindEdgeAny = function(id1, id2)
-{
-	return this.graph.FindEdgeAny(id1, id2);
+Application.prototype.FindEdgeAny = function (id1, id2) {
+    return this.graph.FindEdgeAny(id1, id2);
 }
 
-Application.prototype.FindAllEdges = function(id1, id2)
-{
-	return this.graph.FindAllEdges(id1, id2);
+Application.prototype.FindAllEdges = function (id1, id2) {
+    return this.graph.FindAllEdges(id1, id2);
 }
 
-Application.prototype.SetHandlerMode = function(mode)
-{
+Application.prototype.SetHandlerMode = function (mode) {
     var manipolationHandlers = ["default", "addGraph", "addArc", "delete", "findPath", "connectedComponent", "eulerianLoop"];
-    
-    if (this.handler && (g_AlgorithmIds.indexOf(mode) >= 0 || manipolationHandlers.indexOf(mode) >= 0))
-    {
+
+    if (this.handler && (g_AlgorithmIds.indexOf(mode) >= 0 || manipolationHandlers.indexOf(mode) >= 0)) {
         this.handler.RestoreAll();
     }
-    
+
     var modeIndicator = document.getElementById('mode-indicator')
-	if (mode == "default")
-	{
+    if (mode == "default") {
         modeIndicator.textContent = 'Mode: (M)ove'
-		this.handler = new DefaultHandler(this);
-	}
-	else if (mode == "addGraph")
-	{
+        this.handler = new DefaultHandler(this);
+    }
+    else if (mode == "addGraph") {
         modeIndicator.textContent = 'Mode: Add (V)ertex'
-		this.handler = new AddGraphHandler(this);
-	}
-	else if (mode == "addArc")
-	{
+        this.handler = new AddGraphHandler(this);
+    }
+    else if (mode == "addArc") {
         modeIndicator.textContent = 'Mode: Add (E)dge'
-		this.handler = new ConnectionGraphHandler(this);
-	}
-	else if (mode == "delete")
-	{
+        this.handler = new ConnectionGraphHandler(this);
+    }
+    else if (mode == "delete") {
         modeIndicator.textContent = 'Mode: (R)emove'
-		this.handler = new DeleteGraphHandler(this);
-	}
-	else if (mode == "deleteAll")
-	{
-		var removeAll = new DeleteAllHandler(this);
-		removeAll.clear();
-	}	
-	else if (mode == "findPath")
-	{
-		this.handler = new FindPathGraphHandler(this);
-	}
-	else if (mode == "showAdjacencyMatrix")
-	{
-		var showAdjacencyMatrix = new ShowAdjacencyMatrix(this);
-		showAdjacencyMatrix.show();
-	}
-	else if (mode == "showIncidenceMatrix")
-	{
-		var showIncidenceMatrix = new ShowIncidenceMatrix(this);
-		showIncidenceMatrix.show();
-	}
-    else if (mode == "showDistanceMatrix")
-	{
-		var showDistanceMatrix = new ShowDistanceMatrix(this);
-		showDistanceMatrix.show();
-	}
-	else if (mode == "connectedComponent")
-	{
-		this.handler = new ConnectedComponentGraphHandler(this);
-	}  
-	else if (mode == "saveDialog")
-	{
-		var savedDialogGraphHandler = new SavedDialogGraphHandler(this);
-		savedDialogGraphHandler.show();
-	}
-    else if (mode == "saveDialogImage")
-    {
+        this.handler = new DeleteGraphHandler(this);
+    }
+    else if (mode == "deleteAll") {
+        var removeAll = new DeleteAllHandler(this);
+        removeAll.clear();
+    }
+    else if (mode == "findPath") {
+        this.handler = new FindPathGraphHandler(this);
+    }
+    else if (mode == "showAdjacencyMatrix") {
+        var showAdjacencyMatrix = new ShowAdjacencyMatrix(this);
+        showAdjacencyMatrix.show();
+    }
+    else if (mode == "showIncidenceMatrix") {
+        var showIncidenceMatrix = new ShowIncidenceMatrix(this);
+        showIncidenceMatrix.show();
+    }
+    else if (mode == "showDistanceMatrix") {
+        var showDistanceMatrix = new ShowDistanceMatrix(this);
+        showDistanceMatrix.show();
+    }
+    else if (mode == "connectedComponent") {
+        this.handler = new ConnectedComponentGraphHandler(this);
+    }
+    else if (mode == "saveDialog") {
+        var savedDialogGraphHandler = new SavedDialogGraphHandler(this);
+        savedDialogGraphHandler.show();
+    }
+    else if (mode == "saveDialogImage") {
         var savedDialogGraphImageHandler = new SavedDialogGraphImageHandler(this);
         savedDialogGraphImageHandler.showWorkspace();
     }
-    else if (mode == "saveDialogFullImage")
-    {
+    else if (mode == "saveDialogFullImage") {
         var savedDialogGraphImageHandler = new SavedDialogGraphImageHandler(this);
-        savedDialogGraphImageHandler.showFullgraph();           
+        savedDialogGraphImageHandler.showFullgraph();
     }
-    else if (mode == "savePrintGraphImage")
-    {
+    else if (mode == "savePrintGraphImage") {
         var savedDialogGraphImageHandler = new SavedDialogGraphImageHandler(this);
-        savedDialogGraphImageHandler.showPrint();           
+        savedDialogGraphImageHandler.showPrint();
     }
-    else if (mode == "eulerianLoop")
-    {
-		this.handler = new EulerianLoopGraphHandler(this);
+    else if (mode == "eulerianLoop") {
+        this.handler = new EulerianLoopGraphHandler(this);
     }
-    else if (mode == "GroupRename")
-    {
-		var groupRenameVertices = new GroupRenameVertices(this);
-		groupRenameVertices.show();
+    else if (mode == "GroupRename") {
+        var groupRenameVertices = new GroupRenameVertices(this);
+        groupRenameVertices.show();
     }
-    else if (mode == "setupVertexStyle")
-    {
-		var setupVertexStyle = new SetupVertexStyle(this);
-		setupVertexStyle.show(0);
+    else if (mode == "setupVertexStyle") {
+        var setupVertexStyle = new SetupVertexStyle(this);
+        setupVertexStyle.show(0);
     }
-    else if (mode == "setupVertexStyleSelected")
-    {
-		var setupVertexStyle = new SetupVertexStyle(this);
-		setupVertexStyle.show(1); 
+    else if (mode == "setupVertexStyleSelected") {
+        var setupVertexStyle = new SetupVertexStyle(this);
+        setupVertexStyle.show(1);
     }
-    else if (mode == "setupEdgeStyle")
-    {
-		var setupEdgeStyle = new SetupEdgeStyle(this);
-		setupEdgeStyle.show(0);
+    else if (mode == "setupEdgeStyle") {
+        var setupEdgeStyle = new SetupEdgeStyle(this);
+        setupEdgeStyle.show(0);
     }
-    else if (mode == "setupEdgeStyleSelected")
-    {
-		var setupEdgeStyle = new SetupEdgeStyle(this);
-		setupEdgeStyle.show(1); 
+    else if (mode == "setupEdgeStyleSelected") {
+        var setupEdgeStyle = new SetupEdgeStyle(this);
+        setupEdgeStyle.show(1);
     }
-    else if (mode == "setupBackgroundStyle")
-    {
-		var setupBackgroundStyle = new SetupBackgroundStyle(this);
-		setupBackgroundStyle.show();
+    else if (mode == "setupBackgroundStyle") {
+        var setupBackgroundStyle = new SetupBackgroundStyle(this);
+        setupBackgroundStyle.show();
     }
-    else if (mode == "graphUndo")
-    {
-		if (!this.IsUndoStackEmpty())
+    else if (mode == "graphUndo") {
+        if (!this.IsUndoStackEmpty())
             this.Undo();
     }
-    else if (g_AlgorithmIds.indexOf(mode) >= 0)
-    {
+    else if (g_AlgorithmIds.indexOf(mode) >= 0) {
         this.handler = new AlgorithmGraphHandler(this, g_Algorithms[g_AlgorithmIds.indexOf(mode)](this.graph, this));
     }
-    
+
     console.log(mode);
 
     this.setRenderPath([]);
-	this.updateMessage();
-	this.redrawGraph();
+    this.updateMessage();
+    this.redrawGraph();
 }
 
 
-Application.prototype.getParameterByName = function (name)
-{
+Application.prototype.getParameterByName = function (name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-    results = regex.exec(location.search);
+        results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-Application.prototype.onPostLoadEvent = function()
-{
+Application.prototype.onPostLoadEvent = function () {
     this.SetEnumVertexsType(document.cookie.replace(/(?:(?:^|.*;\s*)enumType\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
 
     var wasLoad = false;
-    var matrix  = document.getElementById("inputMatrix").innerHTML;
+    var matrix = document.getElementById("inputMatrix").innerHTML;
     var separator = document.getElementById("separator").innerHTML == "space" ? " " : ",";
-    
+
     console.log(matrix);
     console.log("separator: \"" + separator + "\"");
-    
-    matrix  = (matrix.length <= 0) ? this.getParameterByName("matrix") : matrix;
-    if (matrix.length > 0)
-    {   
-	    if (!this.SetAdjacencyMatrixSmart(matrix, separator))
-	    {
-           this.userAction("AdjacencyMatrix.Failed");
-		   this.ShowAdjacencyMatrixErrorDialog(matrix);
-	    }
-        else
-        {
-           this.userAction("AdjacencyMatrix.Success");
+
+    matrix = (matrix.length <= 0) ? this.getParameterByName("matrix") : matrix;
+    if (matrix.length > 0) {
+        if (!this.SetAdjacencyMatrixSmart(matrix, separator)) {
+            this.userAction("AdjacencyMatrix.Failed");
+            this.ShowAdjacencyMatrixErrorDialog(matrix);
+        }
+        else {
+            this.userAction("AdjacencyMatrix.Success");
         }
 
-    	this.updateMessage();
-    	this.redrawGraph();
+        this.updateMessage();
+        this.redrawGraph();
         wasLoad = true;
     }
 
-    var matrix  = document.getElementById("inputIncidenceMatrix").innerHTML;
-    matrix  = (matrix.length <= 0) ? this.getParameterByName("incidenceMatrix") : matrix;
-    
-    if (matrix.length > 0)
-    {    
-	    if (!this.SetIncidenceMatrixSmart(matrix))
-	    {
+    var matrix = document.getElementById("inputIncidenceMatrix").innerHTML;
+    matrix = (matrix.length <= 0) ? this.getParameterByName("incidenceMatrix") : matrix;
+
+    if (matrix.length > 0) {
+        if (!this.SetIncidenceMatrixSmart(matrix)) {
             this.userAction("IncidenceMatrix.Failed");
-		    this.ShowIncidenceMatrixErrorDialog(matrix);
-	    }
-        else
-        {
+            this.ShowIncidenceMatrixErrorDialog(matrix);
+        }
+        else {
             this.userAction("IncidenceMatrix.Success");
         }
 
-    	this.updateMessage();
-    	this.redrawGraph();
-	    wasLoad = true;
+        this.updateMessage();
+        this.redrawGraph();
+        wasLoad = true;
     }
 
-    if (!wasLoad)
-    {
-    	var graphName  = this.getParameterByName("graph");
-	    if (graphName.length <= 0)
-	    {
-           graphName = document.cookie.replace(/(?:(?:^|.*;\s*)graphName\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-	    }
-                          
-       	if (graphName.length > 0)
-	    {
+    if (!wasLoad) {
+        var graphName = this.getParameterByName("graph");
+        if (graphName.length <= 0) {
+            graphName = document.cookie.replace(/(?:(?:^|.*;\s*)graphName\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        }
+
+        if (graphName.length > 0) {
             this.userAction("LoadGraphFromDisk");
-    		this.LoadGraphFromDisk(graphName);
-	    }
+            this.LoadGraphFromDisk(graphName);
+        }
     }
 
 
@@ -7387,8 +6737,7 @@ Application.prototype.onPostLoadEvent = function()
     this.redrawGraph();
 }
 
-Application.prototype.onLoad = function()
-{
+Application.prototype.onLoad = function () {
     this.canvas = this.document.getElementById('canvas');
 
     this.handler = new DefaultHandler(this);
@@ -7397,531 +6746,464 @@ Application.prototype.onLoad = function()
     this.redrawGraph();
 }
 
-Application.prototype.NeedRedraw = function()
-{
-	//TODO
-	this.updateMessage();
-	this.redrawGraph();
+Application.prototype.NeedRedraw = function () {
+    //TODO
+    this.updateMessage();
+    this.redrawGraph();
 }
 
-Application.prototype.SetStatus = function(name, value)
-{
-	this.status[name] = value;
+Application.prototype.SetStatus = function (name, value) {
+    this.status[name] = value;
 }
 
-Application.prototype.GetStatus = function()
-{
-	return this.status[name];
+Application.prototype.GetStatus = function () {
+    return this.status[name];
 }
 
 
-Application.prototype.GetAdjacencyMatrix = function ()
-{
-	return this.graph.GetAdjacencyMatrixStr();
+Application.prototype.GetAdjacencyMatrix = function () {
+    return this.graph.GetAdjacencyMatrixStr();
 }
 
-Application.prototype.TestAdjacencyMatrix = function (matrix, rowsObj, colsObj, separator)
-{
-    if(separator === undefined) 
-    {
-      separator = ",";
+Application.prototype.TestAdjacencyMatrix = function (matrix, rowsObj, colsObj, separator) {
+    if (separator === undefined) {
+        separator = ",";
     }
-    
-	return this.graph.TestAdjacencyMatrix(matrix, rowsObj, colsObj, separator);
+
+    return this.graph.TestAdjacencyMatrix(matrix, rowsObj, colsObj, separator);
 }
 
-Application.prototype.SetAdjacencyMatrix = function (matrix, separator)
-{
-    if(separator === undefined) 
-    {
-      separator = ",";
+Application.prototype.SetAdjacencyMatrix = function (matrix, separator) {
+    if (separator === undefined) {
+        separator = ",";
     }
-    
-	var res = true;
+
+    var res = true;
     var r = {};
-	var c = {};
-	if (!this.TestAdjacencyMatrix(matrix, r, c, separator))
-	{
-		$.get( "/" + SiteDir + "cgi-bin/addFailedMatrix.php?text=adjacency&matrix=" + encodeURIComponent(matrix), function( data ) {;});
-		res = false;
-	}
-
-	this.graph.SetAdjacencyMatrix(matrix, new Point(this.GetRealWidth(), this.GetRealHeight()), this.currentEnumVertesType, separator);
-    this.AutoAdjustViewport();
-	this.redrawGraph();
-	return res;
-}
-
-
-Application.prototype.GetIncidenceMatrix = function ()
-{
-	return this.graph.GetIncidenceMatrix();
-}
-
-Application.prototype.TestIncidenceMatrix = function (matrix, rowsObj, colsObj)
-{
-	return this.graph.TestIncidenceMatrix(matrix, rowsObj, colsObj);
-}
-
-Application.prototype.SetIncidenceMatrix = function (matrix)
-{
-	var res = true;
-        var r = {};
-	var c = {};
-	if (!this.TestIncidenceMatrix(matrix, r, c))
-	{
-		$.get( "/" + SiteDir + "cgi-bin/addFailedMatrix.php?text=incidence&matrix=" + encodeURIComponent(matrix), function( data ) {;});
-		res = false;
-	}
-
-	this.graph.SetIncidenceMatrix(matrix, new Point(this.GetRealWidth(), this.GetRealHeight()), this.currentEnumVertesType);
-    this.AutoAdjustViewport();
-	this.redrawGraph();
-	return res;
-}
-
-Application.prototype.Test = function ()
-{
-	this.graph.VertexesReposition(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices);
-	this.redrawGraph();
-}
-
-
-Application.prototype.SetAdjacencyMatrixSmart = function (matrix, separator)
-{
-    if (separator === undefined) 
-    {
-      separator = ",";
+    var c = {};
+    if (!this.TestAdjacencyMatrix(matrix, r, c, separator)) {
+        $.get("/" + SiteDir + "cgi-bin/addFailedMatrix.php?text=adjacency&matrix=" + encodeURIComponent(matrix), function (data) { ; });
+        res = false;
     }
-    
-	var res = false;
-	if (this.TestAdjacencyMatrix(matrix, {}, {}, separator))
-        {
-    		res = this.SetAdjacencyMatrix(matrix, separator);
-	}
-        else if (this.TestIncidenceMatrix(matrix, {}, {}))
-	{
-    		res = this.SetIncidenceMatrix(matrix);
-        }
-	else
-	{
-    		res = this.SetAdjacencyMatrix(matrix);
-	}
-	return res;
-}
 
-Application.prototype.SetIncidenceMatrixSmart = function (matrix)
-{
-	var res = false;
-
-        if (this.TestIncidenceMatrix(matrix, {}, {}))
-	{
-    		res = this.SetIncidenceMatrix(matrix);
-        }
-	else if (this.TestAdjacencyMatrix(matrix, {}, {})) 	
-        {
-    		res = this.SetAdjacencyMatrix(matrix);
-	}
-	else
-	{
-    		res = this.SetIncidenceMatrix(matrix);
-	}
-
-	return res;
+    this.graph.SetAdjacencyMatrix(matrix, new Point(this.GetRealWidth(), this.GetRealHeight()), this.currentEnumVertesType, separator);
+    this.AutoAdjustViewport();
+    this.redrawGraph();
+    return res;
 }
 
 
-Application.prototype.SaveGraphOnDisk = function ()
-{
-	var graphAsString = this.graph.SaveToXML(this.SaveUserSettings());
-    
+Application.prototype.GetIncidenceMatrix = function () {
+    return this.graph.GetIncidenceMatrix();
+}
+
+Application.prototype.TestIncidenceMatrix = function (matrix, rowsObj, colsObj) {
+    return this.graph.TestIncidenceMatrix(matrix, rowsObj, colsObj);
+}
+
+Application.prototype.SetIncidenceMatrix = function (matrix) {
+    var res = true;
+    var r = {};
+    var c = {};
+    if (!this.TestIncidenceMatrix(matrix, r, c)) {
+        $.get("/" + SiteDir + "cgi-bin/addFailedMatrix.php?text=incidence&matrix=" + encodeURIComponent(matrix), function (data) { ; });
+        res = false;
+    }
+
+    this.graph.SetIncidenceMatrix(matrix, new Point(this.GetRealWidth(), this.GetRealHeight()), this.currentEnumVertesType);
+    this.AutoAdjustViewport();
+    this.redrawGraph();
+    return res;
+}
+
+Application.prototype.Test = function () {
+    this.graph.VertexesReposition(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices);
+    this.redrawGraph();
+}
+
+
+Application.prototype.SetAdjacencyMatrixSmart = function (matrix, separator) {
+    if (separator === undefined) {
+        separator = ",";
+    }
+
+    var res = false;
+    if (this.TestAdjacencyMatrix(matrix, {}, {}, separator)) {
+        res = this.SetAdjacencyMatrix(matrix, separator);
+    }
+    else if (this.TestIncidenceMatrix(matrix, {}, {})) {
+        res = this.SetIncidenceMatrix(matrix);
+    }
+    else {
+        res = this.SetAdjacencyMatrix(matrix);
+    }
+    return res;
+}
+
+Application.prototype.SetIncidenceMatrixSmart = function (matrix) {
+    var res = false;
+
+    if (this.TestIncidenceMatrix(matrix, {}, {})) {
+        res = this.SetIncidenceMatrix(matrix);
+    }
+    else if (this.TestAdjacencyMatrix(matrix, {}, {})) {
+        res = this.SetAdjacencyMatrix(matrix);
+    }
+    else {
+        res = this.SetIncidenceMatrix(matrix);
+    }
+
+    return res;
+}
+
+
+Application.prototype.SaveGraphOnDisk = function () {
+    var graphAsString = this.graph.SaveToXML(this.SaveUserSettings());
+
     var styleSave = this.SaveUserSettings();
-	
-	if (this.savedGraphName.length <= 0)
-	{
-		this.savedGraphName = this.GetNewGraphName();
-	}
 
-	var app = this;
-	$.ajax({
-	type: "POST",
-	url: "/" + SiteDir + "cgi-bin/saveGraph.php?name=" + this.savedGraphName,
-	data: graphAsString,
-	dataType: "text"
-	})
-	.done(function( msg ) 
-	{
-	        document.cookie = "graphName=" + app.savedGraphName;
-	});
+    if (this.savedGraphName.length <= 0) {
+        this.savedGraphName = this.GetNewGraphName();
+    }
+
+    var app = this;
+    $.ajax({
+        type: "POST",
+        url: "/" + SiteDir + "cgi-bin/saveGraph.php?name=" + this.savedGraphName,
+        data: graphAsString,
+        dataType: "text"
+    })
+        .done(function (msg) {
+            document.cookie = "graphName=" + app.savedGraphName;
+        });
 }
-                          
-Application.prototype.SaveGraphImageOnDisk = function (showDialogCallback)
-{
+
+Application.prototype.SaveGraphImageOnDisk = function (showDialogCallback) {
     var imageName = this.GetNewName();
-                          
+
     this.stopRenderTimer();
     this.redrawGraph();
-                          
+
     var bbox = this.graph.getGraphBBox();
-    
+
     var rectParams = "";
-    if (this.IsGraphFitOnViewport())
-    {
-        var canvasWidth  = this.GetRealWidth();
+    if (this.IsGraphFitOnViewport()) {
+        var canvasWidth = this.GetRealWidth();
         var canvasHeight = this.GetRealHeight();
         var canvasPositionInverse = this.canvasPosition.inverse();
 
         var pos = bbox.minPoint.subtract(canvasPositionInverse);
-        
+
         rectParams = "&x=" + Math.round(pos.x * this.canvasScale) + "&y=" + Math.round(pos.y * this.canvasScale)
             + "&width=" + Math.round(bbox.size().x * this.canvasScale) + "&height=" + Math.round(bbox.size().y * this.canvasScale);
-        
+
         //console.log(rectParams);
     }
 
     var imageBase64Data = this.canvas.toDataURL();
 
     $.ajax({
-     type: "POST",
-     url: "/" + SiteDir + "cgi-bin/saveImage.php?name=" + imageName + rectParams,
-     data: {
-           base64data : imageBase64Data
-     },
-     dataType: "text",
-     success: function(data){
-        showDialogCallback();
-    }
-     });
-                          
+        type: "POST",
+        url: "/" + SiteDir + "cgi-bin/saveImage.php?name=" + imageName + rectParams,
+        data: {
+            base64data: imageBase64Data
+        },
+        dataType: "text",
+        success: function (data) {
+            showDialogCallback();
+        }
+    });
+
     return imageName;
 }
 
-Application.prototype.SaveFullGraphImageOnDisk = function (showDialogCallback, forPrint)
-{
+Application.prototype.SaveFullGraphImageOnDisk = function (showDialogCallback, forPrint) {
     var imageName = this.GetNewName();
-                          
+
     this.stopRenderTimer();
     var canvas = forPrint ? this._PrintRedrawGraph() : this._OffscreenRedrawGraph();
-                          
+
     var bbox = this.graph.getGraphBBox();
-    
-    var rectParams = ""; 
+
+    var rectParams = "";
     rectParams = "&x=0" + "&y=0" + "&width=" + bbox.size().x + "&height=" + bbox.size().y;
 
     var imageBase64Data = canvas.toDataURL();
 
     $.ajax({
-     type: "POST",
-     url: "/" + SiteDir + "cgi-bin/saveImage.php?name=" + imageName + rectParams,
-     data: {
-           base64data : imageBase64Data
-     },
-     dataType: "text",
-     success: function(data){
-        showDialogCallback();
-    }
-     });
-                          
+        type: "POST",
+        url: "/" + SiteDir + "cgi-bin/saveImage.php?name=" + imageName + rectParams,
+        data: {
+            base64data: imageBase64Data
+        },
+        dataType: "text",
+        success: function (data) {
+            showDialogCallback();
+        }
+    });
+
     return imageName;
 }
-                          
-Application.prototype.LoadGraphFromString = function (str)
-{
+
+Application.prototype.LoadGraphFromString = function (str) {
     var graph = new Graph();
-    
+
     //console.log(str);
-    
+
     var userSettings = {};
     graph.LoadFromXML(str, userSettings);
     if (userSettings.hasOwnProperty("data") && userSettings["data"].length > 0)
         this.LoadUserSettings(userSettings["data"]);
     this.SetDefaultTransformations();
     this.graph = graph;
-    if (this.graph.isNeedReposition())
-    {
-        this.graph.VertexesReposition(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices); 
+    if (this.graph.isNeedReposition()) {
+        this.graph.VertexesReposition(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices);
     }
     this.AutoAdjustViewport();
     this.updateMessage();
-    this.redrawGraph();   
+    this.redrawGraph();
 }
 
-Application.prototype.LoadGraphFromDisk = function (graphName)
-{
-	var  app = this;
+Application.prototype.LoadGraphFromDisk = function (graphName) {
+    var app = this;
 
-	$.ajax({
-	type: "GET",
-	url: "/" + SiteDir + "cgi-bin/loadGraph.php?name=" + graphName
-	})
-	.done(function( msg ) 
-	{
-       app.LoadGraphFromString(msg);
-	});
+    $.ajax({
+        type: "GET",
+        url: "/" + SiteDir + "cgi-bin/loadGraph.php?name=" + graphName
+    })
+        .done(function (msg) {
+            app.LoadGraphFromString(msg);
+        });
 }
 
 
-Application.prototype.GetNewGraphName = function()
-{
+Application.prototype.GetNewGraphName = function () {
     var name = this.GetNewName();
-    
-    if (this.isVertexCommonStyleCustom || this.isVertexSelectedVertexStylesCustom || 
-       this.isBackgroundCommonStyleCustom || this.isEdgeCommonStyleCustom || this.isEdgeSelectedStylesCustom)
-    {
+
+    if (this.isVertexCommonStyleCustom || this.isVertexSelectedVertexStylesCustom ||
+        this.isBackgroundCommonStyleCustom || this.isEdgeCommonStyleCustom || this.isEdgeSelectedStylesCustom) {
         name = name + "ZZcst";
     }
-    
+
     return name;
 }
 
-Application.prototype.GetNewName = function()
-{
+Application.prototype.GetNewName = function () {
     var name = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    for (var i = 0; i < this.graphNameLength; i++ )
-    {
+    for (var i = 0; i < this.graphNameLength; i++) {
         name += possible.charAt(Math.floor(Math.random() * possible.length));
     }
 
     return name;
 }
 
-Application.prototype.GetGraphName = function()
-{
+Application.prototype.GetGraphName = function () {
     return this.savedGraphName;
 }
 
 
-Application.prototype.SetDefaultHandler = function()
-{
-	restButtons ('Default');
-	this.SetHandlerMode("default");
+Application.prototype.SetDefaultHandler = function () {
+    restButtons('Default');
+    this.SetHandlerMode("default");
 }
 
-Application.prototype.GetEnumVertexsList = function()
-{
-	var res = [];
+Application.prototype.GetEnumVertexsList = function () {
+    var res = [];
 
-	for (var i = 0; i < this.enumVertexesTextList.length; i ++)
-	{
-		var one = {};
-		one["text"]  = this.enumVertexesTextList[i].GetText();
-		one["value"] = this.enumVertexesTextList[i].GetValue();
+    for (var i = 0; i < this.enumVertexesTextList.length; i++) {
+        var one = {};
+        one["text"] = this.enumVertexesTextList[i].GetText();
+        one["value"] = this.enumVertexesTextList[i].GetValue();
 
-		one["select"] = this.enumVertexesTextList[i].GetValue() == this.currentEnumVertesType.GetValue();
+        one["select"] = this.enumVertexesTextList[i].GetValue() == this.currentEnumVertesType.GetValue();
 
-		res.push(one);
-	}
+        res.push(one);
+    }
 
-	return res;
+    return res;
 }
 
-Application.prototype.SetEnumVertexsType = function(value)
-{
-	for (var i = 0; i < this.enumVertexesTextList.length; i ++)
-	{
-		if (this.enumVertexesTextList[i].GetValue() == value)
-		{
-			this.currentEnumVertesType = this.enumVertexesTextList[i];
-			document.cookie = "enumType=" + value;
-			break;
-		}
-	}
+Application.prototype.SetEnumVertexsType = function (value) {
+    for (var i = 0; i < this.enumVertexesTextList.length; i++) {
+        if (this.enumVertexesTextList[i].GetValue() == value) {
+            this.currentEnumVertesType = this.enumVertexesTextList[i];
+            document.cookie = "enumType=" + value;
+            break;
+        }
+    }
 
 }
 
 
-Application.prototype.ShowAdjacencyMatrixErrorDialog = function(matrix)
-{
-	var dialogButtons = {};
+Application.prototype.ShowAdjacencyMatrixErrorDialog = function (matrix) {
+    var dialogButtons = {};
 
-	matrixRes = matrix.replace(/\n/g,'%0A');
-	dialogButtons[g_readMatrixHelp] = function() {
-			window.location.assign(g_language == "ru" ? "./wiki/Справка/МатрицаСмежности#matrixFormat" : "./wiki/Help/AdjacencyMatrix#matrixFormat");
-		};
-	dialogButtons[g_fixMatrix] = function() {
-			window.location.assign("./create_graph_by_matrix?matrix=" + matrixRes);
-		};
-	dialogButtons[g_close] = function() {
-			$( this ).dialog( "close" );					
-		}; 
+    matrixRes = matrix.replace(/\n/g, '%0A');
+    dialogButtons[g_readMatrixHelp] = function () {
+        window.location.assign(g_language == "ru" ? "./wiki/Справка/МатрицаСмежности#matrixFormat" : "./wiki/Help/AdjacencyMatrix#matrixFormat");
+    };
+    dialogButtons[g_fixMatrix] = function () {
+        window.location.assign("./create_graph_by_matrix?matrix=" + matrixRes);
+    };
+    dialogButtons[g_close] = function () {
+        $(this).dialog("close");
+    };
 
-	$( "#matrixError" ).dialog({
-		resizable: false,
-		title: g_matrixWrongFormat,
-		width: 400,
-		modal: true,
-		dialogClass: 'EdgeDialog',
-		buttons: dialogButtons,
-	});
+    $("#matrixError").dialog({
+        resizable: false,
+        title: g_matrixWrongFormat,
+        width: 400,
+        modal: true,
+        dialogClass: 'EdgeDialog',
+        buttons: dialogButtons,
+    });
 }
 
-Application.prototype.ShowIncidenceMatrixErrorDialog = function(matrix)
-{
-	var dialogButtons = {};
+Application.prototype.ShowIncidenceMatrixErrorDialog = function (matrix) {
+    var dialogButtons = {};
 
-	matrixRes = matrix.replace(/\n/g,'%0A');
-	dialogButtons[g_readMatrixHelp] = function() {
-			window.location.assign(g_language == "ru" ? "./wiki/Справка/МатрицаИнцидентности#matrixFormat" : "./wiki/Help/IncidenceMatrix#matrixFormat");
-		};
-	dialogButtons[g_fixMatrix] = function() {
-			window.location.assign("./create_graph_by_incidence_matrix?incidenceMatrix=" + matrixRes);
-		};
-	dialogButtons[g_close] = function() {
-			$( this ).dialog( "close" );					
-		}; 
+    matrixRes = matrix.replace(/\n/g, '%0A');
+    dialogButtons[g_readMatrixHelp] = function () {
+        window.location.assign(g_language == "ru" ? "./wiki/Справка/МатрицаИнцидентности#matrixFormat" : "./wiki/Help/IncidenceMatrix#matrixFormat");
+    };
+    dialogButtons[g_fixMatrix] = function () {
+        window.location.assign("./create_graph_by_incidence_matrix?incidenceMatrix=" + matrixRes);
+    };
+    dialogButtons[g_close] = function () {
+        $(this).dialog("close");
+    };
 
-	$( "#matrixErrorInc" ).dialog({
-		resizable: false,
-		title: g_matrixWrongFormat,
-		width: 400,
-		modal: true,
-		dialogClass: 'EdgeDialog',
-		buttons: dialogButtons,
-	});
+    $("#matrixErrorInc").dialog({
+        resizable: false,
+        title: g_matrixWrongFormat,
+        width: 400,
+        modal: true,
+        dialogClass: 'EdgeDialog',
+        buttons: dialogButtons,
+    });
 }
-                          
-Application.prototype.SetFindPathReport = function (value)
-{
+
+Application.prototype.SetFindPathReport = function (value) {
     this.findPathReport = value;
 }
-                          
-Application.prototype.GetFindPathReport = function ()
-{
+
+Application.prototype.GetFindPathReport = function () {
     return this.findPathReport;
 }
-                                                    
-Application.prototype.GetRealWidth = function ()
-{
+
+Application.prototype.GetRealWidth = function () {
     return this.canvas.width / this.canvasScale;
 }
-                          
-Application.prototype.GetRealHeight = function ()
-{
+
+Application.prototype.GetRealHeight = function () {
     return this.canvas.height / this.canvasScale;
 }
-                          
-Application.prototype.SetDefaultTransformations = function()
-{
+
+Application.prototype.SetDefaultTransformations = function () {
     this.canvasScale = 1.0;
     this.canvasPosition = new Point(0, 0);
 }
 
-Application.prototype.AutoAdjustViewport = function()
-{
-    graphBBox  = this.graph.getGraphBBox();
+Application.prototype.AutoAdjustViewport = function () {
+    graphBBox = this.graph.getGraphBBox();
     bboxCenter = graphBBox.center();
-    bboxSize   = graphBBox.size();
-                          
-    if (bboxSize.length() > 0)
-    {
+    bboxSize = graphBBox.size();
+
+    if (bboxSize.length() > 0) {
         // Setup size
-        if (bboxSize.x > this.GetRealWidth() || bboxSize.y > this.GetRealHeight())
-        {
+        if (bboxSize.x > this.GetRealWidth() || bboxSize.y > this.GetRealHeight()) {
             this.canvasScale = Math.min(this.GetRealWidth() / bboxSize.x, this.GetRealHeight() / bboxSize.y);
         }
-                          
+
         // Setup position.
         if (graphBBox.minPoint.x < 0.0 || graphBBox.minPoint.y < 0.0 ||
-            graphBBox.maxPoint.x > this.GetRealWidth() || graphBBox.maxPoint.y > this.GetRealHeight())
-        {
+            graphBBox.maxPoint.x > this.GetRealWidth() || graphBBox.maxPoint.y > this.GetRealHeight()) {
             // Move center.
-            this.canvasPosition  = graphBBox.minPoint.inverse();
+            this.canvasPosition = graphBBox.minPoint.inverse();
         }
     }
 }
-                          
-Application.prototype.OnAutoAdjustViewport = function()
-{
+
+Application.prototype.OnAutoAdjustViewport = function () {
     this.SetDefaultTransformations();
     this.AutoAdjustViewport();
     this.redrawGraph();
 }
-                          
-Application.prototype.getAlgorithmNames = function()
-{
+
+Application.prototype.getAlgorithmNames = function () {
     var res = [];
-    for (var i = 0; i < g_Algorithms.length; i++)
-    {
+    for (var i = 0; i < g_Algorithms.length; i++) {
         factory = g_Algorithms[i];
         var obj = {};
         oneFactory = factory(this.graph);
         obj.name = oneFactory.getName(g_language);
-        obj.id   = oneFactory.getId();
+        obj.id = oneFactory.getId();
         obj.priority = oneFactory.getPriority();
         obj.category = oneFactory.getCategory();
         res.push(obj);
     }
-    
+
     res.sort(function (a, b) {
-      return a.priority - b.priority;
+        return a.priority - b.priority;
     });
-    
+
     return res;
 }
-   
-Application.prototype.resultCallback = function(paths)
-{
+
+Application.prototype.resultCallback = function (paths) {
     console.log(paths);
-    if ((paths instanceof Object) && "paths" in paths)
-    {
+    if ((paths instanceof Object) && "paths" in paths) {
         this.setRenderPath(paths["paths"][0], "minPath" in paths);
     }
-    else if ((paths instanceof Object) && "pathsWithEdges" in paths)
-    {
+    else if ((paths instanceof Object) && "pathsWithEdges" in paths) {
         this.setRenderPathWithEdges(paths["pathsWithEdges"][0]);
     }
-    
+
     this.updateMessage();
     this.redrawGraph();
 }
 
-Application.prototype.GetCurrentValue = function(paramName, defaultValue)
-{
+Application.prototype.GetCurrentValue = function (paramName, defaultValue) {
     return (paramName in this.algorithmsValues) ? this.algorithmsValues[paramName] : defaultValue;
 }
 
-Application.prototype.SetCurrentValue = function(paramName, value)
-{
+Application.prototype.SetCurrentValue = function (paramName, value) {
     this.algorithmsValues[paramName] = value;
 }
 
-Application.prototype.IsGraphFitOnViewport = function()
-{
+Application.prototype.IsGraphFitOnViewport = function () {
     res = true;
-    graphBBox  = this.graph.getGraphBBox();
-    var canvasWidth  = this.GetRealWidth();//  * this.canvasScale;
+    graphBBox = this.graph.getGraphBBox();
+    var canvasWidth = this.GetRealWidth();//  * this.canvasScale;
     var canvasHeight = this.GetRealHeight();// * this.canvasScale;
     var canvasPositionInverse = this.canvasPosition./*multiply(this.canvasScale).*/inverse();
     //console.log("BBox_min = " + graphBBox.minPoint.toString() + " - BBox_max = " + graphBBox.maxPoint.toString()
     //    + " Position" + canvasPositionInverse.toString() + " - cw = " + canvasWidth + " ch = " + canvasHeight);
-    
+
     return (Math.floor(canvasPositionInverse.x) <= Math.floor(graphBBox.minPoint.x) &&
         Math.floor(canvasPositionInverse.y) <= Math.floor(graphBBox.minPoint.y) && Math.floor(canvasPositionInverse.x + canvasWidth) >= Math.floor(graphBBox.maxPoint.x)
         && Math.floor(canvasPositionInverse.y + canvasHeight) >= Math.floor(graphBBox.maxPoint.y));
 }
 
-Application.prototype.PushToStack = function(actionName)
-{
-    var object        = {};
+Application.prototype.PushToStack = function (actionName) {
+    var object = {};
     object.actionName = actionName;
-    object.graphSave  = this.graph.SaveToXML(this.SaveUserSettings());    
-    
+    object.graphSave = this.graph.SaveToXML(this.SaveUserSettings());
+
     this.undoStack.push(object);
 
-    while (this.undoStack.length > this.maxUndoStackSize)
-    {
+    while (this.undoStack.length > this.maxUndoStackSize) {
         this.undoStack.shift();
     }
 }
 
-Application.prototype.Undo = function()
-{
+Application.prototype.Undo = function () {
     if (this.IsUndoStackEmpty())
         return;
-    
-    var state  = this.undoStack.pop();
+
+    var state = this.undoStack.pop();
     this.graph = new Graph();
 
     var userSettings = {};
@@ -7934,344 +7216,326 @@ Application.prototype.Undo = function()
     //console.log("undo:" + state.actionName + " size =" + this.undoStack.length);
 
     if (this.IsUndoStackEmpty())
-        document.getElementById('GraphUndo').style.display = 'none';    
+        document.getElementById('GraphUndo').style.display = 'none';
 }
 
-Application.prototype.ClearUndoStack = function()
-{
+Application.prototype.ClearUndoStack = function () {
     this.undoStack = [];
 }
 
-Application.prototype.IsUndoStackEmpty = function()
-{
+Application.prototype.IsUndoStackEmpty = function () {
     return (this.undoStack.length <= 0);
 }
 
-Application.prototype.SaveUserSettings = function()
-{
+Application.prototype.SaveUserSettings = function () {
     var res = "{";
-    
-    var needEnd    = false;
+
+    var needEnd = false;
     var checkValue = [];
-    
-    checkValue.push({field: "edgeCommonStyle",
-                     value: this.edgeCommonStyle,
-                     check: this.isEdgeCommonStyleCustom});
-    
-    checkValue.push({field: "edgeSelectedStyles",
-                     value: this.edgeSelectedStyles,
-                     check: this.isEdgeSelectedStylesCustom});
+
+    checkValue.push({
+        field: "edgeCommonStyle",
+        value: this.edgeCommonStyle,
+        check: this.isEdgeCommonStyleCustom
+    });
+
+    checkValue.push({
+        field: "edgeSelectedStyles",
+        value: this.edgeSelectedStyles,
+        check: this.isEdgeSelectedStylesCustom
+    });
 
     //checkValue.push({field: "edgePrintCommonStyle",
     //                 value: this.edgePrintCommonStyle});
 
     //checkValue.push({field: "edgePrintSelectedStyles",
     //                 value: this.edgePrintSelectedStyles});
-    
-    checkValue.push({field: "vertexCommonStyle",
-                     value: this.vertexCommonStyle,
-                     check: this.isVertexCommonStyleCustom});
-    
-    checkValue.push({field: "vertexSelectedVertexStyles",
-                     value: this.vertexSelectedVertexStyles,
-                     check: this.isVertexSelectedVertexStylesCustom});
-    
-    checkValue.push({field: "backgroundCommonStyle",
-                     value: this.backgroundCommonStyle,
-                     check: this.isBackgroundCommonStyleCustom});
 
-    checkValue.push({field: "defaultVertexSize",
-                      value: this.defaultVertexSize,
-                      check: this.defaultVertexSize != null}); 
+    checkValue.push({
+        field: "vertexCommonStyle",
+        value: this.vertexCommonStyle,
+        check: this.isVertexCommonStyleCustom
+    });
 
-    checkValue.push({field: "defaultEdgeWidth",
-                      value: this.defaultEdgeWidth,
-                      check: this.defaultEdgeWidth != null});
-    
+    checkValue.push({
+        field: "vertexSelectedVertexStyles",
+        value: this.vertexSelectedVertexStyles,
+        check: this.isVertexSelectedVertexStylesCustom
+    });
+
+    checkValue.push({
+        field: "backgroundCommonStyle",
+        value: this.backgroundCommonStyle,
+        check: this.isBackgroundCommonStyleCustom
+    });
+
+    checkValue.push({
+        field: "defaultVertexSize",
+        value: this.defaultVertexSize,
+        check: this.defaultVertexSize != null
+    });
+
+    checkValue.push({
+        field: "defaultEdgeWidth",
+        value: this.defaultEdgeWidth,
+        check: this.defaultEdgeWidth != null
+    });
+
     //checkValue.push({field: "vertexPrintCommonStyle",
     //                 value: this.vertexPrintCommonStyle});
 
     //checkValue.push({field: "vertexPrintSelectedVertexStyles",
     //                 value: this.vertexPrintSelectedVertexStyles});
-    
-    checkValue.forEach(function(entry) {
-            if (!entry.check)
-                return;
-                
-            if (needEnd)
-                res = res + ",";
-                
-            res = res + "\"" + entry.field + "\"" + ":" + JSON.stringify(entry.value);
-            needEnd = true;
-        });
-    
+
+    checkValue.forEach(function (entry) {
+        if (!entry.check)
+            return;
+
+        if (needEnd)
+            res = res + ",";
+
+        res = res + "\"" + entry.field + "\"" + ":" + JSON.stringify(entry.value);
+        needEnd = true;
+    });
+
     res = res + "}";
-    
+
     return this.EncodeToHTML(res);
 }
 
-Application.prototype.LoadUserSettings = function(json)
-{
+Application.prototype.LoadUserSettings = function (json) {
     var checkValue = [];
-    
-    checkValue.push({field: "edgeCommonStyle",
-                     value: this.edgeCommonStyle,
-                     check: "isEdgeCommonStyleCustom",
-                     deep: false});
-    
-    checkValue.push({field: "edgeSelectedStyles",
-                     value: this.edgeSelectedStyles,
-                     check: "isEdgeSelectedStylesCustom",
-                     deep: true});
+
+    checkValue.push({
+        field: "edgeCommonStyle",
+        value: this.edgeCommonStyle,
+        check: "isEdgeCommonStyleCustom",
+        deep: false
+    });
+
+    checkValue.push({
+        field: "edgeSelectedStyles",
+        value: this.edgeSelectedStyles,
+        check: "isEdgeSelectedStylesCustom",
+        deep: true
+    });
 
     //checkValue.push({field: "edgePrintCommonStyle",
     //                 value: this.edgePrintCommonStyle});
 
     //checkValue.push({field: "edgePrintSelectedStyles",
     //                 value: this.edgePrintSelectedStyles});
-    
-    checkValue.push({field: "vertexCommonStyle",
-                     value: this.vertexCommonStyle,
-                     check: "isVertexCommonStyleCustom",
-                     deep: false});
-    
-    checkValue.push({field: "vertexSelectedVertexStyles",
-                     value: this.vertexSelectedVertexStyles,
-                     check: "isVertexSelectedVertexStylesCustom",
-                     deep: true});
 
-    checkValue.push({field: "defaultVertexSize",
-                    value: "defaultVertexSize",
-                    check: null,
-                    deep: false});
+    checkValue.push({
+        field: "vertexCommonStyle",
+        value: this.vertexCommonStyle,
+        check: "isVertexCommonStyleCustom",
+        deep: false
+    });
 
-    checkValue.push({field: "defaultEdgeWidth",
-                    value: "defaultEdgeWidth",
-                    check: null,
-                    deep: false});
+    checkValue.push({
+        field: "vertexSelectedVertexStyles",
+        value: this.vertexSelectedVertexStyles,
+        check: "isVertexSelectedVertexStylesCustom",
+        deep: true
+    });
+
+    checkValue.push({
+        field: "defaultVertexSize",
+        value: "defaultVertexSize",
+        check: null,
+        deep: false
+    });
+
+    checkValue.push({
+        field: "defaultEdgeWidth",
+        value: "defaultEdgeWidth",
+        check: null,
+        deep: false
+    });
 
     //checkValue.push({field: "vertexPrintCommonStyle",
     //                 value: this.vertexPrintCommonStyle});
 
     //checkValue.push({field: "vertexPrintSelectedVertexStyles",
     //                 value: this.vertexPrintSelectedVertexStyles});
-    
-    checkValue.push({field: "backgroundCommonStyle",
-                     value: this.backgroundCommonStyle,
-                     check: this.isBackgroundCommonStyleCustom,
-                     deep: false});
-    
+
+    checkValue.push({
+        field: "backgroundCommonStyle",
+        value: this.backgroundCommonStyle,
+        check: this.isBackgroundCommonStyleCustom,
+        deep: false
+    });
+
     var decoderStr = this.DecodeFromHTML(json);
     var parsedSave = JSON.parse(decoderStr);
-    
+
     var app = this;
-    
-    checkValue.forEach(function(entry) {
-            if (parsedSave.hasOwnProperty(entry.field))
-            {
-                if (typeof parsedSave[entry.field] === 'number')
-                {
-                    app[entry.value] = parseInt(parsedSave[entry.field]);
-                }
-                else
-                {
-                    if (!entry.deep)
-                        entry.value.Clear();
 
-                    for(var k in parsedSave[entry.field])
-                    {
-                        if (!entry.deep)
-                        {
-                            if (entry.value.ShouldLoad(k))
-                            {
-                                entry.value[k] = parsedSave[entry.field][k];
-                            }
+    checkValue.forEach(function (entry) {
+        if (parsedSave.hasOwnProperty(entry.field)) {
+            if (typeof parsedSave[entry.field] === 'number') {
+                app[entry.value] = parseInt(parsedSave[entry.field]);
+            }
+            else {
+                if (!entry.deep)
+                    entry.value.Clear();
+
+                for (var k in parsedSave[entry.field]) {
+                    if (!entry.deep) {
+                        if (entry.value.ShouldLoad(k)) {
+                            entry.value[k] = parsedSave[entry.field][k];
                         }
-                        else
-                        {
-                            // Check is number or not
-                            if (k % 1 != 0)
-                                continue;
+                    }
+                    else {
+                        // Check is number or not
+                        if (k % 1 != 0)
+                            continue;
 
-                            entry.value[k].Clear();
-                            for(var deepK in parsedSave[entry.field][k])
-                            {
-                                if (k < entry.value.length && entry.value[k].ShouldLoad(deepK))
-                                    entry.value[k][deepK] = parsedSave[entry.field][k][deepK];
-                            }
+                        entry.value[k].Clear();
+                        for (var deepK in parsedSave[entry.field][k]) {
+                            if (k < entry.value.length && entry.value[k].ShouldLoad(deepK))
+                                entry.value[k][deepK] = parsedSave[entry.field][k][deepK];
                         }
                     }
                 }
-                
-                if (entry.check != null)
-                    app[entry.check] = true;
             }
-        });
+
+            if (entry.check != null)
+                app[entry.check] = true;
+        }
+    });
 }
 
-Application.prototype.EncodeToHTML = function (str)
-{
+Application.prototype.EncodeToHTML = function (str) {
     return gEncodeToHTML(str);
 }
 
-Application.prototype.DecodeFromHTML = function (str)
-{
-   return gDecodeFromHTML(str); 
+Application.prototype.DecodeFromHTML = function (str) {
+    return gDecodeFromHTML(str);
 }
 
-Application.prototype.SetVertexStyle = function (index, style)
-{
-    if (index == 0)
-    {
+Application.prototype.SetVertexStyle = function (index, style) {
+    if (index == 0) {
         this.vertexCommonStyle = style;
         this.isVertexCommonStyleCustom = true;
     }
-    else
-    {
+    else {
         this.vertexSelectedVertexStyles[index - 1] = style;
         this.isVertexSelectedVertexStylesCustom = true;
     }
 }
 
-Application.prototype.ResetVertexStyle = function (index)
-{
-    if (index == 0)
-    {
+Application.prototype.ResetVertexStyle = function (index) {
+    if (index == 0) {
         this.vertexCommonStyle = new CommonVertexStyle();
         this.isVertexCommonStyleCustom = false;
     }
-    else
-    {
+    else {
         this.vertexSelectedVertexStyles = FullArrayCopy(DefaultSelectedGraphStyles);
         this.isVertexSelectedVertexStylesCustom = false;
     }
 }
 
-Application.prototype.SetEdgeStyle = function (index, style)
-{
-    if (index == 0)
-    {
+Application.prototype.SetEdgeStyle = function (index, style) {
+    if (index == 0) {
         this.edgeCommonStyle = style;
         this.isEdgeCommonStyleCustom = true;
     }
-    else
-    {
+    else {
         this.edgeSelectedStyles[index - 1] = style;
         this.isEdgeSelectedStylesCustom = true;
     }
 }
 
-Application.prototype.ResetEdgeStyle = function (index)
-{
-    if (index == 0)
-    {
+Application.prototype.ResetEdgeStyle = function (index) {
+    if (index == 0) {
         this.edgeCommonStyle = new CommonEdgeStyle();
         this.isEdgeCommonStyleCustom = false;
     }
-    else
-    {
+    else {
         this.edgeSelectedStyles = FullArrayCopy(DefaultSelectedEdgeStyles);
         this.isEdgeSelectedStylesCustom = false;
     }
 }
 
-Application.prototype.SetBackgroundStyle = function (style)
-{
-    this.backgroundCommonStyle         = style;
+Application.prototype.SetBackgroundStyle = function (style) {
+    this.backgroundCommonStyle = style;
     this.isBackgroundCommonStyleCustom = true;
 }
 
-Application.prototype.ResetBackgroundStyle = function ()
-{
-    this.backgroundCommonStyle         = new CommonBackgroundStyle();
+Application.prototype.ResetBackgroundStyle = function () {
+    this.backgroundCommonStyle = new CommonBackgroundStyle();
     this.isBackgroundCommonStyleCustom = false;
 }
 
-Application.prototype.GetAvalibleCruvledValue = function(neighbourEdges, originalEdge)
-{
+Application.prototype.GetAvalibleCruvledValue = function (neighbourEdges, originalEdge) {
     return this.graph.GetAvalibleCruvledValue(neighbourEdges, originalEdge);
 }
 
-Application.prototype.GraphTypeChanged = function()
-{
+Application.prototype.GraphTypeChanged = function () {
     $("#CanvasMessage").text(this.graph.isMulti() ? g_GrapsIsMultiMessage : g_GrapsIsGeneralMessage);
 }
 
-Application.prototype.UpdateEdgePresets = function(weight)
-{
+Application.prototype.UpdateEdgePresets = function (weight) {
     var oldPresets = this.edgePresets;
     this.edgePresets = [1];
     oldPresets.unshift(weight);
-    
-    for(var i = 0; i < oldPresets.length; i ++) 
-    {
+
+    for (var i = 0; i < oldPresets.length; i++) {
         var k = oldPresets[i];
         if (!this.edgePresets.includes(k))
             this.edgePresets.push(k);
-        
+
         if (this.edgePresets.length >= this.maxEdgePresets)
             break;
     }
 }
 
-Application.prototype.GetEdgePresets = function()
-{
+Application.prototype.GetEdgePresets = function () {
     return this.edgePresets;
 }
 
-Application.prototype.SetSelectionRect = function(rect)
-{
-  this.selectionRect = rect;
+Application.prototype.SetSelectionRect = function (rect) {
+    this.selectionRect = rect;
 }
 
-Application.prototype.GetSelectionRect = function(rect)
-{
-  return this.selectionRect;
+Application.prototype.GetSelectionRect = function (rect) {
+    return this.selectionRect;
 }
 
-Application.prototype.GetStyle = function(type, styleName, object, index)
-{
+Application.prototype.GetStyle = function (type, styleName, object, index) {
     var correctIndex = index;
     if (correctIndex == undefined)
         correctIndex = 0;
 
-    if (type == "vertex")
-    {
-        if (styleName == "common")
-        {
+    if (type == "vertex") {
+        if (styleName == "common") {
             return object !== undefined ? object.getStyleFor(0) : this.vertexCommonStyle;
         }
-        else if (styleName == "selected")
-        {
+        else if (styleName == "selected") {
             return object !== undefined && object.hasOwnStyleFor(correctIndex + 1) ? object.getStyleFor(correctIndex + 1) : this.vertexSelectedVertexStyles[correctIndex];
         }
-        else if (styleName == "printed")
-        {
+        else if (styleName == "printed") {
             return this.vertexPrintCommonStyle;
         }
-        else if (styleName == "printedSelected")
-        {
+        else if (styleName == "printedSelected") {
             return this.vertexPrintSelectedVertexStyles[correctIndex];
-        }       
+        }
 
         return null;
     }
-    else if(type == "edge")
-    {
-        if (styleName == "common")
-        {
+    else if (type == "edge") {
+        if (styleName == "common") {
             return object !== undefined ? object.getStyleFor(0) : this.edgeCommonStyle;
         }
-        else if (styleName == "selected")
-        {
+        else if (styleName == "selected") {
             return object !== undefined && object.hasOwnStyleFor(correctIndex + 1) ? object.getStyleFor(correctIndex + 1) : this.edgeSelectedStyles[correctIndex];
         }
-        else if (styleName == "printed")
-        {
+        else if (styleName == "printed") {
             return this.edgePrintCommonStyle;
         }
-        else if (styleName == "printedSelected")
-        {
+        else if (styleName == "printedSelected") {
             return this.edgePrintSelectedStyles[correctIndex];
         }
 
@@ -8281,18 +7545,17 @@ Application.prototype.GetStyle = function(type, styleName, object, index)
     return null;
 }
 
-Application.prototype._RedrawGraph = function(context, backgroundPosition, backgroundStyle, bDrawSelectedRect,
-    forceVertexCommon, forceVertexSeleceted, forceEdgeCommon, forceEdgeSelected)
-{
+Application.prototype._RedrawGraph = function (context, backgroundPosition, backgroundStyle, bDrawSelectedRect,
+    forceVertexCommon, forceVertexSeleceted, forceEdgeCommon, forceEdgeSelected) {
     var backgroundDrawer = new BaseBackgroundDrawer(context);
-    
+
     backgroundDrawer.Draw(
-        backgroundStyle, 
-        Math.max(this.canvas.width, this.GetRealWidth()), 
-        Math.max(this.canvas.height, this.GetRealHeight()), 
-        backgroundPosition, 
+        backgroundStyle,
+        Math.max(this.canvas.width, this.GetRealWidth()),
+        Math.max(this.canvas.height, this.GetRealHeight()),
+        backgroundPosition,
         this.canvasScale);
-    
+
     this.UpdateEdgesCurrentStyle(forceEdgeCommon, forceEdgeSelected);
     this.UpdateNodesCurrentStyle(forceVertexCommon, forceVertexSeleceted);
 
@@ -8302,13 +7565,10 @@ Application.prototype._RedrawGraph = function(context, backgroundPosition, backg
         this.RedrawSelectionRect(context);
 }
 
-Application.prototype.GetSelectedVertexes = function()
-{
+Application.prototype.GetSelectedVertexes = function () {
     var res = [];
-    for (i = 0; i < this.graph.vertices.length; i ++)
-    {
-        if (this.handler.GetSelectedGroup(this.graph.vertices[i]) > 0)
-        {
+    for (i = 0; i < this.graph.vertices.length; i++) {
+        if (this.handler.GetSelectedGroup(this.graph.vertices[i]) > 0) {
             res.push(this.graph.vertices[i]);
         }
     }
@@ -8316,13 +7576,10 @@ Application.prototype.GetSelectedVertexes = function()
     return res;
 }
 
-Application.prototype.GetSelectedEdges = function()
-{
+Application.prototype.GetSelectedEdges = function () {
     var res = [];
-    for (i = 0; i < this.graph.edges.length; i ++)
-    {
-        if (this.handler.GetSelectedGroup(this.graph.edges[i]) > 0)
-        {
+    for (i = 0; i < this.graph.edges.length; i++) {
+        if (this.handler.GetSelectedGroup(this.graph.edges[i]) > 0) {
             res.push(this.graph.edges[i]);
         }
     }
@@ -8330,141 +7587,115 @@ Application.prototype.GetSelectedEdges = function()
     return res;
 }
 
-Application.prototype.SetDefaultVertexSize = function(diameter)
-{
+Application.prototype.SetDefaultVertexSize = function (diameter) {
     var oldDefaultDiameter = this.GetDefaultVertexSize();
     this.defaultVertexSize = diameter;
 
-    for (i = 0; i < this.graph.vertices.length; i ++)
-    {
-        if (this.graph.vertices[i].model.diameter == oldDefaultDiameter)
-        {
+    for (i = 0; i < this.graph.vertices.length; i++) {
+        if (this.graph.vertices[i].model.diameter == oldDefaultDiameter) {
             this.graph.vertices[i].model.diameter = diameter;
         }
-    }     
+    }
 }
 
-Application.prototype.GetDefaultVertexSize = function(diameter)
-{
+Application.prototype.GetDefaultVertexSize = function (diameter) {
     if (this.defaultVertexSize != null)
         return this.defaultVertexSize;
     else
         return defaultVertexDiameter;
 }
 
-Application.prototype.ResetVertexSize = function()
-{
+Application.prototype.ResetVertexSize = function () {
     this.defaultVertexSize = null;
 
-    for (i = 0; i < this.graph.vertices.length; i ++)
-    {
+    for (i = 0; i < this.graph.vertices.length; i++) {
         this.graph.vertices[i].model.diameter = this.GetDefaultVertexSize();
-    }     
+    }
 }
 
-Application.prototype.SetDefaultEdgeWidth = function(width)
-{
+Application.prototype.SetDefaultEdgeWidth = function (width) {
     var oldDefaultWidth = this.GetDefaultEdgeWidth();
     this.defaultEdgeWidth = width;
 
-    for (i = 0; i < this.graph.edges.length; i ++)
-    {
-        if (this.graph.edges[i].model.width == oldDefaultWidth)
-        {
+    for (i = 0; i < this.graph.edges.length; i++) {
+        if (this.graph.edges[i].model.width == oldDefaultWidth) {
             this.graph.edges[i].model.width = width;
         }
-    }     
+    }
 }
 
-Application.prototype.GetDefaultEdgeWidth = function(diameter)
-{
+Application.prototype.GetDefaultEdgeWidth = function (diameter) {
     if (this.defaultEdgeWidth != null)
         return this.defaultEdgeWidth;
     else
         return defaultEdgeWidth;
 }
 
-Application.prototype.ResetEdgeWidth = function()
-{
+Application.prototype.ResetEdgeWidth = function () {
     this.defaultEdgeWidth = null;
 
-    for (i = 0; i < this.graph.edges.length; i ++)
-    {
+    for (i = 0; i < this.graph.edges.length; i++) {
         this.graph.edges[i].model.width = this.GetDefaultEdgeWidth();
-    }     
+    }
 }
 
-Application.prototype.setEmscripten = function(processFunction) 
-{
+Application.prototype.setEmscripten = function (processFunction) {
     this.processEmscriptenFunction = processFunction;
     console.log("Emscripten set");
 }
 
-Application.prototype.isSupportEmscripten = function () 
-{
+Application.prototype.isSupportEmscripten = function () {
     return this.processEmscriptenFunction != null;
 }
 
-Application.prototype.processEmscripten = function (inputData)
-{
+Application.prototype.processEmscripten = function (inputData) {
     return this.processEmscriptenFunction(inputData);
 }
-var SiteDir           = "";
+var SiteDir = "";
 var DisableEmscripted = false;
 var algorithmsVersion = 2;
 
 var application = new Application(document, window);
 
 var waitCounter = false;
-var fullscreen  = false;
-var userAction = function(str)
-{
-    if (typeof window.yaCounter25827098 !== "undefined")
-    {
+var fullscreen = false;
+var userAction = function (str) {
+    if (typeof window.yaCounter25827098 !== "undefined") {
         console.log(g_language + "/" + str);
         window.yaCounter25827098.hit(window.location.protocol + "//" + window.location.hostname + (g_language != "ru" ? "/" + g_language : "") + "/UserAction#" + str);
     }
-    else if (!waitCounter)
-    {
+    else if (!waitCounter) {
         waitCounter = true;
-        setTimeout(function()
-                   {
-                     userAction(str);
-                   }, 2000);
+        setTimeout(function () {
+            userAction(str);
+        }, 2000);
     }
 }
 
-var isIe = (navigator.userAgent.toLowerCase().indexOf("msie") != -1 
-           || navigator.userAgent.toLowerCase().indexOf("trident") != -1);
+var isIe = (navigator.userAgent.toLowerCase().indexOf("msie") != -1
+    || navigator.userAgent.toLowerCase().indexOf("trident") != -1);
 
 var buttonsList = ['AddGraph', 'ConnectGraphs', 'DeleteObject', 'Default'];
 var g_ctrlPressed = false;
 
-function restButtons (me)
-{
+function restButtons(me) {
     var needSetDefault = false;
-	for (var i = 0; i < buttonsList.length; i ++)
-	{
-		if (buttonsList[i] != me)
-		{
-			document.getElementById(buttonsList[i]).className = "btn btn-default btn-sm";
-		}
-		else
-		{
-			if (document.getElementById(buttonsList[i]).className != "btn btn-default btn-sm")
-			{
-				needSetDefault = true;	
-			}
-		}
-	}
-	if (needSetDefault)
-	{
-		document.getElementById(buttonsList[i]).className = "btn btn-primary btn-sm";
-	}
-	else
-	{
-		document.getElementById(me).className = "btn btn-primary btn-sm";
-	}
+    for (var i = 0; i < buttonsList.length; i++) {
+        if (buttonsList[i] != me) {
+            document.getElementById(buttonsList[i]).className = "btn btn-default btn-sm";
+        }
+        else {
+            if (document.getElementById(buttonsList[i]).className != "btn btn-default btn-sm") {
+                needSetDefault = true;
+            }
+        }
+    }
+    if (needSetDefault) {
+        document.getElementById(buttonsList[i]).className = "btn btn-primary btn-sm";
+    }
+    else {
+        document.getElementById(me).className = "btn btn-primary btn-sm";
+    }
 }
 
 var single = 0;
@@ -8483,91 +7714,85 @@ function resizeCanvas() {
     application.redrawGraph();
 }
 
-function touchHandler(event)
-{
+function touchHandler(event) {
     var touches = event.changedTouches,
         first = touches[0],
         type = "";
-    switch(event.type)
-    {
+    switch (event.type) {
         case "touchstart": type = "mousedown"; break;
-        case "touchmove":  type="mousemove"; break;        
-        case "touchend":   type="mouseup"; break;
+        case "touchmove": type = "mousemove"; break;
+        case "touchend": type = "mouseup"; break;
         default: return;
     }
 
     var simulatedEvent = document.createEvent("MouseEvent");
-    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
-                              first.screenX, first.screenY, 
-                              first.clientX, first.clientY, false, 
-                              false, false, false, 0/*left*/, null);
+    simulatedEvent.initMouseEvent(type, true, true, window, 1,
+        first.screenX, first.screenY,
+        first.clientX, first.clientY, false,
+        false, false, false, 0/*left*/, null);
 
-	first.target.dispatchEvent(simulatedEvent);
+    first.target.dispatchEvent(simulatedEvent);
     event.preventDefault();
 }
 
-function preLoadPage()
-{
-	loadTexts();
-	application.onLoad();
+function preLoadPage() {
+    loadTexts();
+    application.onLoad();
 }
 
-function createAlgorithmMenu()
-{
+function createAlgorithmMenu() {
     var algorihtmsBaseId = "Algo";
     var algorithms = application.getAlgorithmNames();
     var index = 0;
 
-    for (var i = 0; i < algorithms.length; i++)
-    {
+    for (var i = 0; i < algorithms.length; i++) {
         algorithm = algorithms[i];
-        
-        var list   = document.getElementById("algorithmCategoryElements" + algorithm.category);
-        var item   = document.getElementById("algTopic" + algorithm.category);
-        var clone  = item.cloneNode(true);
-        var button   = clone.getElementsByTagName("button")[0];
+
+        var list = document.getElementById("algorithmCategoryElements" + algorithm.category);
+        var item = document.getElementById("algTopic" + algorithm.category);
+        var clone = item.cloneNode(true);
+        var button = clone.getElementsByTagName("button")[0];
         var textSpan = button.getElementsByTagName("span")[1];
         button.id = algorithm.id;
         textSpan.innerHTML = algorithm.name;
         clone.style.display = "block";
-        
+
         buttonsList.push(algorithm.id);
-        
-        button.onclick = function (e)
-        {
+
+        button.onclick = function (e) {
             e["closeThisMenu"] = true;
             userAction(this.id);
-            restButtons (this.id);
+            restButtons(this.id);
             application.SetHandlerMode(this.id);
         }
-        
+
         var eventData = {};
-        eventData.index     = i;
-        eventData.object    = clone;
+        eventData.index = i;
+        eventData.object = clone;
         eventData.algorithm = algorithm;
-        
+
         $("#openAlgorithmList").bind('click', eventData, function (_eventData) {
-            var data      = _eventData.data;
+            var data = _eventData.data;
             var algorithm = g_Algorithms[g_AlgorithmIds.indexOf(data.algorithm.id)](application.graph, application);
-            
+
             if (application.graph.isMulti() && !algorithm.IsSupportMultiGraph())
-              $(data.object).hide();
+                $(data.object).hide();
             else
-              $(data.object).show();
-          });
-        
+                $(data.object).show();
+        });
+
         list.insertBefore(clone, document.getElementById("insert" + algorithm.category));
         index++;
     }
 
 }
 
-    
+
 function handelImportGraph(files) {
     var graphFileToLoad = files[0];
 
     var fileReader = new FileReader();
-    fileReader.onload = function(fileLoadedEvent){
+    fileReader.onload = function (fileLoadedEvent) {
         var textFromFileLoaded = fileLoadedEvent.target.result;
         console.log(textFromFileLoaded);
         application.LoadGraphFromString(textFromFileLoaded);
@@ -8576,73 +7801,64 @@ function handelImportGraph(files) {
 
     fileReader.readAsText(graphFileToLoad, "UTF-8");
 }
-function animationLoop(){
+function animationLoop() {
     // console.log(application.graph)
 }
 
-function postLoadPage()
-{
+function postLoadPage() {
     application.userAction = userAction;
-    setInterval(function(){
+    setInterval(function () {
         animationLoop(application);
     }, 100)
 
-    
-	application.canvas.onmousemove = function (e)
-		{
-			return application.CanvasOnMouseMove(e);
-		};
 
-	application.canvas.onmousedown = function (e)
-		{
-            autosaveXML();
-			return application.CanvasOnMouseDown(e);
-		};
-		
-	application.canvas.onmouseup   = function (e)
-		{
-            autosaveXML();
-			return application.CanvasOnMouseUp(e);
-		}
-    
-    application.canvas.onmousewheel = function (e)
-    {
+    application.canvas.onmousemove = function (e) {
+        return application.CanvasOnMouseMove(e);
+    };
+
+    application.canvas.onmousedown = function (e) {
+        autosaveXML();
+        return application.CanvasOnMouseDown(e);
+    };
+
+    application.canvas.onmouseup = function (e) {
+        autosaveXML();
+        return application.CanvasOnMouseUp(e);
+    }
+
+    application.canvas.onmousewheel = function (e) {
         var e = window.event || e; // old IE support
         var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-        if (delta > 0)
-        {
+        if (delta > 0) {
             application.multCanvasScale(1.3);
         }
-        else
-        {
+        else {
             application.multCanvasScale(1.0 / 1.3);
         }
     }
-    
+
     function getCharCode(event) {
-      if (event.which == null) { // IE
-        return event.keyCode;
-      }
+        if (event.which == null) { // IE
+            return event.keyCode;
+        }
 
-      if (event.which != 0 && event.charCode != 0) { // все кроме IE
-        return event.which; // остальные
-      }
+        if (event.which != 0 && event.charCode != 0) { // все кроме IE
+            return event.which; // остальные
+        }
 
-      return null; // спец. символ
+        return null; // спец. символ
     }
-    
+
     function getChar(event) {
         return String.fromCharCode(getCharCode(event)); // остальные
     }
-    
-    function selectHandler(buttonName, handlerName)
-    {
-            userAction(buttonName + "_shortcut");
-			application.SetHandlerMode(handlerName);  
+
+    function selectHandler(buttonName, handlerName) {
+        userAction(buttonName + "_shortcut");
+        application.SetHandlerMode(handlerName);
     }
-    
-    document.onkeypress   = function (e)
-    {
+
+    document.onkeypress = function (e) {
         if (event.defaultPrevented
             || ($('#addVertex').hasClass('ui-dialog-content') && $('#addVertex').dialog('isOpen'))
             || ($('#adjacencyMatrix').hasClass('ui-dialog-content') && $('#adjacencyMatrix').dialog('isOpen'))
@@ -8652,19 +7868,18 @@ function postLoadPage()
             || ($('#saveImageDialog').hasClass('ui-dialog-content') && $('#saveImageDialog').dialog('isOpen'))
             || ($('#GroupRenameDialog').hasClass('ui-dialog-content') && $('#GroupRenameDialog').dialog('isOpen'))
             // || $('#developerTools').css("display") != "none"
-            || ($('#NeedAlgorithm').hasClass('ui-dialog-content') && $('#NeedAlgorithm').dialog('isOpen')))
-        {
+            || ($('#NeedAlgorithm').hasClass('ui-dialog-content') && $('#NeedAlgorithm').dialog('isOpen'))) {
             console.log("prevent");
             return; // Should do nothing if the default action has been cancelled
         }
-        
-        
+
+
         var key = getChar(event);
         var code = getCharCode(event);
         console.log(key + " code=" + code);
         var evtobj = window.event ? event : e;
         var isCtrl = evtobj ? evtobj.ctrlKey : false;
-        
+
         var moveValue = 10;
         if (e.key == ']') // +
         {
@@ -8676,7 +7891,7 @@ function postLoadPage()
         }
         else if (key == 'w' || key == 'ц') // up
         {
-//            application.onCanvasMove(new Point(0, moveValue));
+            //            application.onCanvasMove(new Point(0, moveValue));
         }
         else if (key == 's' || key == 'ы') // down
         {
@@ -8711,119 +7926,117 @@ function postLoadPage()
         //else if (key == 'n' || key == 'т') // new
         //{
         //    userAction('NewGraph_shortcut');
-		//	application.SetHandlerMode("deleteAll");
+        //	application.SetHandlerMode("deleteAll");
         //    application.SetDefaultTransformations();
         //}
         else if (key == 'm' || key == 'ь') // move
         {
             selectHandler('Default', 'default');
         }
-        else if (code == 26 && isCtrl)
-        {
+        else if (code == 26 && isCtrl) {
             // userAction("Key_GraphUndo");
             // application.SetHandlerMode("graphUndo");        
         }
-        else if (key == 't')
-        {
+        else if (key == 't') {
             // console.log('meowtch')
             // var x = Math.random() * application.canvas.width;
             // var y = Math.random() * application.canvas.height;
             // application.CreateNewGraph(x,y)
         }
     }
- 
-    $(document).keydown(function(event) {
+
+    $(document).keydown(function (event) {
         if (event.which == "17" || event.which == "91")
-          g_ctrlPressed = true;
+            g_ctrlPressed = true;
     });
 
-    $(document).keyup(function() {
-      g_ctrlPressed = false;
+    $(document).keyup(function () {
+        g_ctrlPressed = false;
     });
 
-	// document.getElementById('ShowAdjacencyMatrix').onclick = function ()
-	// 	{
+    // document.getElementById('ShowAdjacencyMatrix').onclick = function ()
+    // 	{
     //         userAction(this.id);
-	// 		application.SetHandlerMode("showAdjacencyMatrix");
-	// 	}		
-	// document.getElementById('ShowIncidenceMatrix').onclick = function ()
-	// 	{
+    // 		application.SetHandlerMode("showAdjacencyMatrix");
+    // 	}		
+    // document.getElementById('ShowIncidenceMatrix').onclick = function ()
+    // 	{
     //         userAction(this.id);
-	// 		application.SetHandlerMode("showIncidenceMatrix");
-	// 	}
-	// document.getElementById('ShowDistanceMatrix').onclick = function ()
-	// 	{
+    // 		application.SetHandlerMode("showIncidenceMatrix");
+    // 	}
+    // document.getElementById('ShowDistanceMatrix').onclick = function ()
+    // 	{
     //         userAction(this.id);
-	// 		application.SetHandlerMode("showDistanceMatrix");
-	// 	}
-    
-	// document.getElementById('GroupRename').onclick = function ()
-	// 	{
-    //         userAction(this.id);
-	// 		application.SetHandlerMode("GroupRename");
-	// 	}
-	// document.getElementById('groupRenameButton').onclick = function ()
-	// 	{
-    //         userAction(this.id);
-	// 		application.SetHandlerMode("GroupRename");
-	// 	}
-    
-		
-	// document.getElementById('Default').onclick = function ()
-	// 	{
-    //         userAction(this.id);
-	// 		restButtons ('Default');
-	// 		application.SetHandlerMode("default");
-	// 		document.getElementById('Default').className = "btn btn-primary btn-sm";			
-	// 	}		
-		
-	// document.getElementById('AddGraph').onclick = function ()
-	// 	{
-    //         userAction(this.id);
-	// 		restButtons ('AddGraph');
-	// 		application.SetHandlerMode(document.getElementById('AddGraph').className != "" ? "addGraph" : "default");
-	// 	}
-	
-	// document.getElementById('ConnectGraphs').onclick = function ()
-	// 	{
-    //         userAction(this.id);
-	// 		restButtons ('ConnectGraphs');
-	// 		application.SetHandlerMode(document.getElementById('ConnectGraphs').className != "" ? "addArc" : "default");
-	// 	}	
-	
-	// document.getElementById('DeleteObject').onclick = function ()
-	// 	{
-    //         userAction(this.id);
-	// 		restButtons ('DeleteObject');
-	// 		application.SetHandlerMode(document.getElementById('DeleteObject').className != "" ? "delete" : "default");
-	// 	}
+    // 		application.SetHandlerMode("showDistanceMatrix");
+    // 	}
 
-	// document.getElementById('DeleteAll').onclick = function ()
-	// 	{
+    // document.getElementById('GroupRename').onclick = function ()
+    // 	{
     //         userAction(this.id);
-	// 		application.SetHandlerMode("deleteAll");
-	// 	}
+    // 		application.SetHandlerMode("GroupRename");
+    // 	}
+    // document.getElementById('groupRenameButton').onclick = function ()
+    // 	{
+    //         userAction(this.id);
+    // 		application.SetHandlerMode("GroupRename");
+    // 	}
 
 
-	// document.getElementById('SaveGraph').onclick = function ()
-	// 	{
+    // document.getElementById('Default').onclick = function ()
+    // 	{
     //         userAction(this.id);
-	// 		application.SetHandlerMode("saveDialog");
-	// 	}
+    // 		restButtons ('Default');
+    // 		application.SetHandlerMode("default");
+    // 		document.getElementById('Default').className = "btn btn-primary btn-sm";			
+    // 	}		
 
-	// document.getElementById('NewGraph').onclick = function ()
-	// 	{
+    // document.getElementById('AddGraph').onclick = function ()
+    // 	{
     //         userAction(this.id);
-	// 		application.SetHandlerMode("deleteAll");
+    // 		restButtons ('AddGraph');
+    // 		application.SetHandlerMode(document.getElementById('AddGraph').className != "" ? "addGraph" : "default");
+    // 	}
+
+    // document.getElementById('ConnectGraphs').onclick = function ()
+    // 	{
+    //         userAction(this.id);
+    // 		restButtons ('ConnectGraphs');
+    // 		application.SetHandlerMode(document.getElementById('ConnectGraphs').className != "" ? "addArc" : "default");
+    // 	}	
+
+    // document.getElementById('DeleteObject').onclick = function ()
+    // 	{
+    //         userAction(this.id);
+    // 		restButtons ('DeleteObject');
+    // 		application.SetHandlerMode(document.getElementById('DeleteObject').className != "" ? "delete" : "default");
+    // 	}
+
+    // document.getElementById('DeleteAll').onclick = function ()
+    // 	{
+    //         userAction(this.id);
+    // 		application.SetHandlerMode("deleteAll");
+    // 	}
+
+
+    // document.getElementById('SaveGraph').onclick = function ()
+    // 	{
+    //         userAction(this.id);
+    // 		application.SetHandlerMode("saveDialog");
+    // 	}
+
+    // document.getElementById('NewGraph').onclick = function ()
+    // 	{
+    //         userAction(this.id);
+    // 		application.SetHandlerMode("deleteAll");
     //         application.SetDefaultTransformations();
-	// 	}
-    
+    // 	}
+
     // document.getElementById('SaveGraphImage').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.SetHandlerMode("saveDialogImage");
     // }
-    
+
     // document.getElementById('SaveFullGraphImage').onclick = function ()
     // {
     //     userAction(this.id);
@@ -8835,43 +8048,43 @@ function postLoadPage()
     //     userAction(this.id);
     //     application.SetHandlerMode("savePrintGraphImage");
     // }
-    
+
     // document.getElementById('Zoom100').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.setCanvasScale(1.0);
     // }
-    
+
     // document.getElementById('Zoom50').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.setCanvasScale(50 / 100);
     // }
-    
+
     // document.getElementById('Zoom25').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.setCanvasScale(25 / 100);
     // }
-  
+
     // document.getElementById('ZoomFit').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.OnAutoAdjustViewport();
     // }
-    
+
     // document.getElementById('ZoomIn').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.multCanvasScale(1.5);
     // }
-    
+
     // document.getElementById('ZoomOut').onclick = function ()
     // {
     //     userAction(this.id);
     //     application.multCanvasScale(1.0 / 1.5);
     // }
-    
+
     // document.getElementById('MoveWorspace').onclick = function ()
     // {
     //     userAction(this.id);
@@ -8910,92 +8123,88 @@ function postLoadPage()
     //     userAction(this.id);
     //     application.SetHandlerMode("graphUndo");
     // }    
-    
+
     // document.getElementById('runUserScript').onclick = function ()
     // {
     //     var el = document.getElementById('userScript');
-        
+
     //     var oldScript = document.getElementById("userScriptSource");
     //     if (oldScript)
     //     {
     //         document.head.removeChild(oldScript);
     //     }
-        
+
     //     var script = document.createElement('script');
     //     script.type = "text/javascript";
     //     script.innerHTML = el.value;
     //     script.id = "userScriptSource";
     //     document.head.appendChild(script);
-        
+
     //     application.SetHandlerMode("user.algorithm");
     // }
-    
+
     // document.getElementById('submitUserScript').onclick = function ()
     // {
-        // var script = document.getElementById('userScript');
-        // var data = "message=" + script.value + "&";
+    // var script = document.getElementById('userScript');
+    // var data = "message=" + script.value + "&";
     // 
-        // $.ajax({
-            // type: "POST",
-            // url: "/feedback",
-            // data: data
-        // });
-        // 
-        // $( "#sentAlgorithm" ).dialog({
-                                    //  resizable: false,
-                                    //  height: "auto",
-                                    //  width:  400,
-                                    //  modal: true,
-                                    //  dialogClass: 'EdgeDialog'
-                                    //  });
+    // $.ajax({
+    // type: "POST",
+    // url: "/feedback",
+    // data: data
+    // });
+    // 
+    // $( "#sentAlgorithm" ).dialog({
+    //  resizable: false,
+    //  height: "auto",
+    //  width:  400,
+    //  modal: true,
+    //  dialogClass: 'EdgeDialog'
+    //  });
     // }
-    
+
     // Get algorithms list and load it.
-    $.get( "/" + SiteDir + "cgi-bin/getPluginsList.php",
-            function( data )
-            {
-                var scriptList = JSON.parse(data);
-          
-                var loadOneScript = function()
-                {
-                    if (scriptList.length == 0)
-                    {
-                        createAlgorithmMenu();
-                    }
-                    else
-                    {
-                        var script = document.createElement('script');
-                        script.src = "/" + SiteDir + "script/" + scriptList[0] + "?v=" + algorithmsVersion;
-                        scriptList.shift();
-                        script.onload  = loadOneScript;
-                        script.onerror = loadOneScript;
-                        document.head.appendChild(script);
-                    }
+    $.get("/" + SiteDir + "cgi-bin/getPluginsList.php",
+        function (data) {
+            var scriptList = JSON.parse(data);
+
+            var loadOneScript = function () {
+                if (scriptList.length == 0) {
+                    createAlgorithmMenu();
                 }
-          
-                loadOneScript();
-          
-            });
+                else {
+                    var script = document.createElement('script');
+                    script.src = "/" + SiteDir + "script/" + scriptList[0] + "?v=" + algorithmsVersion;
+                    scriptList.shift();
+                    script.onload = loadOneScript;
+                    script.onerror = loadOneScript;
+                    document.head.appendChild(script);
+                }
+            }
+
+            loadOneScript();
+
+        });
 
     // var devTools = document.getElementById('developerTools');
     // devTools.style.left = 0;
-	resizeCanvas();
-	application.onPostLoadEvent();
+    resizeCanvas();
+    application.onPostLoadEvent();
 
-    $(function() {
-        $('#algorithmList').on('click', function(event) {
+    $(function () {
+        $('#algorithmList').on('click', function (event) {
             if (!event.originalEvent.closeThisMenu) {
                 event.stopPropagation();
             }
-        });      
-        $(window).on('click', function() {
-          $('#algorithmList').slideUp();
-        });      
-      });    
+        });
+        $(window).on('click', function () {
+            $('#algorithmList').slideUp();
+        });
+    });
 
 
-    let showHideCategory = function(button, elementsListName){
-        let width     = $( button ).width();
+    let showHideCategory = function (button, elementsListName) {
+        let width = $(button).width();
         let elementsList = $(elementsListName);
         var hideMark = button.querySelector('span[name="hideMark"]')
         var showMark = button.querySelector('span[name="showMark"]')
@@ -9007,8 +8216,8 @@ function postLoadPage()
             elementsList.show();
             $(hideMark).hide();
             $(showMark).show();
-        }            
-        $( button ).width(width);
+        }
+        $(button).width(width);
 
         userAction("algCategory_" + elementsListName);
     }
@@ -9025,39 +8234,37 @@ function postLoadPage()
     // });
 }
 
-function addTag(){
+function addTag() {
     var obj = application.globalHoverObject;
-    if(obj == null) return;
+    if (obj == null) return;
     var tagInput = document.getElementById('add-tag-input');
-    if(tagInput.value.trim() == '') return;
+    if (tagInput.value.trim() == '') return;
     obj.nodeInfo.tags.push(new Tag(tagInput.value.trim()));
     listResoures(obj)
     tagInput.value = ''
 }
 
 //window.onload = function ()
-$(document).ready(function ()
-{
+$(document).ready(function () {
 
     resizeCanvas();
     application.LoadGraphFromString(localStorage.getItem('xml'))
-	window.onresize = function(event) 
-		{
-			resizeCanvas();
-		}
+    window.onresize = function (event) {
+        resizeCanvas();
+    }
 
 
     document.getElementById('canvas').addEventListener("touchstart", touchHandler, true);
     document.getElementById('canvas').addEventListener("touchmove", touchHandler, true);
     document.getElementById('canvas').addEventListener("touchend", touchHandler, true);
     document.getElementById('canvas').addEventListener("touchcancel", touchHandler, true);
-    document.getElementById('add-tag-input').addEventListener("keypress", function(e){
-        if(e.key == "Enter"){
+    document.getElementById('add-tag-input').addEventListener("keypress", function (e) {
+        if (e.key == "Enter") {
             e.preventDefault();
             addTag();
         }
     });
-    
+
 
     // Try load emscripted implementation
     // var isMobile = navigator.userAgent.match(/(iPad)|(iPhone)|(iPod)|(android)|(webOS)/i);
@@ -9066,49 +8273,48 @@ $(document).ready(function ()
     //   jsScript.src   = '/script/Graphoffline.Emscripten.js';
     //   document.body.appendChild(jsScript);      
     //   jsScript.addEventListener('load', () => {
-        // Module['onRuntimeInitialized'] = onRuntimeInitialized;
-        // var process = Module.cwrap('ProcessAlgorithm', 'string', ['string']);
-        // function onRuntimeInitialized() {
-        //   application.setEmscripten(process);
-        // }
+    // Module['onRuntimeInitialized'] = onRuntimeInitialized;
+    // var process = Module.cwrap('ProcessAlgorithm', 'string', ['string']);
+    // function onRuntimeInitialized() {
+    //   application.setEmscripten(process);
+    // }
     //   });
     // }
-/*
-	$(document).ready(function(){
-	    //set up some basic options for the feedback_me plugin
-	    fm_options = {
-	        position: "left-bottom",
-	        message_placeholder: g_what_do_you_think,
-	        message_required: true,
-	        name_label: g_name,
-	        message_label: g_feedback,
-	        trigger_label: g_feedback,
-	        submit_label: g_send,
-	        title_label: g_write_to_us,	        
-	        feedback_url: "/feedback",
-	    };
-	    //init feedback_me plugin
-	    fm.init(fm_options);
-	});
-*/
+    /*
+        $(document).ready(function(){
+            //set up some basic options for the feedback_me plugin
+            fm_options = {
+                position: "left-bottom",
+                message_placeholder: g_what_do_you_think,
+                message_required: true,
+                name_label: g_name,
+                message_label: g_feedback,
+                trigger_label: g_feedback,
+                submit_label: g_send,
+                title_label: g_write_to_us,	        
+                feedback_url: "/feedback",
+            };
+            //init feedback_me plugin
+            fm.init(fm_options);
+        });
+    */
 });
 
-Array.prototype.swap = function (x,y) {
-  var b = this[x];
-  this[x] = this[y];
-  this[y] = b;
-  return this;
+Array.prototype.swap = function (x, y) {
+    var b = this[x];
+    this[x] = this[y];
+    this[y] = b;
+    return this;
 }
 /**
  * Find short path.
  *
  */
-function BaseTraversal(graph, app)
-{
+function BaseTraversal(graph, app) {
     BaseAlgorithmEx.apply(this, arguments);
     this.visited = [];
-    this.edges   = [];
-    this.timer   = null;
+    this.edges = [];
+    this.timer = null;
 }
 
 // inheritance.
@@ -9116,42 +8322,37 @@ BaseTraversal.prototype = Object.create(BaseAlgorithmEx.prototype);
 // timer interval
 BaseTraversal.prototype.timerInterval = 500;
 
-BaseTraversal.prototype.result = function(resultCallback)
-{
+BaseTraversal.prototype.result = function (resultCallback) {
     var result = {};
     result["version"] = 1;
-    
+
     return result;
 }
 
-BaseTraversal.prototype.selectVertex = function(vertex)
-{
-	this.visited = [];
-    this.edges   = [];
+BaseTraversal.prototype.selectVertex = function (vertex) {
+    this.visited = [];
+    this.edges = [];
 
     if (this.timer)
         clearTimeout(this.timer);
-    this.timer   = null;
-    
+    this.timer = null;
+
     this.visited.push(vertex);
 
     var context = this;
-    this.timer  = setInterval(function()
-                             {
-                               context.step();
-                             }, this.timerInterval);
+    this.timer = setInterval(function () {
+        context.step();
+    }, this.timerInterval);
 
     this.message = this.getMainMessage();
 
     return true;
 }
 
-BaseTraversal.prototype.getObjectSelectedGroup = function(object)
-{
+BaseTraversal.prototype.getObjectSelectedGroup = function (object) {
     return (this.visited.includes(object) ? 1 : (this.edges.includes(object) ? 1 : 0));
 }
 
-BaseTraversal.prototype.instance = function()
-{
+BaseTraversal.prototype.instance = function () {
     return false;
 }
