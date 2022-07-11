@@ -80,6 +80,7 @@ DefaultHandler.prototype.MouseMove = function (pos) {
 DefaultHandler.prototype.MouseDown = function (pos) {
     this.dragObject = null;
     var selectedObject = this.GetSelectedObject(pos);
+    if(selectedObject) console.log(selectedObject.height)
     var severalSelect = g_ctrlPressed;
 
     if (selectedObject == null || (!severalSelect && !this.selectedObjects.includes(selectedObject))) {

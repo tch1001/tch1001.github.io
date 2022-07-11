@@ -22,6 +22,8 @@ ConnectionGraphHandler.prototype.GetSelectedVertex = function () {
 
 ConnectionGraphHandler.prototype.AddNewEdge = function (selectedObject, isDirect, pushtostack = true) {
     var newEdge = this.app.CreateNewArc(this.firstObject, selectedObject, isDirect, document.getElementById('EdgeWeight').value, $("#RadiosReplaceEdge").prop("checked"), document.getElementById('EdgeLable').value);
+    this.firstObject.edgesOut.push(newEdge)
+    selectedObject.edgesIn.push(newEdge)
     if (pushtostack) this.app.PushToStack(new Command('AddNewEdge', { 'edge': newEdge }))
 
     this.SelectFirst();

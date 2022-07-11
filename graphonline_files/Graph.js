@@ -326,7 +326,60 @@ Graph.prototype.GetRandomPositionOfVertex = function (matrix, vertexIndex, viewp
     return point;
 }
 
-Graph.prototype.VertexesReposition = function (viewportSize, newVertexes) {
+
+
+Graph.prototype.topologicalSort = function(){
+    var resultStack = [];
+    for(var i = 0; i < this.vertices.length; ++i){
+        this.vertices[i].visited = false;
+    }
+    function dfs(cur) {
+        if (cur.visited) return;
+        cur.visited = true;
+        for (const eo of cur.edgesOut) {
+            const nxt = eo.vertex2;
+            if (!nxt.visited) dfs(nxt);
+        }
+        resultStack.push(cur);
+    }
+    for(var i = 0; i < this.vertices.length; ++i){ 
+        if(!this.vertices[i].visited) dfs(this.vertices[i]);
+    }
+    return resultStack.reverse();
+}
+
+Graph.prototype.calculateHeight = function(){
+    if(this.vertices.length == 0) return;
+    for(var i = 0; i < this.vertices.length; ++i){
+        this.vertices[i].visited = false;
+        this.vertices[i].height = -this.infinity;
+    }
+    var resultStack = this.topologicalSort();
+    resultStack[0].height = 0;
+    for(var i = 0; i<resultStack.length; ++i){ resultStack[i].topoIdx = i; }
+    for(const cur of resultStack){
+        if(cur.height == -this.infinity) cur.height = 0;
+        for(const eo of cur.edgesOut){
+            const nxt = eo.vertex2;
+            if(cur.topoIdx > nxt.topoIdx) continue;
+            nxt.height = Math.max(nxt.height, cur.height + 1);
+        }
+    }
+    return resultStack;
+}
+Graph.prototype.VertexesReposition = function(viewportSize, vertices){
+    var resultStack = this.calculateHeight();
+    var trackHeight = [];
+    for(const cur of resultStack){
+        // cur.height could be 0
+        if(cur.height >= trackHeight.length) trackHeight.push(1);
+        else trackHeight[cur.height]++;
+        cur.position.x = cur.height * 100;
+        cur.position.y = trackHeight[cur.height] * 100;
+    }
+}
+
+Graph.prototype.VertexesReposition_old = function (viewportSize, newVertexes) {
     var maxGravityDistanceSqr = Math.max(viewportSize.x, viewportSize.y) / 5.0;
     maxGravityDistanceSqr = maxGravityDistanceSqr * maxGravityDistanceSqr;
     //Math.min(viewportSize.x, viewportSize.y) / 2.0;

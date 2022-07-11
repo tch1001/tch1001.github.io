@@ -7,6 +7,7 @@
  function BaseEdge(vertex1, vertex2, isDirect, weight, upText) {
     this.vertex1 = vertex1;
     this.vertex2 = vertex2;
+    this.updateAdjacencyList();
     this.arrayStyleStart = "";
     this.arrayStyleFinish = "";
 
@@ -27,10 +28,15 @@
 
     this.ownStyles = {};
 }
+BaseEdge.prototype.updateAdjacencyList = function(){
+    if (this.vertex1 && !(this in this.vertex1.edgesOut)) this.vertex1.edgesOut.push(this)
+    if (this.vertex2 && !(this in this.vertex2.edgesIn)) this.vertex2.edgesIn.push(this)
+}
 
 BaseEdge.prototype.copyFrom = function (other) {
     this.vertex1 = other.vertex1;
     this.vertex2 = other.vertex2;
+    this.updateAdjacencyList();
     this.arrayStyleStart = other.arrayStyleStart;
     this.arrayStyleFinish = other.arrayStyleFinish;
 
@@ -75,6 +81,7 @@ BaseEdge.prototype.LoadFromXML = function (xml, graph) {
         attr = xml.attr('target');
     }
     this.vertex2 = graph.FindVertex(typeof attr !== 'undefined' ? attr : xml.attr('graph2'));
+    this.updateAdjacencyList();
     this.isDirect = xml.attr('isDirect') == "true";
     this.weight = parseFloat(xml.attr('weight'));
     if (isNaN(this.weight)) {

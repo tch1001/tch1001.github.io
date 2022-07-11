@@ -897,8 +897,9 @@ Application.prototype.SetIncidenceMatrix = function (matrix) {
     return res;
 }
 
-Application.prototype.Test = function () {
-    this.graph.VertexesReposition(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices);
+Application.prototype.Test = function (mode=0) {
+    if(mode == 0) this.graph.VertexesReposition_old(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices);
+    else if(mode == 1) this.graph.VertexesReposition(new Point(this.GetRealWidth(), this.GetRealHeight()), this.graph.vertices);
     this.redrawGraph();
 }
 

@@ -209,6 +209,8 @@ Rect.prototype.isIn = function (v) {
     this.hasUndefinedPosition = false;
     this.ownStyles = {};
     this.nodeInfo = new NodeInfo();
+    this.edgesIn = [];
+    this.edgesOut = [];
 };
 
 BaseVertex.prototype.position = new Point(0, 0);
