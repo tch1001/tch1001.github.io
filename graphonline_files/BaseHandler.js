@@ -85,9 +85,17 @@ BaseHandler.prototype.GetMessage = function () {
     return this.message;
 }
 
-function listResoures(mouseoverObject) {
+function listResources(mouseoverObject) {
     var infoResources = document.getElementById('info-resources')
     infoResources.innerHTML = ''
+    var tagsDiv = document.getElementById('tags-div')
+    tagsDiv.innerHTML = ''
+    var infoTitle = document.getElementById('info-title');
+    infoTitle.value = ''
+    var infoUid = document.getElementById('info-uid')
+    infoUid.textContent = 'Hover over something to see it'
+
+    if(mouseoverObject == null) return;
     mouseoverObject.nodeInfo.resources = mouseoverObject.nodeInfo.resources.filter(function (el) {
         return el.link != '' || el.description != '';
     })
@@ -102,8 +110,8 @@ function listResoures(mouseoverObject) {
         inputChild.value = item.link;
         inputChild.onchange = function (ev) {
             item.link = inputChild.value;
-            aChild.href = item.link;
-            if (inputChild.value.indexOf('youtube.com') != -1) {
+            aChild.href = item.link; 
+            if (inputChild.value.indexOf('youtube.com') != -1) { // handle youtube loading
                 var apiKey = '';
                 apiKey = "AIzaSyD8mjjKuMprrGJjb3ZbZn7G5hS12_BsfzU";
                 const youtubeID = inputChild.value.split('v=')[1].split('&')[0]
@@ -118,7 +126,7 @@ function listResoures(mouseoverObject) {
                             document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
                         }
                         item.description = obj.items[0].snippet.description;
-                        listResoures(mouseoverObject)
+                        listResources(mouseoverObject)
                         autosaveXML();
                     }
                 }
@@ -148,8 +156,6 @@ function listResoures(mouseoverObject) {
 
         infoResources.prepend(liChild)
     });
-    var tagsDiv = document.getElementById('tags-div')
-    tagsDiv.innerHTML = ''
     mouseoverObject.nodeInfo.tags.forEach(function (item, index) {
         var tag = $(`<span class='tag'>${item.name}</span>`);
         tag.on('mousedown', function (e) {
@@ -157,7 +163,7 @@ function listResoures(mouseoverObject) {
                 mouseoverObject.nodeInfo.tags = mouseoverObject.nodeInfo.tags.filter(function (i) {
                     return i.name != e.currentTarget.textContent;
                 });
-                listResoures(mouseoverObject);
+                listResources(mouseoverObject);
                 e.preventDefault();
             }
         })

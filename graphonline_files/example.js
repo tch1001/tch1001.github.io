@@ -791,7 +791,7 @@ function addTag() {
     var tagInput = document.getElementById('add-tag-input');
     if (tagInput.value.trim() == '') return;
     obj.nodeInfo.tags.push(new Tag(tagInput.value.trim()));
-    listResoures(obj)
+    listResources(obj)
     tagInput.value = ''
 }
 

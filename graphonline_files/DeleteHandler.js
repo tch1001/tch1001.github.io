@@ -27,6 +27,9 @@ DeleteGraphHandler.prototype.MouseDown = function (pos, pushtostack = true) {
     var cmd = new Command("DeleteObject", {'obj': selectedObject, 'affected_edges': []})
     this.app.DeleteObject(selectedObject, cmd);
     if(pushtostack) this.app.PushToStack(cmd)
+    if(this.app.globalHoverObject == selectedObject){
+        listResources(null)
+    }
 
     this.needRedraw = true;
 

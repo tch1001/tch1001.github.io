@@ -429,13 +429,13 @@ function focusOnNode(mouseoverObject) {
     var infoTitle = document.getElementById('info-title');
     var infoUid = document.getElementById('info-uid')
 
+    listResources(mouseoverObject);
     infoTitle.value = mouseoverObject.nodeInfo.title;
     infoTitle.onchange = function (ev) {
         mouseoverObject.nodeInfo.title = infoTitle.value;
         autosaveXML();
     }
     infoUid.textContent = mouseoverObject.nodeInfo.uid;
-    listResoures(mouseoverObject);
 
     // change node style
     application.UndoColoring();
@@ -457,7 +457,7 @@ Application.prototype.MouseMove = function (pos) {
         addResourceButton.disabled = false;
         addResourceButton.onclick = function addResource(e) {
             mouseoverObject.nodeInfo.resources.push(new Resource('', ' '))
-            listResoures(mouseoverObject)
+            listResources(mouseoverObject)
             autosaveXML();
         };
 
@@ -557,7 +557,6 @@ Application.prototype.onCanvasMove = function (point) {
 }
 
 Application.prototype.AddNewVertex = function (vertex) {
-
     return this.graph.AddNewVertex(vertex);
 }
 
@@ -570,9 +569,9 @@ Application.prototype.CreateNewGraph = function (x, y) {
     var newVertex = new BaseVertex(x, y, null)
     newVertex.SetId(this.graph.uidGraph);
     newVertex.mainText = this.graph.uidGraph;
-    this.graph.uidGraph = this.graph.uidGraph + 1;
     newVertex.nodeInfo.title = this.graph.uidGraph;
-    newVertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.uidGraph))
+    newVertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.graph.uidGraph))
+    this.graph.uidGraph = this.graph.uidGraph + 1;
     app.graph.AddNewVertex(newVertex);
     app.redrawGraph();
     return newVertex;
@@ -1271,9 +1270,9 @@ Application.prototype.Undo = function () {
     }else if(cmd.actionName == 'DeleteObject'){
         if(cmd.params['obj'] instanceof BaseVertex){
             this.AddNewVertex(cmd.params['obj'])
-            cmd.params['affected_edges'].forEach(function(item){
+            for(item of cmd.params['affected_edges']){
                 this.AddNewEdge(item)
-            })
+            }
         }else if(cmd.params['obj'] instanceof BaseEdge){
             this.AddNewEdge(cmd.params['obj'])
         }
