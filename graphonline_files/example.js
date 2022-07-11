@@ -716,8 +716,8 @@ function postLoadPage() {
             selectHandler('Default', 'default');
         }
         else if (code == 26 && isCtrl) {
-            // userAction("Key_GraphUndo");
-            // application.SetHandlerMode("graphUndo");        
+            userAction("Key_GraphUndo");
+            application.SetHandlerMode("graphUndo");        
         }
         else if (key == 't') {
             // console.log('meowtch')

@@ -16,7 +16,7 @@ DeleteGraphHandler.prototype = Object.create(BaseHandler.prototype);
 DeleteGraphHandler.prototype.MouseDown = function (pos, pushtostack = true) {
     var selectedObject = this.GetSelectedObject(pos);
     if (selectedObject == null) {
-        application.SetHandlerMode('default')
+        this.app.SetHandlerMode('default')
         return;
     }
 
@@ -24,8 +24,9 @@ DeleteGraphHandler.prototype.MouseDown = function (pos, pushtostack = true) {
         return;
 
     // this.app.PushToStack("Delete");
-    if(pushtostack) this.app.PushToStack(new Command("DeleteObject", {'obj': selectedObject}))
-    this.app.DeleteObject(selectedObject);
+    var cmd = new Command("DeleteObject", {'obj': selectedObject, 'affected_edges': []})
+    this.app.DeleteObject(selectedObject, cmd);
+    if(pushtostack) this.app.PushToStack(cmd)
 
     this.needRedraw = true;
 

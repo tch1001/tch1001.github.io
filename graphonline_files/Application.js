@@ -557,6 +557,7 @@ Application.prototype.onCanvasMove = function (point) {
 }
 
 Application.prototype.AddNewVertex = function (vertex) {
+
     return this.graph.AddNewVertex(vertex);
 }
 
@@ -566,8 +567,12 @@ Application.prototype.AddNewEdge = function (edge, replaceIfExists) {
 
 Application.prototype.CreateNewGraph = function (x, y) {
     var app = this;
-
     var newVertex = new BaseVertex(x, y, null)
+    newVertex.SetId(this.graph.uidGraph);
+    newVertex.mainText = this.graph.uidGraph;
+    this.graph.uidGraph = this.graph.uidGraph + 1;
+    newVertex.nodeInfo.title = this.graph.uidGraph;
+    newVertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.uidGraph))
     app.graph.AddNewVertex(newVertex);
     app.redrawGraph();
     return newVertex;
@@ -608,13 +613,13 @@ Application.prototype.DeleteEdge = function (edgeObject) {
     }
 }
 
-Application.prototype.DeleteVertex = function (graphObject, pushtostack = true) {
-    this.graph.DeleteVertex(graphObject);
+Application.prototype.DeleteVertex = function (graphObject, cmd) {
+    this.graph.DeleteVertex(graphObject, cmd);
 }
 
-Application.prototype.DeleteObject = function (object) {
+Application.prototype.DeleteObject = function (object, cmd = null) {
     if (object instanceof BaseVertex) {
-        this.DeleteVertex(object);
+        this.DeleteVertex(object, cmd);
     }
     else if (object instanceof BaseEdge) {
         this.DeleteEdge(object);
@@ -1258,20 +1263,28 @@ Application.prototype.Undo = function () {
     if (this.IsUndoStackEmpty())
         return;
 
-    var state = this.undoStack.pop();
-    this.graph = new Graph();
-
-    var userSettings = {};
-    this.graph.LoadFromXML(state.graphSave, userSettings);
-    if (userSettings.hasOwnProperty("data") && userSettings["data"].length > 0)
-        this.LoadUserSettings(userSettings["data"]);
+    var cmd = this.undoStack.pop();
+    if(cmd.actionName == 'AddNewVertex'){
+        this.DeleteVertex(cmd.params['vertex'])
+    }else if(cmd.actionName == 'AddNewEdge'){
+        this.DeleteEdge(cmd.params['edge'])
+    }else if(cmd.actionName == 'DeleteObject'){
+        if(cmd.params['obj'] instanceof BaseVertex){
+            this.AddNewVertex(cmd.params['obj'])
+            cmd.params['affected_edges'].forEach(function(item){
+                this.AddNewEdge(item)
+            })
+        }else if(cmd.params['obj'] instanceof BaseEdge){
+            this.AddNewEdge(cmd.params['obj'])
+        }
+    }
 
     this.redrawGraph();
 
     //console.log("undo:" + state.actionName + " size =" + this.undoStack.length);
 
-    if (this.IsUndoStackEmpty())
-        document.getElementById('GraphUndo').style.display = 'none';
+    // if (this.IsUndoStackEmpty())
+    //     document.getElementById('GraphUndo').style.display = 'none';
 }
 
 Application.prototype.ClearUndoStack = function () {

@@ -29,11 +29,7 @@ Graph.prototype.edgesOffset = 10000;
 
 Graph.prototype.AddNewVertex = function (vertex) {
     if (this.vertices.length <= this.maxVertexes) {
-        vertex.SetId(this.uidGraph);
-        vertex.mainText = this.uidGraph;
-        this.uidGraph = this.uidGraph + 1;
-        vertex.nodeInfo.title = this.uidGraph;
-        vertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.uidGraph))
+
         this.vertices.push(vertex);
     }
     return this.vertices.length - 1;
@@ -82,11 +78,12 @@ Graph.prototype.DeleteEdge = function (edgeObject) {
     this.isMultiGraph = this.checkMutiGraph();
 }
 
-Graph.prototype.DeleteVertex = function (vertexObject) {
+Graph.prototype.DeleteVertex = function (vertexObject, cmd = null) {
     var index = this.vertices.indexOf(vertexObject);
     if (index > -1) {
         for (var i = 0; i < this.edges.length; i++) {
             if (this.edges[i].vertex1 == vertexObject || this.edges[i].vertex2 == vertexObject) {
+                cmd.params['affected_edges'].push(this.edges[i])
                 this.DeleteEdge(this.edges[i]);
                 i--;
             }

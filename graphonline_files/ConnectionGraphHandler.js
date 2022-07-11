@@ -46,7 +46,7 @@ ConnectionGraphHandler.prototype.SelectVertex = function (selectedObject) {
 ConnectionGraphHandler.prototype.MouseDown = function (pos) {
     var selectedObject = this.GetSelectedGraph(pos);
     if (selectedObject == null) {
-        application.SetHandlerMode('default')
+        this.app.SetHandlerMode('default')
         return;
     }
     if (selectedObject && (selectedObject instanceof BaseVertex)) {
