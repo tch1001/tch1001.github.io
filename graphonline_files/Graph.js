@@ -83,7 +83,7 @@ Graph.prototype.DeleteVertex = function (vertexObject, cmd = null) {
     if (index > -1) {
         for (var i = 0; i < this.edges.length; i++) {
             if (this.edges[i].vertex1 == vertexObject || this.edges[i].vertex2 == vertexObject) {
-                cmd.params['affected_edges'].push(this.edges[i])
+                if(cmd) cmd.params['affected_edges'].push(this.edges[i])
                 this.DeleteEdge(this.edges[i]);
                 i--;
             }

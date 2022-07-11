@@ -683,10 +683,6 @@ function postLoadPage() {
         {
             // application.onCanvasMove(new Point(moveValue, 0));
         }
-        else if (key == 'd' || key == 'в') // right
-        {
-            // application.onCanvasMove(new Point(-moveValue, 0));
-        }
         else if (e.key == 'f' && e.ctrlKey) // right
         {
             document.getElementById('search-input').focus();
@@ -700,7 +696,7 @@ function postLoadPage() {
         {
             selectHandler('ConnectGraphs', 'addArc');
         }
-        else if (key == 'r' || key == 'к') // delete
+        else if (key == 'd' || key == 'к') // delete
         {
             selectHandler('DeleteObject', 'delete');
         }
@@ -715,9 +711,12 @@ function postLoadPage() {
         {
             selectHandler('Default', 'default');
         }
-        else if (code == 26 && isCtrl) {
+        else if (e.key == 'z' && e.ctrlKey) {
             userAction("Key_GraphUndo");
             application.SetHandlerMode("graphUndo");        
+        }
+        else if (e.key == 'r' && e.ctrlKey) {
+            application.SetHandlerMode('graphRedo')
         }
         else if (key == 't') {
             // console.log('meowtch')

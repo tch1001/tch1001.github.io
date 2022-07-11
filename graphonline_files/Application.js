@@ -24,6 +24,7 @@ function Application(document, window) {
     this.algorithmsValues = {};
     this.userAction = function () { };
     this.undoStack = [];
+    this.redoStack = [];
 
     this.edgeCommonStyle = new CommonEdgeStyle();
     this.isEdgeCommonStyleCustom = false;
@@ -69,7 +70,7 @@ Application.prototype.status = {};
 // Graph name length
 Application.prototype.graphNameLength = 16;
 // Max undo stack size
-Application.prototype.maxUndoStackSize = 8;
+Application.prototype.maxUndoStackSize = 1000;
 
 Application.prototype.getMousePos = function (canvas, e) {
     /// getBoundingClientRect is supported in most browsers and gives you
@@ -663,7 +664,7 @@ Application.prototype.SetHandlerMode = function (mode) {
         this.handler = new ConnectionGraphHandler(this);
     }
     else if (mode == "delete") {
-        modeIndicator.textContent = 'Mode: (R)emove'
+        modeIndicator.textContent = 'Mode: (D)elete'
         this.handler = new DeleteGraphHandler(this);
     }
     else if (mode == "deleteAll") {
@@ -734,6 +735,10 @@ Application.prototype.SetHandlerMode = function (mode) {
     else if (mode == "graphUndo") {
         if (!this.IsUndoStackEmpty())
             this.Undo();
+    }else if(mode == 'graphRedo'){
+        if(this.redoStack.length > 0){
+            this.Redo();
+        } 
     }
     else if (g_AlgorithmIds.indexOf(mode) >= 0) {
         this.handler = new AlgorithmGraphHandler(this, g_Algorithms[g_AlgorithmIds.indexOf(mode)](this.graph, this));
@@ -1259,10 +1264,10 @@ Application.prototype.PushToStack = function (cmd) {
 }
 
 Application.prototype.Undo = function () {
-    if (this.IsUndoStackEmpty())
-        return;
+    if (this.IsUndoStackEmpty()) return;
 
     var cmd = this.undoStack.pop();
+    this.redoStack.push(cmd);
     if(cmd.actionName == 'AddNewVertex'){
         this.DeleteVertex(cmd.params['vertex'])
     }else if(cmd.actionName == 'AddNewEdge'){
@@ -1271,7 +1276,8 @@ Application.prototype.Undo = function () {
         if(cmd.params['obj'] instanceof BaseVertex){
             this.AddNewVertex(cmd.params['obj'])
             for(item of cmd.params['affected_edges']){
-                this.AddNewEdge(item)
+                this.AddNewEdge(item) 
+                // can cause aesthetics problems when one brings back an edge that doesnt have two end nodes
             }
         }else if(cmd.params['obj'] instanceof BaseEdge){
             this.AddNewEdge(cmd.params['obj'])
@@ -1279,11 +1285,22 @@ Application.prototype.Undo = function () {
     }
 
     this.redrawGraph();
-
-    //console.log("undo:" + state.actionName + " size =" + this.undoStack.length);
-
-    // if (this.IsUndoStackEmpty())
-    //     document.getElementById('GraphUndo').style.display = 'none';
+}
+Application.prototype.Redo = function(){
+    if(this.redoStack.length == 0) return;
+    var cmd = this.redoStack.pop();
+    this.undoStack.push(cmd);
+    if(cmd.actionName == 'AddNewVertex'){
+        this.AddNewVertex(cmd.params['vertex'])
+    }else if(cmd.actionName == 'AddNewEdge'){
+        this.AddNewEdge(cmd.params['edge'])
+    }else if(cmd.actionName == 'DeleteObject'){
+        if(cmd.params['obj'] instanceof BaseVertex){
+            this.DeleteVertex(cmd.params['obj'])
+        }else if(cmd.params['obj'] instanceof BaseEdge){
+            this.DeleteEdge(cmd.params['obj'])
+        }
+    }
 }
 
 Application.prototype.ClearUndoStack = function () {
