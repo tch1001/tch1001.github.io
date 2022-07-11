@@ -582,7 +582,8 @@ Application.prototype.CreateNewArc = function (graph1, graph2, isDirect, weight,
 
     this.graph.FixEdgeCurved(edge);
 
-    var edgeObject = this.graph.edges[edge];
+    // var edgeObject = this.graph.edges[edge];
+    edgeObject = edge;
 
     if (edgeObject.useWeight)
         this.UpdateEdgePresets(edgeObject.weight);

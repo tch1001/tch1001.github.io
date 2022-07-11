@@ -68,6 +68,7 @@ Graph.prototype.AddNewEdge = function (edge, replaceIfExists, pushtostack = true
 
     this.isMultiGraph = this.checkMutiGraph();
 
+    return edge;
     return this.edges.length - 1;
 }
 
@@ -466,61 +467,61 @@ Graph.prototype.VertexesReposition = function (viewportSize, newVertexes) {
     }
 }
 
-Graph.prototype.SetAdjacencyMatrix = function (matrix, viewportSize, currentEnumVertesType, separator) {
-    if (separator === undefined) {
-        separator = ",";
-    }
+// Graph.prototype.SetAdjacencyMatrix = function (matrix, viewportSize, currentEnumVertesType, separator) {
+//     if (separator === undefined) {
+//         separator = ",";
+//     }
 
-    var rowsObj = {};
-    var colsObj = {};
+//     var rowsObj = {};
+//     var colsObj = {};
 
-    //ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
+//     //ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
 
-    if (this.TestAdjacencyMatrix(matrix, rowsObj, colsObj, separator)) {
-        rows = rowsObj.rows;
-        cols = colsObj.cols;
+//     if (this.TestAdjacencyMatrix(matrix, rowsObj, colsObj, separator)) {
+//         rows = rowsObj.rows;
+//         cols = colsObj.cols;
 
-        var clonedEdge = this.edges.slice(0);
-        for (var i = 0; i < clonedEdge.length; i++) {
-            this.DeleteEdge(clonedEdge[i]);
-        }
+//         var clonedEdge = this.edges.slice(0);
+//         for (var i = 0; i < clonedEdge.length; i++) {
+//             this.DeleteEdge(clonedEdge[i]);
+//         }
 
-        var newVertexes = [];
-        var bWeightGraph = false;
+//         var newVertexes = [];
+//         var bWeightGraph = false;
 
-        for (var i = 0; i < rows.length; i++) {
-            for (var j = 0; j < rows.length; j++) {
-                if (j >= this.vertices.length) {
-                    var newPos = this.GetRandomPositionOfVertex(matrix, j, viewportSize);
-                    newVertexes.push(new BaseVertex(newPos.x, newPos.y, currentEnumVertesType));
-                    this.AddNewVertex(newVertexes[newVertexes.length - 1]);
-                }
+//         for (var i = 0; i < rows.length; i++) {
+//             for (var j = 0; j < rows.length; j++) {
+//                 if (j >= this.vertices.length) {
+//                     var newPos = this.GetRandomPositionOfVertex(matrix, j, viewportSize);
+//                     newVertexes.push(new BaseVertex(newPos.x, newPos.y, currentEnumVertesType));
+//                     this.AddNewVertex(newVertexes[newVertexes.length - 1]);
+//                 }
 
-                if (cols[i][j] > 0) {
-                    var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[i], this.vertices[j], cols[i][j] != cols[j][i], cols[i][j], true);
-                    this.FixEdgeCurved(nEdgeIndex);
-                    if (nEdgeIndex >= 0) {
-                        bWeightGraph = bWeightGraph || this.edges[nEdgeIndex].weight != 1;
-                    }
-                }
-            }
-        }
+//                 if (cols[i][j] > 0) {
+//                     var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[i], this.vertices[j], cols[i][j] != cols[j][i], cols[i][j], true);
+//                     this.FixEdgeCurved(nEdgeIndex);
+//                     if (nEdgeIndex >= 0) {
+//                         bWeightGraph = bWeightGraph || this.edges[nEdgeIndex].weight != 1;
+//                     }
+//                 }
+//             }
+//         }
 
-        // Set use weight false, because we have unwieghts graph.
-        if (!bWeightGraph) {
-            this.edges.forEach(function (part, index, theArray) {
-                theArray[index].useWeight = false;
-            });
-        }
+//         // Set use weight false, because we have unwieghts graph.
+//         if (!bWeightGraph) {
+//             this.edges.forEach(function (part, index, theArray) {
+//                 theArray[index].useWeight = false;
+//             });
+//         }
 
-        for (var i = rows.length; i < Math.max(this.vertices.length, rows.length); i++) {
-            this.DeleteVertex(this.vertices[i]);
-            i--;
-        }
+//         for (var i = rows.length; i < Math.max(this.vertices.length, rows.length); i++) {
+//             this.DeleteVertex(this.vertices[i]);
+//             i--;
+//         }
 
-        this.VertexesReposition(viewportSize, newVertexes);
-    }
-}
+//         this.VertexesReposition(viewportSize, newVertexes);
+//     }
+// }
 
 
 Graph.prototype.TestIncidenceMatrix = function (matrix, rowsObj, colsObj, separator) {
@@ -574,75 +575,75 @@ Graph.prototype.TestIncidenceMatrix = function (matrix, rowsObj, colsObj, separa
     return bGoodFormat;
 }
 
-Graph.prototype.SetIncidenceMatrix = function (matrix, viewportSize, currentEnumVertesType) {
-    var rowsObj = {};
-    var colsObj = {};
+// Graph.prototype.SetIncidenceMatrix = function (matrix, viewportSize, currentEnumVertesType) {
+//     var rowsObj = {};
+//     var colsObj = {};
 
-    //ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
-    if (this.TestIncidenceMatrix(matrix, rowsObj, colsObj)) {
-        rows = rowsObj.rows;
-        cols = colsObj.cols;
-        var clonedEdge = this.edges.slice(0);
-        for (var i = 0; i < clonedEdge.length; i++) {
-            this.DeleteEdge(clonedEdge[i]);
-        }
-        var newVertexes = [];
-        var bWeightGraph = false;
-        for (var i = 0; i < cols[0].length; i++) {
-            var edgeValue = [];
-            var edgeIndex = [];
-            for (var j = 0; j < cols.length; j++) {
-                if (j >= this.vertices.length) {
+//     //ViewportSize = viewportSize.subtract(new Point((new VertexModel()).diameter * 2, (new VertexModel()).diameter * 2));
+//     if (this.TestIncidenceMatrix(matrix, rowsObj, colsObj)) {
+//         rows = rowsObj.rows;
+//         cols = colsObj.cols;
+//         var clonedEdge = this.edges.slice(0);
+//         for (var i = 0; i < clonedEdge.length; i++) {
+//             this.DeleteEdge(clonedEdge[i]);
+//         }
+//         var newVertexes = [];
+//         var bWeightGraph = false;
+//         for (var i = 0; i < cols[0].length; i++) {
+//             var edgeValue = [];
+//             var edgeIndex = [];
+//             for (var j = 0; j < cols.length; j++) {
+//                 if (j >= this.vertices.length) {
 
-                    var newPos = new Point(0, 0);//this.GetRandomPositionOfVertex (matrix, j, viewportSize);
-                    newVertexes.push(new BaseVertex(newPos.x, newPos.y, currentEnumVertesType));
-                    this.AddNewVertex(newVertexes[newVertexes.length - 1]);
-                }
+//                     var newPos = new Point(0, 0);//this.GetRandomPositionOfVertex (matrix, j, viewportSize);
+//                     newVertexes.push(new BaseVertex(newPos.x, newPos.y, currentEnumVertesType));
+//                     this.AddNewVertex(newVertexes[newVertexes.length - 1]);
+//                 }
 
-                if (cols[j][i] != 0) {
-                    edgeValue.push(cols[j][i]);
-                    edgeIndex.push(j);
-                }
-            }
+//                 if (cols[j][i] != 0) {
+//                     edgeValue.push(cols[j][i]);
+//                     edgeIndex.push(j);
+//                 }
+//             }
 
-            if (edgeIndex.length == 1) {
-                edgeValue.push(edgeValue[0]);
-                edgeIndex.push(edgeIndex[0]);
-            }
+//             if (edgeIndex.length == 1) {
+//                 edgeValue.push(edgeValue[0]);
+//                 edgeIndex.push(edgeIndex[0]);
+//             }
 
-            if (edgeIndex.length == 2) {
-                if (edgeValue[0] != edgeValue[1]) {
-                    if (edgeValue[1] > 0) {
-                        edgeValue = edgeValue.swap(0, 1);
-                        edgeIndex = edgeIndex.swap(0, 1);
-                    }
-                }
+//             if (edgeIndex.length == 2) {
+//                 if (edgeValue[0] != edgeValue[1]) {
+//                     if (edgeValue[1] > 0) {
+//                         edgeValue = edgeValue.swap(0, 1);
+//                         edgeIndex = edgeIndex.swap(0, 1);
+//                     }
+//                 }
 
-                var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[edgeIndex[0]], this.vertices[edgeIndex[1]],
-                    edgeValue[0] != edgeValue[1], Math.abs(edgeValue[1]), false);
+//                 var nEdgeIndex = this.AddNewEdgeSafe(this.vertices[edgeIndex[0]], this.vertices[edgeIndex[1]],
+//                     edgeValue[0] != edgeValue[1], Math.abs(edgeValue[1]), false);
 
-                this.FixEdgeCurved(nEdgeIndex);
-                if (nEdgeIndex >= 0) {
-                    bWeightGraph = bWeightGraph || this.edges[nEdgeIndex].weight != 1;
-                }
-            }
-        }
+//                 this.FixEdgeCurved(nEdgeIndex);
+//                 if (nEdgeIndex >= 0) {
+//                     bWeightGraph = bWeightGraph || this.edges[nEdgeIndex].weight != 1;
+//                 }
+//             }
+//         }
 
-        // Set use weight false, because we have unwieghts graph.
-        if (!bWeightGraph) {
-            this.edges.forEach(function (part, index, theArray) {
-                theArray[index].useWeight = false;
-            });
-        }
+//         // Set use weight false, because we have unwieghts graph.
+//         if (!bWeightGraph) {
+//             this.edges.forEach(function (part, index, theArray) {
+//                 theArray[index].useWeight = false;
+//             });
+//         }
 
-        for (var i = cols.length; i < Math.max(this.vertices.length, cols.length); i++) {
-            this.DeleteVertex(this.vertices[i]);
-            i--;
-        }
+//         for (var i = cols.length; i < Math.max(this.vertices.length, cols.length); i++) {
+//             this.DeleteVertex(this.vertices[i]);
+//             i--;
+//         }
 
-        this.VertexesReposition(viewportSize, newVertexes);
-    }
-}
+//         this.VertexesReposition(viewportSize, newVertexes);
+//     }
+// }
 
 Graph.prototype.GetIncidenceMatrix = function () {
     var matrix = "";
@@ -1033,8 +1034,8 @@ Graph.prototype.isNeedReposition = function () {
     return res;
 }
 
-Graph.prototype.FixEdgeCurved = function (edgeIndex) {
-    var edgeObject = this.edges[edgeIndex];
+Graph.prototype.FixEdgeCurved = function (edgeObject) {
+    // var edgeObject = this.edges[edgeIndex];
     var hasPair = this.hasPair(edgeObject);
     var neighbourEdges = this.getNeighbourEdges(edgeObject);
 
