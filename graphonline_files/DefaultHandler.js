@@ -33,7 +33,7 @@ DefaultHandler.prototype.GetSelectedVertex = function () {
 DefaultHandler.prototype.MouseMove = function (pos) {
     if (this.dragObject) {
         if (!this.saveUndo) {
-            this.app.PushToStack("Move");
+            this.app.PushToStack(new Command('move', {'from_position' : this.dragObject.position}));
             this.saveUndo = true;
         }
 
@@ -43,7 +43,7 @@ DefaultHandler.prototype.MouseMove = function (pos) {
     }
     else if (this.selectedObjects.length > 0 && this.pressed && !this.groupingSelect) {
         if (!this.saveUndo) {
-            this.app.PushToStack("Move");
+            this.app.PushToStack(new Command('move', {'from_position' : this.dragObject.position}));
             this.saveUndo = true;
         }
 
@@ -189,7 +189,7 @@ DefaultHandler.prototype.MouseUp = function (pos) {
 
             dialogButtons[g_save] = function () {
 
-                handler.app.PushToStack("ChangeCurvelEdge");
+                // handler.app.PushToStack("ChangeCurvelEdge");
 
                 handler.selectedObject.SetWeight(document.getElementById('EdgeWeight').value);
                 handler.selectedObject.SetUpText(document.getElementById('EdgeLable').value);
@@ -231,7 +231,7 @@ DefaultHandler.prototype.MouseUp = function (pos) {
         });
 
         $('#message').on('click', '#incCurvel', function () {
-            handler.app.PushToStack("ChangeCurvelEdge");
+            // handler.app.PushToStack("ChangeCurvelEdge");
 
             handler.selectedObject.model.ChangeCurvedValue(DefaultHandler.prototype.curvedValue);
             handler.needRedraw = true;
@@ -239,7 +239,7 @@ DefaultHandler.prototype.MouseUp = function (pos) {
             userAction("Edge.Bend");
         });
         $('#message').on('click', '#decCurvel', function () {
-            handler.app.PushToStack("ChangeCurvelEdge");
+            // handler.app.PushToStack("ChangeCurvelEdge");
 
             handler.selectedObject.model.ChangeCurvedValue(-DefaultHandler.prototype.curvedValue);
             handler.needRedraw = true;
@@ -304,7 +304,7 @@ DefaultHandler.prototype.MouseUp = function (pos) {
         $('#message').unbind();
 
         $('#message').on('click', '#DublicateSelected', function () {
-            handler.app.PushToStack("DublicateSelection");
+            // handler.app.PushToStack("DublicateSelection");
 
             userAction("GroupSelected.Dublicate");
 
@@ -362,7 +362,7 @@ DefaultHandler.prototype.MouseUp = function (pos) {
         });
 
         $('#message').on('click', '#RemoveSelected', function () {
-            handler.app.PushToStack("RemoveSelection");
+            // handler.app.PushToStack("RemoveSelection");
 
             userAction("GroupSelected.Remove");
 

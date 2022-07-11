@@ -20,8 +20,9 @@ ConnectionGraphHandler.prototype.GetSelectedVertex = function () {
     return (this.firstObject instanceof BaseVertex) ? this.firstObject : null;
 }
 
-ConnectionGraphHandler.prototype.AddNewEdge = function (selectedObject, isDirect) {
-    this.app.CreateNewArc(this.firstObject, selectedObject, isDirect, document.getElementById('EdgeWeight').value, $("#RadiosReplaceEdge").prop("checked"), document.getElementById('EdgeLable').value);
+ConnectionGraphHandler.prototype.AddNewEdge = function (selectedObject, isDirect, pushtostack = true) {
+    var newEdge = this.app.CreateNewArc(this.firstObject, selectedObject, isDirect, document.getElementById('EdgeWeight').value, $("#RadiosReplaceEdge").prop("checked"), document.getElementById('EdgeLable').value);
+    if (pushtostack) this.app.PushToStack(new Command('AddNewEdge', { 'edge': newEdge }))
 
     this.SelectFirst();
     this.app.NeedRedraw();

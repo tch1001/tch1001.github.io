@@ -5,7 +5,7 @@
  */
 
 
- function Graph() {
+function Graph() {
     // List of vertex.
     this.vertices = [];
     // List of arcs.
@@ -30,6 +30,7 @@ Graph.prototype.edgesOffset = 10000;
 Graph.prototype.AddNewVertex = function (vertex) {
     if (this.vertices.length <= this.maxVertexes) {
         vertex.SetId(this.uidGraph);
+        vertex.mainText = this.uidGraph;
         this.uidGraph = this.uidGraph + 1;
         vertex.nodeInfo.title = this.uidGraph;
         vertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.uidGraph))
@@ -42,7 +43,7 @@ Graph.prototype.AddNewEdgeSafe = function (graph1, graph2, isDirect, weight, rep
     return this.AddNewEdge(new BaseEdge(graph1, graph2, isDirect, weight), replaceIfExists);
 }
 
-Graph.prototype.AddNewEdge = function (edge, replaceIfExists) {
+Graph.prototype.AddNewEdge = function (edge, replaceIfExists, pushtostack = true) {
     edge.id = this.uidEdge;
     this.uidEdge = this.uidEdge + 1;
 
@@ -748,10 +749,10 @@ Graph.prototype.SaveToXML = function (additionalData) {
 
 function boldSearchTerm(text, searchTerm) {
     var newText = '';
-    while(text.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1){
+    while (text.toLowerCase().indexOf(searchTerm.toLowerCase()) != -1) {
         const idx = text.toLowerCase().indexOf(searchTerm.toLowerCase())
-        newText += text.substr(0,idx)
-        console.log(text.substr(0,idx))
+        newText += text.substr(0, idx)
+        console.log(text.substr(0, idx))
         text = text.slice(idx);
         console.log(text)
         const highlighted = text.substr(0, searchTerm.length)

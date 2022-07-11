@@ -15,9 +15,9 @@ AddGraphHandler.prototype = Object.create(BaseHandler.prototype);
 
 AddGraphHandler.prototype.MouseDown = function (pos) {
     if (this.GetSelectedObject(pos)) return;
-    this.app.PushToStack("Add");
 
-    this.app.CreateNewGraph(pos.x, pos.y);
+    var newVertex = this.app.CreateNewGraph(pos.x, pos.y);
+    this.app.PushToStack(new Command('AddNewVertex', { 'vertex': newVertex }))
     this.needRedraw = true;
     this.inited = false;
 }

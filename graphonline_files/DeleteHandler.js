@@ -13,7 +13,7 @@
 // inheritance.
 DeleteGraphHandler.prototype = Object.create(BaseHandler.prototype);
 
-DeleteGraphHandler.prototype.MouseDown = function (pos) {
+DeleteGraphHandler.prototype.MouseDown = function (pos, pushtostack = true) {
     var selectedObject = this.GetSelectedObject(pos);
     if (selectedObject == null) {
         application.SetHandlerMode('default')
@@ -23,8 +23,10 @@ DeleteGraphHandler.prototype.MouseDown = function (pos) {
     if (!this.app.IsCorrectObject(selectedObject))
         return;
 
-    this.app.PushToStack("Delete");
+    // this.app.PushToStack("Delete");
+    if(pushtostack) this.app.PushToStack(new Command("DeleteObject", {'obj': selectedObject}))
     this.app.DeleteObject(selectedObject);
+
     this.needRedraw = true;
 
 }
@@ -41,7 +43,7 @@ function DeleteAllHandler(app) {
 DeleteAllHandler.prototype = Object.create(BaseHandler.prototype);
 
 DeleteAllHandler.prototype.clear = function () {
-    this.app.PushToStack("DeleteAll");
+    // this.app.PushToStack("DeleteAll");
 
     // Selected Graph.
     this.app.graph = new Graph();

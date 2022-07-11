@@ -258,7 +258,7 @@ BaseHandler.prototype.addContextMenu = function () {
 
     $("#Context_Delete").click(function () {
         if (handler.contextMenuObject != null) {
-            handler.app.PushToStack("DeleteObject");
+            // handler.app.PushToStack("DeleteObject");
             handler.app.DeleteObject(handler.contextMenuObject);
             handler.app.redrawGraph();
             userAction("DeleteObject_contextMenu");
@@ -291,7 +291,7 @@ BaseHandler.prototype.addContextMenu = function () {
 
     $("#Context_Delete_Edge").click(function () {
         if (handler.contextMenuObject != null) {
-            handler.app.PushToStack("DeleteObject");
+            // handler.app.PushToStack("DeleteObject");
             handler.app.DeleteObject(handler.contextMenuObject);
             handler.app.redrawGraph();
             userAction("DeleteObject_contextMenu");
@@ -305,7 +305,7 @@ BaseHandler.prototype.addContextMenu = function () {
     });
 
     $("#Context_Add_Vertex").click(function () {
-        handler.app.PushToStack("Add");
+        // handler.app.PushToStack("Add");
         handler.app.CreateNewGraph(handler.contextMenuPoint.x, handler.contextMenuPoint.y);
         handler.app.redrawGraph();
     });
@@ -363,14 +363,14 @@ BaseHandler.prototype.removeContextMenu = function () {
 
 BaseHandler.prototype.RenameVertex = function (text, object) {
     if (object != null && (object instanceof BaseVertex)) {
-        this.app.PushToStack("RenameVertex");
+        // this.app.PushToStack("RenameVertex");
         object.mainText = text;
         this.app.redrawGraph();
     }
 }
 
 BaseHandler.prototype.ShowCreateEdgeDialog = function (firstVertex, secondVertex, addEdgeCallBack) {
-    this.app.PushToStack("Connect");
+    // this.app.PushToStack("Connect");
     addEdgeCallBack(firstVertex, secondVertex, true);
 }
 
@@ -380,7 +380,7 @@ BaseHandler.prototype.ShowEditEdgeDialog = function (edgeObject) {
     var handler = this;
 
     dialogButtons[g_save] = function () {
-        handler.app.PushToStack("ChangeEdge");
+        // handler.app.PushToStack("ChangeEdge");
 
         edgeObject.SetWeight(document.getElementById('EdgeWeight').value);
         edgeObject.SetUpText(document.getElementById('EdgeLable').value);
