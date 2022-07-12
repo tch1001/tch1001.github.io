@@ -11,6 +11,7 @@ function DefaultHandler(app) {
     this.dragObject = null;
     this.selectedObject = null;
     this.prevPosition = null;
+    this.startPosition = null;
     this.groupingSelect = false;
     this.selectedLogRect = false;
     this.selectedLogCtrl = false;
@@ -39,6 +40,7 @@ DefaultHandler.prototype.MouseMove = function (pos) {
         this.dragObject.position.x = pos.x;
         this.dragObject.position.y = pos.y;
         this.needRedraw = true;
+        this.dragged = true;
     }
     else if (this.selectedObjects.length > 0 && this.pressed && !this.groupingSelect) {
         if (!this.saveUndo) {
@@ -54,6 +56,7 @@ DefaultHandler.prototype.MouseMove = function (pos) {
             }
         }
         this.prevPosition = pos;
+        this.dragged = true;
         this.needRedraw = true;
     }
     else if (this.pressed) {
@@ -115,20 +118,23 @@ DefaultHandler.prototype.MouseDown = function (pos) {
             this.message = g_moveCursorForMoving;
         }
     }
-    console.log('down', this.selectedObject, this.selectedObjects);
-    if(this.selectedObject){
-        // moving single object
-        this.app.PushToStack(new Command('move_start', {'from_position' : this.selectedObject.position.clone(), 'obj': [this.selectedObject]}));
-        console.log('start', this.selectedObject.position)
-    }else if(this.selectedObjects.length > 0){
-        // moving many objects
-        this.app.PushToStack(new Command('move_start', {'from_position' : this.selectedObjects[0].position.clone(), 'obj': this.selectedObjects}));
-        console.log('start', this.selectedObjects[0].position)
-    }
+    // if (this.selectedObject) {
+    //     // moving single object
+    //     this.app.PushToStack(new Command('move_start', { 'from_position': this.selectedObject.position.clone(), 'obj': [this.selectedObject] }));
+    //     console.log('start', this.selectedObject.position)
+    // } else if (this.selectedObjects.length > 0) {
+    //     // moving many objects
+    //     this.app.PushToStack(new Command('move_start', { 'from_position': this.selectedObjects[0].position.clone(), 'obj': this.selectedObjects }));
+    //     console.log('start', this.selectedObjects[0].position)
+    // }
     this.needRedraw = true;
     this.pressed = true;
     this.prevPosition = pos;
     this.app.canvas.style.cursor = "move";
+
+    this.startPosition = pos;
+    this.dragged = false;
+
 }
 
 DefaultHandler.prototype.MouseUp = function (pos) {
@@ -139,16 +145,21 @@ DefaultHandler.prototype.MouseUp = function (pos) {
     this.app.canvas.style.cursor = "auto";
 
     this.app.SetSelectionRect(null);
-    console.log('up', this.selectedObject, this.selectedObjects)
-    if(this.selectedObject){
-        // moving single object
-        this.app.PushToStack(new Command('move_end', {'to_position' : this.selectedObject.position.clone(), 'obj': [this.selectedObject]}));
-        console.log('end', this.selectedObject.position)
-    }else if(this.selectedObjects.length > 0){
-        // moving many objects
-        this.app.PushToStack(new Command('move_end', {'to_position' : this.selectedObjects[0].position.clone(), 'obj': this.selectedObjects}));
-        console.log('end', this.selectedObjects[0].position)
+    // console.log('up', this.groupingSelect, this.movedEvent)
+    if(this.startPosition && this.dragged){
+        if(this.selectedObject){
+            // moving single object
+            this.app.PushToStack(new Command('move', {'from_position': this.startPosition, 'to_position' : pos, 'obj': [this.selectedObject]}));
+            console.log('move', this.selectedObject.position)
+        }else if(this.selectedObjects.length > 0){
+            // moving many objects
+            this.app.PushToStack(new Command('move', {'from_position': this.startPosition, 'to_position' : pos, 'obj': this.selectedObjects}));
+            console.log('move', this.selectedObjects[0].position)
+        }
     }
+    this.startPosition = null;
+    this.dragged = false;
+
     this.groupingSelect = false;
     if (this.selectedObject != null && (this.selectedObject instanceof BaseVertex)) {
         this.message = g_textsSelectAndMove
