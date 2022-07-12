@@ -43,7 +43,7 @@ DefaultHandler.prototype.MouseMove = function (pos) {
     }
     else if (this.selectedObjects.length > 0 && this.pressed && !this.groupingSelect) {
         if (!this.saveUndo) {
-            this.app.PushToStack(new Command('move', {'from_position' : this.dragObject.position}));
+            // this.app.PushToStack(new Command('move', {'from_position' : this.dragObject.position}));
             this.saveUndo = true;
         }
 

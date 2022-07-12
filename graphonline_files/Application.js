@@ -374,16 +374,11 @@ Application.prototype.UpdateNodesCurrentStyle = function (ForceCommonStyle, Forc
         else
             currentStyle = selected ? selectedStyle[selectedGroup] : commonStyle;
 
-        // console.log(this.handler.globalHoverObject)
-        // if(this.handler.globalHoverObject){
-        //   this.handler.globalHoverObject.currentStyle = new HoverVertexStyle();
-        //   // TODO find out of this is the best practice
-        // }
-
-        if (this.graph.vertices[i].currentStyle) {
-        } else {
-            this.graph.vertices[i].currentStyle = currentStyle;
+        if(this.globalHoverObject == this.graph.vertices[i]){
+            currentStyle = new HoverVertexStyle();
         }
+
+        this.graph.vertices[i].currentStyle = currentStyle;
     }
 }
 
