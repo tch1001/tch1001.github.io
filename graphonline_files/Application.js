@@ -400,16 +400,6 @@ Application.prototype.updateMessage = function () {
     this.handler.InitControls();
 }
 
-Application.prototype.UndoColoring = function () {
-    if (this.globalHoverObject instanceof BaseVertex) {
-        this.globalHoverObject.currentStyle = new CommonVertexStyle();
-    } else if (this.globalHoverObject instanceof BaseEdge) {
-        this.globalHoverObject.vertex1.currentStyle = new CommonVertexStyle();
-        this.globalHoverObject.vertex2.currentStyle = new CommonVertexStyle();
-    }
-    this.needRedraw = true;
-}
-
 function toggleRightSection(showResources) {
     var resourcesSection = document.getElementById('resources-section');
     resourcesSection.style.display = 'none';
@@ -433,10 +423,7 @@ function focusOnNode(mouseoverObject) {
     }
     infoUid.textContent = mouseoverObject.nodeInfo.uid;
 
-    // change node style
-    application.UndoColoring();
     application.globalHoverObject = mouseoverObject;
-    application.globalHoverObject.currentStyle = new HoverVertexStyle();
     application.handler.needRedraw = true;
 }
 Application.prototype.MouseMove = function (pos) {
