@@ -357,3 +357,7 @@ BaseVertex.prototype.getStyleFor = function (index) {
 BaseVertex.prototype.hasOwnStyleFor = function (index) {
     return this.ownStyles.hasOwnProperty(index);
 }
+
+BaseVertex.prototype.offset = function(dx,dy){
+    this.position.offset(dx,dy);
+}

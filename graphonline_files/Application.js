@@ -1249,6 +1249,7 @@ Application.prototype.PushToStack = function (cmd) {
 Application.prototype.Undo = function () {
     if (this.IsUndoStackEmpty()) return;
 
+    console.log(this.undoStack)
     var cmd = this.undoStack.pop();
     this.redoStack.push(cmd);
     if(cmd.actionName == 'AddNewVertex'){
@@ -1264,6 +1265,20 @@ Application.prototype.Undo = function () {
             }
         }else if(cmd.params['obj'] instanceof BaseEdge){
             this.AddNewEdge(cmd.params['obj'])
+        }
+    }else if(cmd.actionName == 'move_start'){
+        this.Undo();
+        this.undoStack.push(cmd);
+        this.redoStack.pop();
+    }else if(cmd.actionName == 'move_end'){
+        var start = this.undoStack.pop();
+        this.redoStack.push(start);
+        console.assert(start.actionName == 'move_start')
+        const dx = cmd.params['to_position'].x - start.params['from_position'].x;
+        const dy = cmd.params['to_position'].y - start.params['from_position'].y;
+        for(const item of cmd.params['obj']){
+            // only offset vertices because edges will follow suite
+            if(item instanceof BaseVertex) item.offset(-dx,-dy);
         }
     }
 
@@ -1282,6 +1297,16 @@ Application.prototype.Redo = function(){
             this.DeleteVertex(cmd.params['obj'])
         }else if(cmd.params['obj'] instanceof BaseEdge){
             this.DeleteEdge(cmd.params['obj'])
+        }
+    }else if(cmd.actionName == 'move_start'){
+        const end = this.redoStack.pop();
+        console.assert(end.actionName == 'move_end');
+        this.undoStack.push(end);
+        const dx = cmd.params['from_position'].x - end.params['to_position'].x;
+        const dy = cmd.params['from_position'].y - end.params['to_position'].y;
+        for(const item of cmd.params['obj']){
+            // only offset vertices because edges will follow suite
+            if(item instanceof BaseVertex) item.offset(-dx,-dy);
         }
     }
 }

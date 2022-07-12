@@ -269,3 +269,7 @@ BaseEdge.prototype.getStyleFor = function (index) {
 BaseEdge.prototype.hasOwnStyleFor = function (index) {
     return this.ownStyles.hasOwnProperty(index);
 }
+BaseEdge.prototype.offset = function(dx,dy){
+    this.vertex1.offset(dx,dy);
+    this.vertex2.offset(dx,dy);
+}

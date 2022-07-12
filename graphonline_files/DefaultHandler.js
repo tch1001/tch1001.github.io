@@ -33,7 +33,6 @@ DefaultHandler.prototype.GetSelectedVertex = function () {
 DefaultHandler.prototype.MouseMove = function (pos) {
     if (this.dragObject) {
         if (!this.saveUndo) {
-            this.app.PushToStack(new Command('move', {'from_position' : this.dragObject.position}));
             this.saveUndo = true;
         }
 
@@ -116,6 +115,16 @@ DefaultHandler.prototype.MouseDown = function (pos) {
             this.message = g_moveCursorForMoving;
         }
     }
+    console.log('down', this.selectedObject, this.selectedObjects);
+    if(this.selectedObject){
+        // moving single object
+        this.app.PushToStack(new Command('move_start', {'from_position' : this.selectedObject.position.clone(), 'obj': [this.selectedObject]}));
+        console.log('start', this.selectedObject.position)
+    }else if(this.selectedObjects.length > 0){
+        // moving many objects
+        this.app.PushToStack(new Command('move_start', {'from_position' : this.selectedObjects[0].position.clone(), 'obj': this.selectedObjects}));
+        console.log('start', this.selectedObjects[0].position)
+    }
     this.needRedraw = true;
     this.pressed = true;
     this.prevPosition = pos;
@@ -130,7 +139,16 @@ DefaultHandler.prototype.MouseUp = function (pos) {
     this.app.canvas.style.cursor = "auto";
 
     this.app.SetSelectionRect(null);
-
+    console.log('up', this.selectedObject, this.selectedObjects)
+    if(this.selectedObject){
+        // moving single object
+        this.app.PushToStack(new Command('move_end', {'to_position' : this.selectedObject.position.clone(), 'obj': [this.selectedObject]}));
+        console.log('end', this.selectedObject.position)
+    }else if(this.selectedObjects.length > 0){
+        // moving many objects
+        this.app.PushToStack(new Command('move_end', {'to_position' : this.selectedObjects[0].position.clone(), 'obj': this.selectedObjects}));
+        console.log('end', this.selectedObjects[0].position)
+    }
     this.groupingSelect = false;
     if (this.selectedObject != null && (this.selectedObject instanceof BaseVertex)) {
         this.message = g_textsSelectAndMove
