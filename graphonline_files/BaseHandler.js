@@ -90,10 +90,11 @@ function listResources(mouseoverObject) {
     infoResources.innerHTML = ''
     var tagsDiv = document.getElementById('tags-div')
     tagsDiv.innerHTML = ''
+    // reset title and uid in case this was called from a delete operation
     var infoTitle = document.getElementById('info-title');
     infoTitle.value = ''
     var infoUid = document.getElementById('info-uid')
-    infoUid.textContent = 'Hover over something to see it'
+    infoUid.textContent = 'Hover over something to see it' 
 
     if(mouseoverObject == null) return;
     mouseoverObject.nodeInfo.resources = mouseoverObject.nodeInfo.resources.filter(function (el) {
@@ -119,12 +120,16 @@ function listResources(mouseoverObject) {
                 xhttp.onreadystatechange = function () {
                     if (this.readyState == 4) {
                         const obj = JSON.parse(xhttp.responseText);
-                        if (/^\d+$/.test(mouseoverObject.nodeInfo.title)) {
-                            mouseoverObject.nodeInfo.title = obj.items[0].snippet.title;
-                            document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
+                        try {
+                            if (/^\d+$/.test(mouseoverObject.nodeInfo.title)) { // if current title is a number (value not set yet)
+                                mouseoverObject.nodeInfo.title = obj.items[0].snippet.title;
+                                document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
+                            }
+                            item.description = obj.items[0].snippet.description;
+                        }catch(err){
+                            item.description = 'invalid youtube link! double check the video id'
                         }
-                        item.description = obj.items[0].snippet.description;
-                        listResources(mouseoverObject)
+                        focusOnNode(mouseoverObject)
                         autosaveXML();
                     }
                 }
