@@ -136,9 +136,21 @@ function listResources(mouseoverObject) {
                 xhttp.open("GET", query, true);
                 xhttp.send();
             }
-            if (inputChild.value.indexOf('youtube.com') != -1) // handle youtube loading
+            // add an advanced option to disable stripping of timestamps (reconsider if there's
+            // a need to add references to specific timestamps of a long lecture)
+            if (inputChild.value.indexOf('youtube.com') != -1) { // handle youtube loading
                 getYoutubeData(inputChild.value.split('v=')[1].split('&')[0])
-            else if(inputChild.value.indexOf('youtu.be') != -1)
+                if(inputChild.value.indexOf('&t=') != -1){
+                    var tsplit = inputChild.value.split('&t=');
+                    var rightPart = tsplit[1].split('&');
+                    rightPart.shift();
+                    if(rightPart.length > 0) rightPart.unshift('')
+                    item.link = tsplit[0] + rightPart.join('&')
+                    inputChild.value = item.link
+                }
+                // https://www.youtube.com/watch?v=c9AePvHDvIo&list=PLyQSN7X0ro22WeXM2QCKJm2NP_xHpGV89&index=10&t=1000s&adfasdf
+            }
+            else if (inputChild.value.indexOf('youtu.be') != -1)
                 getYoutubeData(inputChild.value.split('youtu.be/')[1])
             autosaveXML();
         }
