@@ -81,6 +81,7 @@ BaseHandler.prototype.GetUpText = function (object) {
 }
 
 
+const apiKey = "AIzaSyD8mjjKuMprrGJjb3ZbZn7G5hS12_BsfzU";
 BaseHandler.prototype.GetMessage = function () {
     return this.message;
 }
@@ -111,46 +112,123 @@ function listResources(mouseoverObject) {
         inputChild.value = item.link;
         inputChild.onchange = function (ev) {
             item.link = inputChild.value;
-            aChild.href = item.link; 
-            function getYoutubeData(youtubeID){
-                var apiKey = '';
-                apiKey = "AIzaSyD8mjjKuMprrGJjb3ZbZn7G5hS12_BsfzU";
+            aChild.href = item.link;
+            function getYoutubeDataCallback(obj, vertexObj, itemObj) {
+                try {
+                    if (/^\d+$/.test(vertexObj.nodeInfo.title)) { // if current title is a number (value not set yet)
+                        vertexObj.nodeInfo.title = obj.snippet.title;
+                        document.getElementById('info-title').value = vertexObj.nodeInfo.title;
+                    }
+                    itemObj.description = obj.snippet.description;
+                    obj.snippet.tags.unshift(obj.snippet.channelTitle)
+                    for (const tag of obj.snippet.tags) {
+                        vertexObj.nodeInfo.tags.push(new Tag(tag));
+                    }
+                } catch (err) {
+                    itemObj.description = 'invalid youtube link! double check the video id'
+                }
+                focusOnNode(vertexObj)
+                autosaveXML();
+            }
+            function getYoutubeData(youtubeID, vertexObj = null, itemObj = null) {
+                if(vertexObj === null) vertexObj = mouseoverObject;
+                if(itemObj === null) itemObj = item;
                 const query = `https://www.googleapis.com/youtube/v3/videos?id=${youtubeID}&key=${apiKey}&part=snippet`
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4) {
-                        const obj = JSON.parse(xhttp.responseText);
-                        try {
-                            if (/^\d+$/.test(mouseoverObject.nodeInfo.title)) { // if current title is a number (value not set yet)
-                                mouseoverObject.nodeInfo.title = obj.items[0].snippet.title;
-                                document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
-                            }
-                            item.description = obj.items[0].snippet.description;
-                            obj.items[0].snippet.tags.unshift(obj.items[0].snippet.channelTitle)
-                            for(const tag of obj.items[0].snippet.tags){
-                                mouseoverObject.nodeInfo.tags.push(new Tag(tag));
-                            }
-                        }catch(err){
-                            item.description = 'invalid youtube link! double check the video id'
-                        }
-                        focusOnNode(mouseoverObject)
-                        autosaveXML();
+                    if (xhttp.readyState == 4) {
+                        getYoutubeDataCallback(JSON.parse(xhttp.responseText).items[0], vertexObj, itemObj); 
                     }
                 }
                 xhttp.open("GET", query, true);
                 xhttp.send();
             }
-            // add an advanced option to disable stripping of timestamps (reconsider if there's
-            // a need to add references to specific timestamps of a long lecture)
+            function getYoutubePlaylist(playlistID, playlistVertex) {
+                const pos = playlistVertex.position;
+                const query = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&key=${apiKey}&maxResults=5&playlistId=${playlistID}`
+                var getPlaylist = async () => {
+                    var videoIDs = [];
+                    var done = false;
+                    pageToken = ''
+                    while (!done) {
+                        var xhttp = new XMLHttpRequest();
+                        const queryWithPageToken = query+'&pageToken='+pageToken
+                        xhttp.open("GET", queryWithPageToken, false);
+                        xhttp.send();
+                        if(xhttp.readyState != 4) break;
+                        const obj = JSON.parse(xhttp.responseText);
+                        try {
+                            if (obj.pageInfo.resultsPerPage < obj.pageInfo.totalResults) {
+                                pageToken = obj.nextPageToken
+                                if(pageToken === undefined){
+                                    done = true;
+                                }
+                            }else{
+                                done = true;
+                            }
+                            for(const vid of obj.items){
+                                videoIDs.push(vid)
+                            }
+                        } catch (err) {
+                            item.description = 'invalid youtube playlist link???'
+                            break;
+                        }
+                    }
+                    if(!done){
+                        console.log('something went wrong')
+                    }
+                    return videoIDs;
+                }
+                getPlaylist(pos).then((result)=>{
+                    var vertices = []
+                    for(var i=0; i<result.length; ++i){
+                        // var newVertex = application.CreateNewGraph(pos.x + (i+1) * 70, pos.y);
+                        var newVertex = application.CreateNewGraph(pos.x + i * 5 * Math.cos(i/8), pos.y + i * 5 * Math.sin(i/8));
+                        // getYoutubeDataCallback(result[i],newVertex,newVertex.nodeInfo.resources[0])
+                        var videoId = result[i].snippet.resourceId.videoId
+                        getYoutubeData(videoId, newVertex, newVertex.nodeInfo.resources[0])
+                        newVertex.nodeInfo.resources[0].link = `https://www.youtube.com/watch?v=${videoId}&list=${playlistID}`
+                        vertices.push(newVertex)
+                    }
+                    application.graph.AddNewEdgeSafe(playlistVertex, vertices[0], true);
+                    for(var i=0; i<vertices.length-1; ++i){
+                        application.graph.AddNewEdgeSafe(vertices[i],vertices[i+1],true)
+                    }
+                })
+            }
             if (inputChild.value.indexOf('youtube.com') != -1) { // handle youtube loading
-                getYoutubeData(inputChild.value.split('v=')[1].split('&')[0])
-                if(inputChild.value.indexOf('&t=') != -1){
-                    var tsplit = inputChild.value.split('&t=');
-                    var rightPart = tsplit[1].split('&');
-                    rightPart.shift();
-                    if(rightPart.length > 0) rightPart.unshift('')
-                    item.link = tsplit[0] + rightPart.join('&')
-                    inputChild.value = item.link
+                // add an advanced option to disable stripping of timestamps (reconsider if there's
+                // a need to add references to specific timestamps of a long lecture)
+                if (inputChild.value.indexOf('v=') != -1) { // attempt to load video 
+                    getYoutubeData(inputChild.value.split('v=')[1].split('&')[0])
+                    if (inputChild.value.indexOf('&t=') != -1) {
+                        var tsplit = inputChild.value.split('&t=');
+                        var rightPart = tsplit[1].split('&');
+                        rightPart.shift();
+                        if (rightPart.length > 0) rightPart.unshift('')
+                        item.link = tsplit[0] + rightPart.join('&')
+                        inputChild.value = item.link
+                    }
+                }else if(inputChild.value.indexOf('list=')){ // attempt to load playlist
+                    const playlistID = inputChild.value.split('list=')[1].split('&')[0]
+                    const query = `https://www.googleapis.com/youtube/v3/playlists?key=${apiKey}&id=${playlistID}&part=snippet`
+                    getYoutubePlaylist(playlistID, mouseoverObject);
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (xhttp.readyState == 4) {
+                            const obj = JSON.parse(xhttp.responseText);
+                            var resourceItem = mouseoverObject.nodeInfo.resources[0] 
+                            try {
+                                resourceItem.description = obj.items[0].snippet.description
+                                mouseoverObject.nodeInfo.title = obj.items[0].snippet.title
+                                mouseoverObject.nodeInfo.tags.push(new Tag(obj.items[0].snippet.channelTitle))
+                            } catch (err) {
+                                resourceItem.description = 'invalid youtube playlist link'
+                            }
+                        }
+                    }
+                    xhttp.open("GET", query, true);
+                    xhttp.send();
                 }
                 // https://www.youtube.com/watch?v=c9AePvHDvIo&list=PLyQSN7X0ro22WeXM2QCKJm2NP_xHpGV89&index=10&t=1000s&adfasdf
             }
