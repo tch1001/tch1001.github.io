@@ -126,6 +126,10 @@ function listResources(mouseoverObject) {
                                 document.getElementById('info-title').value = mouseoverObject.nodeInfo.title;
                             }
                             item.description = obj.items[0].snippet.description;
+                            obj.items[0].snippet.tags.unshift(obj.items[0].snippet.channelTitle)
+                            for(const tag of obj.items[0].snippet.tags){
+                                mouseoverObject.nodeInfo.tags.push(new Tag(tag));
+                            }
                         }catch(err){
                             item.description = 'invalid youtube link! double check the video id'
                         }
