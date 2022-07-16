@@ -120,6 +120,7 @@ function listResources(mouseoverObject) {
                         document.getElementById('info-title').value = vertexObj.nodeInfo.title;
                     }
                     itemObj.description = obj.snippet.description;
+                    if(obj.snippet.tags == null) obj.snippet.tags = []
                     obj.snippet.tags.unshift(obj.snippet.channelTitle)
                     for (const tag of obj.snippet.tags) {
                         vertexObj.nodeInfo.tags.push(new Tag(tag));
@@ -182,8 +183,8 @@ function listResources(mouseoverObject) {
                 getPlaylist(pos).then((result)=>{
                     var vertices = []
                     for(var i=0; i<result.length; ++i){
-                        // var newVertex = application.CreateNewGraph(pos.x + (i+1) * 70, pos.y);
-                        var newVertex = application.CreateNewGraph(pos.x + i * 5 * Math.cos(i/8), pos.y + i * 5 * Math.sin(i/8));
+                        var newVertex = application.CreateNewGraph(pos.x + (i+1) * 70, pos.y);
+                        // var newVertex = application.CreateNewGraph(pos.x + i * 5 * Math.cos(i/8), pos.y + i * 5 * Math.sin(i/8));
                         // getYoutubeDataCallback(result[i],newVertex,newVertex.nodeInfo.resources[0])
                         var videoId = result[i].snippet.resourceId.videoId
                         getYoutubeData(videoId, newVertex, newVertex.nodeInfo.resources[0])
