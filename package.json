@@ -1,0 +1,26 @@
+{
+  "name": "twig",
+  "version": "1.0.0",
+  "description": "The Web Is Great (TWIG)  but resources are scattered  so let's make a mindmap",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tch1001/twig.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tch1001/twig/issues"
+  },
+  "homepage": "https://github.com/tch1001/twig#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}

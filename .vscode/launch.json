@@ -1,11 +1,30 @@
 {
     "configurations": [
-    {
-        "name": "Launch Chrome",
-        "request": "launch",
-        "type": "pwa-chrome",
-        "url": "file:///Users/tanchienhao/Documents/Computing/twig/index.html",
-        "webRoot": "${workspaceFolder}"
-    }
+        {
+            "name": "debug server",
+            "command": "node app.js",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "name": "offline mode",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "url": "file:///Users/tanchienhao/Documents/Computing/twig/offline.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "javascript debugger",
+            "request": "launch",
+            "type": "pwa-chrome",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Compound",
+            "configurations": ["debug server","javascript debugger"]
+        }
     ]
 }
