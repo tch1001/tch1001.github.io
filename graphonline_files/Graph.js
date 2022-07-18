@@ -877,6 +877,30 @@ function saveToXML() {
 
     document.body.removeChild(element);
 }
+function exportToGdrive() {
+    var xml = application.graph.SaveToXML([]);
+    var url = `https://www.googleapis.com/upload/drive/v3/files?key=${apiKey}&uploadType=media`;
+
+    var http = new XMLHttpRequest();
+    http.open('POST', url, true);
+    http.setRequestHeader('Authorization', "Bearer "+accessToken);
+
+    //Send the proper header information along with the request
+    http.setRequestHeader('content-type', 'text/xml');
+    // const byteSize = str => new Blob([str]).size;
+    // http.setRequestHeader('Content-Length', byteSize(xml).toString());
+
+    http.onreadystatechange = function () {//Call a function when the state changes.
+        if (http.readyState == 4 && http.status == 200) {
+            alert(http.responseText);
+        }
+    }
+    const file = new File(['Hello, world!'], 'hello world.txt', { type: 'text/plain;charset=utf-8' });
+    
+
+    http.send(xml);
+    console.log('sent to gdrive')
+}
 function autosaveXML() {
     if (!document.getElementById('autosave').checked) return;
     var xml = application.graph.SaveToXML([]);
