@@ -877,40 +877,7 @@ function saveToXML() {
 
     document.body.removeChild(element);
 }
-function exportToGdrive() {
-    var xml = application.graph.SaveToXML([]);
-    var url = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
-    var formdata = new FormData();
 
-    var http = new XMLHttpRequest();
-    http.open('POST', url, true);
-    http.setRequestHeader('Authorization', "Bearer "+accessToken);
-    // http.setRequestHeader('Content-Type', 'multipart/related; boundary=asdf');
-    const byteSize = str => new Blob([str]).size;
-//     var body = 
-//     `--asdf
-// Content-Type: application/json; charset=UTF-8
-// {
-//     "name": "test.xml"
-// }
-// --asdf
-// Content-Type: text/xml
-// testasdf
-// --asdf--`
-    // http.setRequestHeader('Content-Length', byteSize(body).toString());
-
-    http.onreadystatechange = function () {//Call a function when the state changes.
-        if (http.readyState == 4 && http.status == 200) {
-            alert(http.responseText);
-        }
-        console.log(http.response)
-    }
-    // const file = new File(['Hello, world!'], 'hello world.txt', { type: 'text/plain;charset=utf-8' });
-    formdata.append("metadata",new Blob([JSON.stringify({"name":"test.xml"})], {type:'application/json'}))
-    formdata.append("file",new Blob([xml],{type:'text/xml'}));
-    http.send(formdata);
-    console.log('sent to gdrive')
-}
 function autosaveXML() {
     if (!document.getElementById('autosave').checked) return;
     var xml = application.graph.SaveToXML([]);
