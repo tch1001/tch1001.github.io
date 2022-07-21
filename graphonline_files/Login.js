@@ -4,7 +4,7 @@
 /* exported handleSignoutClick */
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-const SCOPES = 'https://www.googleapis.com/auth/drive';
+const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 // TODO(developer): Set to client ID and API key from the Developer Console
 const CLIENT_ID = '827413712160-r9ffndduq3m93bsqmui33n05nt800eg0.apps.googleusercontent.com';

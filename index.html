@@ -18,7 +18,6 @@
   <script src="./graphonline_files/jquery-2.0.3.js"></script>
   <link rel="stylesheet" charset="UTF-8" type="text/css" href="./graphonline_files/css1646742603.css">
 
-
   <script src="./graphonline_files/jquery-ui.js"></script>
   <script src="./graphonline_files/jquery.feedback_me.js"></script>
   <script src="./graphonline_files/BaseHandler.js"></script>
@@ -87,19 +86,20 @@
             class="glyphicon glyphicon-resize-full fa-fw" id="FullscreenIcon"></span></button> -->
       <div style="width:100%;">
         <text style="font-size:30px;">twigslot
-          <a href='http://twig.tchlabs.net' onmouseover="this.innerText='(go online)'" onmouseleave="this.innerText='(offline)'">(offline)</a></text>
+          <a href="/offline.html" onmouseover="this.innerText='(go offline)'" 
+            onmouseleave="this.innerText='(online)'">(online)</a>
+        </text>
         <label for="autosave">Autosave</label>
         <input type="checkbox" id='autosave' checked onchange="autosaveXML()" />
-        <button>
-          <label for="save-to-xml" class="btn">Export</label>
-          <input id='save-to-xml' type='button' onclick="saveToXML()" style="display:none;">
-          <input id="filename" value="graph"></input>
-        </button>
+        <input id="filename" value="graph"></input>
+        <button onclick='saveToXML()'> Export </button>
+        <button onclick='exportToGdrive()'> Export to Gdrive </button>
         <button>
           <label for="load-from-xml" class="btn">Import</label>
           <input id='load-from-xml' type='file' accept=".xml" onchange="loadFromXML(this.files)"
             style="display:none;"></input>
         </button>
+        <button onclick='importFromGdrive()'>Import from Gdrive</button>
         <input type="text" onfocus="updateSearchResults(this)" oninput="updateSearchResults(this)" placeholder="Search"
           id='search-input' />
         <button type="button" class="collapsible">Instructions</button>
@@ -114,8 +114,21 @@
             <li>right click a tag to remove it</li>
           </ul>
         </div>
+
         <h3 style="float:right;" id="mode-indicator">Mode: (M)ove</h3>
+        <h6 style="float:right;" id="global-file-id"></h6>
       </div>
+      <!--Add buttons to initiate auth sequence and sign out-->
+      <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
+      <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+
+      <!-- <pre id="content" style="white-space: pre-wrap;"></pre> -->
+
+      <script type="text/javascript" src="graphonline_files/Login.js"></script>
+
+      <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+      <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+      <script src="https://apis.google.com/js/platform.js" async defer></script>
       <section id="canvasSection" style="width:60%; float:left;">
         <span id="CanvasMessage"></span>
         <div>
@@ -135,7 +148,7 @@
         <span style="padding-left:10px;">Tags:</span>
         <div id="tags-div" style="display:inline;" oncontextmenu="return false;">
         </div>
-        <input id='add-tag-input' oncontextmenu="return false;"/><button onclick="addTag()">Add</button>
+        <input id='add-tag-input' oncontextmenu="return false;" /><button onclick="addTag()">Add</button>
       </section>
       <section id="search-results-section" style="width:39%; float:right; display:none;">
         <h4 id="search-results-title">Search Results</h4>
@@ -146,7 +159,6 @@
 
 
   <script>
-
     var coll = document.getElementsByClassName("collapsible");
     console.log(coll)
     var i;
@@ -488,7 +500,8 @@
     <p id="SelectAndMoveObject" class="translation">Select and move objects by mouse or move workspace.</p>
     <p id="MoveCursorForMoving" class="translation">Drag cursor to move objects</p>
     <p id="clickToAddVertex" class="translation">Click to workspace to add a new vertex. <span
-        style="float:right;">Vertex enumeration <select id="enumVertexsText"></select></span></p>
+        style="float:right;">Vertex
+        enumeration <select id="enumVertexsText"></select></span></p>
     <p id="selectFisrtVertextToConnect" class="translation">Select first vertex of edge</p>
     <p id="selectSecondVertextToConnect" class="translation">Select second vertext of edge</p>
     <p id="selectStartShortPathVertex" class="translation">Select the initial vertex of the shortest path</p>
@@ -670,10 +683,10 @@
 
   </section>
   <!--
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
--->
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    -->
   </div>
 
   <!-- Футер приходится обрамить в .container, потому что у него position:absolute и он занимает всю ширину игнорируя паддинги родителя -->
