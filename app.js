@@ -9,6 +9,9 @@ app.get('/', function(request, response){
 app.get('/offline', function(request, response){
     response.sendFile(__dirname + '/index.html');
 });
+app.get('/offline.html', function(request, response){
+    response.sendFile(__dirname + '/offline.html');
+});
 var server = app.listen(port, function(){
     var port = server.address().port;
     console.log("Server started at http://localhost:%s", port);
