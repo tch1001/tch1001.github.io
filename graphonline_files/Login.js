@@ -17,27 +17,36 @@ let tokenClient;
 let accessToken = null;
 let pickerInited = false;
 let gisInited = false;
-
+var globalFileId = null;
 
 function exportToGdriveCallback(){ // with access token already
     var xml = application.graph.SaveToXML([]);
-    var url = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+    var http = new XMLHttpRequest();
+    var url;
+    if(globalFileId){
+        // PATCH https://www.googleapis.com/upload/drive/v3/files/fileId
+        url = `https://www.googleapis.com/upload/drive/v3/files/${globalFileId}?uploadType=multipart`
+        http.open('PATCH', url, true);
+    }else{
+        url = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+        http.open('POST', url, true);
+    }
     var formdata = new FormData();
 
-    var http = new XMLHttpRequest();
-    http.open('POST', url, true);
     http.setRequestHeader('Authorization', "Bearer " + accessToken);
 
     http.onreadystatechange = function () {//Call a function when the state changes.
         if (http.readyState == 4 && http.status == 200) {
-            alert(http.responseText);
+            response = JSON.parse(http.response)
+            alert('Saved into ' + response.name);
+            globalFileId = response.id
+            document.getElementById('global-file-id').innerText = globalFileId;
         }
-        console.log(http.response)
     }
-    formdata.append("metadata", new Blob([JSON.stringify({ "name": "test.xml" })], { type: 'application/json' }))
+    var filename = document.getElementById('filename').value
+    formdata.append("metadata", new Blob([JSON.stringify({ "name": `twigslot_${filename}.xml` })], { type: 'application/json' }))
     formdata.append("file", new Blob([xml], { type: 'text/xml' }));
     http.send(formdata);   
-    console.log('hi')
 }
 function exportToGdrive() {
     if(accessToken === null) handleAuthClick(exportToGdriveCallback);
@@ -54,6 +63,7 @@ function importFromGdrive(){
  */
 function createPicker() {
     const view = new google.picker.View(google.picker.ViewId.DOCS);
+    view.setQuery("twigslot")
     // view.setMimeTypes('image/png,image/jpeg,image/jpg');
     view.setMimeTypes('text/xml');
     const picker = new google.picker.PickerBuilder()
@@ -85,6 +95,9 @@ function pickerCallback(data) {
         http.onreadystatechange = function () {//Call a function when the state changes.
             if (http.readyState == 4 && http.status == 200) {
                 application.LoadGraphFromString(http.responseText);
+                globalFileId = fileId;
+                document.getElementById('global-file-id').innerText = globalFileId;
+                document.getElementById('filename').value = data[google.picker.Response.DOCUMENTS][0]['name'].split('.xml')[0].replace('twigslot_','')
             }
         }
         http.send();

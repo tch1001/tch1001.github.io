@@ -884,7 +884,8 @@ function autosaveXML() {
     localStorage.setItem('xml', xml);
 }
 function loadFromXML(files) {
-
+    globalFileId = null;
+    document.getElementById('global-file-id').innerText = globalFileId;
     var graphFileToLoad = files[0];
 
     var fileReader = new FileReader();
@@ -892,6 +893,8 @@ function loadFromXML(files) {
         var textFromFileLoaded = fileLoadedEvent.target.result;
         console.log(textFromFileLoaded);
         application.LoadGraphFromString(textFromFileLoaded);
+        document.getElementById('filename').value = graphFileToLoad.name.split('.xml')[0]
+        console.log(fileLoadedEvent)
         document.getElementById('load-from-xml').value = '';
     };
 
