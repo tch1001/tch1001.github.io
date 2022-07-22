@@ -552,7 +552,7 @@ Application.prototype.CreateNewGraph = function (x, y) {
     var newVertex = new BaseVertex(x, y, null)
     newVertex.SetId(this.graph.uidGraph);
     newVertex.mainText = this.graph.uidGraph;
-    newVertex.nodeInfo.title = this.graph.uidGraph;
+    newVertex.nodeInfo.title = this.graph.uidGraph.toString();
     newVertex.nodeInfo.resources.push(new Resource('https://www.tchlabs.net', 'desc' + this.graph.uidGraph))
     this.graph.uidGraph = this.graph.uidGraph + 1;
     app.graph.AddNewVertex(newVertex);

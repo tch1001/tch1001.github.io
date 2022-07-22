@@ -800,6 +800,9 @@ $(document).ready(function () {
 
     resizeCanvas();
     application.LoadGraphFromString(localStorage.getItem('xml'))
+    document.getElementById('filename').value = localStorage.getItem('filename')
+    globalFileId = localStorage.getItem('globalFileId')
+    document.getElementById('global-file-id').innerText = globalFileId;
     window.onresize = function (event) {
         resizeCanvas();
     }

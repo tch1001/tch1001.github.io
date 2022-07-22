@@ -109,6 +109,7 @@ Graph.prototype.HasConnectedNodes = function (vertexObject) {
 }
 
 Graph.prototype.FindVertex = function (id) {
+    id = parseInt(id)
     var res = null;
     for (var i = 0; i < this.vertices.length; i++) {
         if (this.vertices[i].id == id) {
@@ -862,9 +863,16 @@ function updateSearchResults(e) {
     document.getElementById('search-results-title').textContent = "Showing " + resultsDiv.childElementCount + " results for: \n" + e.value;
 }
 
-function saveToXML() {
+function saveToLocalStorage(){
     var xml = application.graph.SaveToXML([]);
     localStorage.setItem('xml', xml);
+    localStorage.setItem('filename', document.getElementById('filename').value);
+    localStorage.setItem('globalFileId', document.getElementById('global-file-id').innerText);
+}
+function saveToXML() {
+    var xml = application.graph.SaveToXML([]);
+    saveToLocalStorage();
+
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xml));
     var filename = document.getElementById('filename').value
@@ -874,14 +882,12 @@ function saveToXML() {
     document.body.appendChild(element);
 
     element.click();
-
     document.body.removeChild(element);
 }
 
 function autosaveXML() {
     if (!document.getElementById('autosave').checked) return;
-    var xml = application.graph.SaveToXML([]);
-    localStorage.setItem('xml', xml);
+    saveToLocalStorage();
 }
 function loadFromXML(files) {
     globalFileId = null;
@@ -908,59 +914,48 @@ Graph.prototype.LoadFromXML = function (xmlText, additionalData) {
 
     var loadedGraphId = 0;
     var loadedEdgeId = 0;
+    var graph = this;
 
     $graphs.each(function () {
         loadedGraphId = parseInt($(this).attr('uidGraph'));
         loadedEdgeId = parseInt($(this).attr('uidEdge'));
+
+        graph.uidGraph += parseInt(loadedGraphId);
+        graph.uidEdge += parseInt(loadedEdgeId);
+        console.log('uidGraph', graph.uidGraph)
+
+        $nodes = $(this).find("node");
+
+        var vertexs = [];
+
+        $nodes.each(function () {
+            var vertex = new BaseVertex();
+            vertex.LoadFromXML($(this));
+            vertex.id += graph.uidGraph;
+            console.log(graph.uidGraph, vertex.id)
+            vertexs.push(vertex);
+            var nodeInfo = new NodeInfo();
+            nodeInfo.LoadFromXML($(this).find('topic'))
+            vertex.nodeInfo = nodeInfo;
+        });
+        graph.vertices = graph.vertices.concat(vertexs);
+
+        $edges = $(this).find("edge");
+
+        var edges = [];
+        $edges.each(function () {
+            var edge = new BaseEdge();
+            edge.LoadFromXML($(this), graph);
+            // Fix case with wrong id.
+            if (edge.id < graph.uidEdge) {
+                edge.id = graph.uidEdge;
+                graph.uidEdge++;
+            }
+            edges.push(edge);
+        });
+
+        graph.edges = graph.edges.concat(edges);
     });
-
-    // Back comportebility.
-    if (isNaN(loadedEdgeId)) {
-        loadedEdgeId = this.edgesOffset;
-    } else if (loadedEdgeId < this.edgesOffset) {
-        loadedEdgeId = this.edgesOffset;
-    }
-
-    this.uidGraph = loadedGraphId;
-    this.uidEdge = loadedEdgeId;
-
-    $nodes = $xml.find("node");
-
-    var vertexs = [];
-
-    $nodes.each(function () {
-        var vertex = new BaseVertex();
-        vertex.LoadFromXML($(this));
-        vertexs.push(vertex);
-        var nodeInfo = new NodeInfo();
-        nodeInfo.LoadFromXML($(this).find('topic'))
-        vertex.nodeInfo = nodeInfo;
-    });
-    this.vertices = vertexs;
-
-    $edges = $xml.find("edge");
-
-    var edges = [];
-    var graph = this;
-    $edges.each(function () {
-        var edge = new BaseEdge();
-        edge.LoadFromXML($(this), graph);
-        // Fix case with wrong id.
-        if (edge.id < graph.uidEdge) {
-            edge.id = graph.uidEdge;
-            graph.uidEdge++;
-        }
-        edges.push(edge);
-    });
-
-    this.edges = edges;
-
-    $additional = $xml.find("additional");
-    if ($additional.length != 0 && additionalData != null) {
-        additionalData["data"] = $additional.attr('data');
-    }
-
-    this.isMultiGraph = this.checkMutiGraph();
 }
 
 Graph.prototype.hasDirectEdge = function () {

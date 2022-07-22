@@ -75,11 +75,15 @@ BaseEdge.prototype.LoadFromXML = function (xml, graph) {
     if (typeof attr === 'undefined') {
         attr = xml.attr('source');
     }
+    attr = parseInt(attr);
+    attr += graph.uidGraph;
     this.vertex1 = graph.FindVertex(typeof attr !== 'undefined' ? attr : xml.attr('graph1'));
     var attr = xml.attr('vertex2');
     if (typeof attr === 'undefined') {
         attr = xml.attr('target');
     }
+    attr = parseInt(attr);
+    attr += graph.uidGraph;
     this.vertex2 = graph.FindVertex(typeof attr !== 'undefined' ? attr : xml.attr('graph2'));
     this.updateAdjacencyList();
     this.isDirect = xml.attr('isDirect') == "true";

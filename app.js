@@ -4,7 +4,7 @@ const app = express();
 
 app.use('/graphonline_files', express.static(__dirname + '/graphonline_files'))
 app.get('/', function(request, response){
-    response.sendFile(__dirname + '/online.html');
+    response.sendFile(__dirname + '/index.html');
 });
 app.get('/offline', function(request, response){
     response.sendFile(__dirname + '/index.html');

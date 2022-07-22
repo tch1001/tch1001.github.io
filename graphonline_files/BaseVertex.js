@@ -246,7 +246,7 @@ BaseVertex.prototype.LoadFromXML = function (xml) {
     var xmlY = xml.attr('positionY');
     this.hasUndefinedPosition = (typeof xmlX === 'undefined') || (typeof xmlY === 'undefined');
     this.position = new Point(parseFloat(xmlX), parseFloat(xmlY));
-    this.id = xml.attr('id');
+    this.id = parseInt(xml.attr('id'));
     this.mainText = xml.attr('mainText');
     this.upText = xml.attr('upText');
 
