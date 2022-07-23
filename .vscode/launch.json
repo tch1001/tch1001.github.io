@@ -1,6 +1,30 @@
 {
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "api_server.py",
+                "FLASK_ENV": "development"
+            },
+            "args": [
+                "run",
+                "--no-debugger"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
             "name": "debug server",
             "command": "node app.js",
             "request": "launch",
@@ -24,7 +48,10 @@
     "compounds": [
         {
             "name": "Compound",
-            "configurations": ["debug server","javascript debugger"]
+            "configurations": [
+                "debug server",
+                "javascript debugger"
+            ]
         }
     ]
 }
