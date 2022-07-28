@@ -2,7 +2,7 @@
 from requests_html import HTMLSession
 import json
 from dotenv import dotenv_values
-import os, openai
+import os
 from pymongo import MongoClient
 
 dotenv_values(".env")
