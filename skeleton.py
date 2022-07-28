@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 import json
 from dotenv import dotenv_values
