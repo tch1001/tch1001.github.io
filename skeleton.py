@@ -6,7 +6,6 @@ import os
 from pymongo import MongoClient
 
 dotenv_values(".env")
-openai.api_key = os.environ.get("OPENAI_API_KEY")
 client = MongoClient(os.environ.get("MONGO_URL"))
 infoDB, infoCollection = None, None
 try:
