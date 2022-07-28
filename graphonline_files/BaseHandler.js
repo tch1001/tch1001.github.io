@@ -235,6 +235,29 @@ function listResources(mouseoverObject) {
             }
             else if (inputChild.value.indexOf('youtu.be') != -1)
                 getYoutubeData(inputChild.value.split('youtu.be/')[1])
+            else{
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function(){
+                    if (xhttp.readyState == 4) {
+                        const obj = JSON.parse(xhttp.responseText);
+                        console.log(obj)
+                        var resourceItem = mouseoverObject.nodeInfo.resources[0]
+                        try {
+                            resourceItem.description = obj.summary
+                            mouseoverObject.nodeInfo.title = obj.title
+                            resourceItem.link = obj.url
+                            // mouseoverObject.nodeInfo.tags.push(new Tag(obj.items[0].snippet.channelTitle))
+                        } catch (err) {
+                            resourceItem.description = 'invalid youtube playlist link'
+                        }
+                    }
+                    focusOnNode(mouseoverObject)
+                    autosaveXML();
+                }
+                xhttp.open("GET", "http://api.tchlabs.net/link/?url="+inputChild.value)
+                xhttp.send();
+            }
+
             autosaveXML();
         }
         inputChild.style = 'width:80%'

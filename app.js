@@ -1,7 +1,9 @@
 const port = 3000;
 const express = require('express');
 const app = express();
+var cors = require('cors')
 
+app.use(cors())
 app.use('/graphonline_files', express.static(__dirname + '/graphonline_files'))
 app.get('/', function(request, response){
     response.sendFile(__dirname + '/index.html');

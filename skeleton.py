@@ -8,8 +8,13 @@ from pymongo import MongoClient
 dotenv_values(".env")
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 client = MongoClient(os.environ.get("MONGO_URL"))
-infoDB = client['info-db']
-infoCollection = infoDB['info-collection']
+infoDB, infoCollection = None, None
+try:
+    infoDB = client['info-db']
+    infoCollection = infoDB['info-collection']
+except:
+    print("cannot connect to DB")
+
 
 class Website:
     def __init__(self, url):
@@ -18,9 +23,12 @@ class Website:
         self.summary = None
         self.paragraphs = None
         self.links = None
+        self.saved = False
         # try to retrieve info from database
-        info = infoCollection.find_one({'url':self.url})
+        info = None
+        if(infoCollection != None): info = infoCollection.find_one({'url':self.url})
         if(info): 
+            self.saved = True
             self.title = info['title']
             self.url = info['url']
             self.summary = info['summary']
@@ -28,10 +36,36 @@ class Website:
             self.paragraphs = info['paragraphs']
             return
         self.html = self.render()
+    def getURL(self):
+        return self.url
     def getTitle(self): 
-        return f"title for {self.url}"
+        if(self.title == None):
+            try:
+                self.title = self.html.find('title')[0].text
+            except:
+                self.title = f"title for {self.url}"
+        return self.title
     def getSummary(self): 
-        return f"summary for {self.url}"
+        if(self.summary == None):
+            try:
+                attempts = 0
+                while(attempts < 30): 
+                    try: self.summary = self.html.find('p')[attempts].text
+                    except: self.summary = super().getSummary()
+                    attempts += 1
+                    if(len(self.summary) > 100): return self.summary
+                self.summary = f"summary for {self.url}"
+            except:
+                self.summary = f"summary for {self.url}"
+        return self.summary
+    def getJSON(self):
+        return {'title': self.getTitle(),
+             'url': self.getURL(),
+             'summary': self.getSummary()}
+    def getJSONString(self):
+        info = self.getJSON()
+        return json.dumps(info)
+
     def render(self):
         session = HTMLSession()
         response = session.get(self.url)
@@ -42,11 +76,12 @@ class Wiki(Website):
         url = url.split('#')[0]
         super().__init__(url)
         # if unsaved yet
-        if(self.title == None): 
+        if(self.saved == False): 
             # save() generates json for the first time
             self.save()
     def save(self):
-        infoCollection.insert_one(self.exportToDB())
+        self.saved = True
+        if(infoCollection != None): infoCollection.insert_one(self.exportToDB())
     def exportToDB(self):
         return {'title': self.getTitle(),
              'url': self.getURL(),
@@ -55,26 +90,109 @@ class Wiki(Website):
              'links': self.getLinks() }
 
     def getTitle(self):
-        if(self.title): pass
-        else: 
+        if(self.title == None): 
             try: self.title = self.html.find('#firstHeading')[0].text
             except: self.title = super().getTitle()
         return self.title
     def getURL(self): 
         return self.url
     def getSummary(self): # 
-        if(self.summary): pass
-        else: 
-            try: self.summary = self.html.find('p')[1].text
-            except: self.summary = super().getSummary()
+        if(self.summary == None): 
+            attempts = 1
+            while(attempts < 10): 
+                try: self.summary = self.html.find('p')[attempts].text
+                except: self.summary = super().getSummary()
+                attempts += 1
+                if(len(self.summary) > 100): break
         return self.summary
     def getParagraphs(self):
-        if(self.paragraphs != None): return
-        self.paragraphs = [i.text for i in self.html.find('p')]
+        if(self.paragraphs == None): 
+            self.paragraphs = [i.text for i in self.html.find('p')]
         return self.paragraphs
     def getLinks(self):
-        if(self.links != None): return
-        self.links = list(self.html.absolute_links)
+        if(self.links == None):
+            self.links = list(self.html.absolute_links)
+        return self.links
+    def getJSON(self):
+        return {'title': self.getTitle(),
+             'url': self.getURL(),
+             'summary': self.getSummary()}
+    def getJSONString(self):
+        info = self.getJSON()
+        return json.dumps(info)
+
+class ArXiv(Website):
+    def __init__(self, url):
+        url = url.replace('.pdf', '')
+        self.url = url
+        self.authors = None
+        super().__init__(url)
+        if(self.saved == False):
+            self.save()
+    def getTitle(self):
+        if(self.title == None): 
+            self.title = self.html.find('title')[0].text.split('\n')[0]
+        return self.title
+    def getAuthors(self):
+        if(self.authors == None): 
+            self.authors = self.html.find('.authors')[0].text.split('\n')[0].replace('Authors:','').split(',')
+        return self.authors
+    def getAbstract(self):
+        return self.html.find('.abstract')[0].text.split('\n')[0]
+    def getSummary(self): # summary is just abstract
+        if(self.summary == None): 
+            self.summary = self.getAbstract()
+        return self.summary
+    def getURL(self):
+        return self.url
+    def save(self):
+        return 
+    def getJSONString(self):
+        return {'title': self.getTitle(),
+             'url': self.getURL(),
+             'summary': self.getSummary()}
+
+class Medium(Website):
+    def __init__(self, url):
+        url = url.split('#')[0]
+        super().__init__(url)
+        # if unsaved yet
+        if(self.saved == False): 
+            # save() generates json for the first time
+            self.save()
+    def save(self):
+        self.saved = True
+        if(infoCollection != None): infoCollection.insert_one(self.exportToDB())
+    def exportToDB(self):
+        return {'title': self.getTitle(),
+             'url': self.getURL(),
+             'summary': self.getSummary(),
+             'paragraphs': self.getParagraphs(), 
+             'links': self.getLinks() }
+
+    def getTitle(self):
+        if(self.title == None): 
+            try: self.title = self.html.find('.pw-post-title')[0].text
+            except: self.title = super().getTitle()
+        return self.title
+    def getURL(self): 
+        return self.url
+    def getSummary(self): # 
+        if(self.summary == None): 
+            attempts = 0
+            while(attempts < 10): 
+                try: self.summary = self.html.find('.pw-post-body-paragraph')[attempts].text
+                except: self.summary = super().getSummary()
+                attempts += 1
+                if(len(self.summary) > 100): break
+        return self.summary
+    def getParagraphs(self):
+        if(self.paragraphs == None): 
+            self.paragraphs = [i.text for i in self.html.find('p')]
+        return self.paragraphs
+    def getLinks(self):
+        if(self.links == None):
+            self.links = list(self.html.absolute_links)
         return self.links
     def getJSON(self):
         return {'title': self.getTitle(),
@@ -112,8 +230,10 @@ class WikiCrawler:
             node.addEdge(next)
             self.nodes.append(next)
             self.queue.append(next)
-wc = WikiCrawler()
-wc.stepBFS(Node('https://en.wikipedia.org/wiki/Quantum_field_theory'))
+if(__name__ == "__main__"):
+    pass
+    # wc = WikiCrawler()
+    # wc.stepBFS(Node('https://en.wikipedia.org/wiki/Quantum_field_theory'))
 
-for i in range(10):
-    wc.stepBFS()
+    # for i in range(10):
+    #     wc.stepBFS()
