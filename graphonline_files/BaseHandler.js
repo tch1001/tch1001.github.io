@@ -254,7 +254,7 @@ function listResources(mouseoverObject) {
                     focusOnNode(mouseoverObject)
                     autosaveXML();
                 }
-                xhttp.open("GET", "http://api.tchlabs.net/link/?url="+inputChild.value)
+                xhttp.open("GET", "https://api.tchlabs.net/link/?url="+inputChild.value)
                 xhttp.send();
             }
 
