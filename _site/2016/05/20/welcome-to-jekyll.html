@@ -3,22 +3,22 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Welcome To Jekyll | Your awesome title</title>
-<meta name="generator" content="Jekyll v4.3.1" />
-<meta property="og:title" content="Welcome To Jekyll" />
+<title>Compiling a Minimal Kernel | Your awesome title</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Compiling a Minimal Kernel" />
 <meta name="author" content="GitHub User" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="hello there" />
-<meta property="og:description" content="hello there" />
+<meta name="description" content="The exploration logs are found at here. Let’s try to compile a kernel that is as small as possible." />
+<meta property="og:description" content="The exploration logs are found at here. Let’s try to compile a kernel that is as small as possible." />
 <link rel="canonical" href="http://localhost:4000/2016/05/20/welcome-to-jekyll.html" />
 <meta property="og:url" content="http://localhost:4000/2016/05/20/welcome-to-jekyll.html" />
 <meta property="og:site_name" content="Your awesome title" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2016-05-20T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Welcome To Jekyll" />
+<meta property="twitter:title" content="Compiling a Minimal Kernel" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GitHub User"},"dateModified":"2016-05-20T00:00:00+08:00","datePublished":"2016-05-20T00:00:00+08:00","description":"hello there","headline":"Welcome To Jekyll","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2016/05/20/welcome-to-jekyll.html"},"url":"http://localhost:4000/2016/05/20/welcome-to-jekyll.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"GitHub User"},"dateModified":"2016-05-20T00:00:00+08:00","datePublished":"2016-05-20T00:00:00+08:00","description":"The exploration logs are found at here. Let’s try to compile a kernel that is as small as possible.","headline":"Compiling a Minimal Kernel","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2016/05/20/welcome-to-jekyll.html"},"url":"http://localhost:4000/2016/05/20/welcome-to-jekyll.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Your awesome title" />
 </head>
@@ -34,7 +34,7 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/about/">About</a></div>
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/History.html">HEAD</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
@@ -42,31 +42,53 @@
       <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Welcome To Jekyll</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Compiling a Minimal Kernel</h1>
     <p class="post-meta"><time class="dt-published" datetime="2016-05-20T00:00:00+08:00" itemprop="datePublished">
         May 20, 2016
       </time></p>
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p>hello there</p>
+    <p>The exploration logs are found at <a href="https://github.com/tch1001/kernel">here</a>.
+Let’s try to compile a kernel that is as small as possible.</p>
 
-\[meow = \int_0^\infty 1/x^2\]
+<h2 id="measuring-size">Measuring Size</h2>
+<p>The kernel size can be determined using</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lh</span> vmlinux
+<span class="nt">-rw-r--r--</span>  1 tanchienhao  staff   2.2K Jan 31 12:12 	README.md
+</code></pre></div></div>
+<p>In this case, I will measure the size of <code class="language-plaintext highlighter-rouge">vmlinux</code> instead of <code class="language-plaintext highlighter-rouge">vmlinuz</code> since compression is cheating.</p>
 
-<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<h2 id="building-the-kernel">Building the Kernel</h2>
+<p>Of course the small kernel must still be functional, so we will test it using <a href="https://www.qemu.org/">qemu</a>. One can also use virtualbox but I chose qemu because I will be working remotely using SSH and VNC takes too much mobile data lol.</p>
 
-<p>To add new posts, simply add a file in the <code class="language-plaintext highlighter-rouge">_posts</code> directory that follows the convention <code class="language-plaintext highlighter-rouge">YYYY-MM-DD-name-of-post.ext</code> and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git <span class="nt">--depth</span> 1 <span class="nt">--branch</span> v6.1.4
+<span class="nv">$ </span>git log
+commit 2cb8e624295ffa0c4d659fcec7d9e7a6c48de156 <span class="o">(</span>grafted, HEAD, tag: v6.1.4<span class="o">)</span>
+    Author: Greg Kroah-Hartman &lt;gregkh@linuxfoundation.org&gt;
+        Date:   Sat Jan 7 11:12:04 2023 +0100
+	Linux 6.1.4
+<span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> libncurses5 libncurses5-dev bison flex
+<span class="nv">$ </span>make menuconfig
+<span class="nv">$ </span>vim .config <span class="c"># remove "debian" things if they complain</span>
+<span class="nv">$ </span>apt <span class="nb">install</span> <span class="nt">-y</span> libssl-dev libelf-dev
+<span class="nv">$ </span>make <span class="nt">-j12</span> <span class="c"># change -jN to your liking, my 32-core computer can take N=12 or more but my Thinkpad laptop could only take N=2 before crashing</span>
+</code></pre></div></div>
 
-<p>Jekyll also offers powerful support for code snippets:</p>
+<h2 id="running-the-kernel-in-qemu">Running the Kernel in QEMU</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls -lh vmlinux
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">vmlinux</code> should exist, if it doesn’t, something went wrong and go back to <a href="#building-the-kernel">build</a>.</p>
 
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
+<p>Otherwise, let’s run our kernel!</p>
 
-<p>Check out the <a href="http://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>
-
+<h2 id="running-the-kernel-on-hardware">Running the Kernel on Hardware</h2>
+<p>If you’re on ubuntu, you can do</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ update-grub2 # make sure you're using the grub bootloader
+$ make modules_install
+$ make install
+</code></pre></div></div>
+<p>When booting up, press and hold <code class="language-plaintext highlighter-rouge">&lt;Shift&gt;</code> to go to the grub menu, then go to advanced options to select the kernel you want to boot with.</p>
 
   </div><a class="u-url" href="/2016/05/20/welcome-to-jekyll.html" hidden></a>
 </article>
