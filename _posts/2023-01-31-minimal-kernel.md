@@ -18,26 +18,36 @@ Of course the small kernel must still be functional, so we will test it using [q
 
 ```bash
 $ git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git --depth 1 --branch v6.1.4
+$ cd linux
 $ git log
 commit 2cb8e624295ffa0c4d659fcec7d9e7a6c48de156 (grafted, HEAD, tag: v6.1.4)
     Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
         Date:   Sat Jan 7 11:12:04 2023 +0100
 	Linux 6.1.4
 $ apt install -y libncurses5 libncurses5-dev bison flex
-$ make menuconfig
-$ vim .config # remove "debian" things if they complain
+$ make menuconfig 
+# go enable PVH if u want to run in QEMU
+$ vim .config # remove "debian" things if they complain, and also the "certs/signing_key.pem"
 $ apt install -y libssl-dev libelf-dev
 $ make -j12 # change -jN to your liking, my 32-core computer can take N=12 or more but my Thinkpad laptop could only take N=2 before crashing
+# if they prompt something involving certs, just press enter (default choices)
 ```
 
 ## Running the Kernel in QEMU
+Important: Don't forget to enable `CONFIG_PVH=y` in `.config` if you want to run in QEMU.
 ```
 $ ls -lh vmlinux
 ```
 `vmlinux` should exist, if it doesn't, something went wrong and go back to [build](#building-the-kernel).
 
 Otherwise, let's run our kernel!
-
+```
+$ mkinitramfs -o ramdisk.img
+$ dd if=/dev/zero of=roorfs.ext2 bs=1024k count=256
+$ mkfs.ext2 rootfs.ext2
+$ qemu-system-x86_64 -kernel ./vmlinux -initrd ramdisk.img -hda rootfs.ext2 -nographic --append "console=tty0 console=ttyS0 root=/dev/sda init=/bin/sh" -m 512 -vga none -display none -serial mon:stdio
+```
+Doesnt seem to work right now
 
 ## Running the Kernel on Hardware
 If you're on ubuntu, you can do 
