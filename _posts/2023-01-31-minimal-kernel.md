@@ -41,11 +41,34 @@ $ ls -lh vmlinux
 `vmlinux` should exist, if it doesn't, something went wrong and go back to [build](#building-the-kernel).
 
 Otherwise, let's run our kernel!
+### Make our initramfs
+Either use
 ```
 $ mkinitramfs -o ramdisk.img
+```
+OR make your own
+```
+$ cat << EOF > hello-kernel.c
+#include <stdio.h>
+
+int main(){
+        printf("Hello, kernel!\n");
+        sleep(9999999999999);
+}
+EOF
+$ gcc --static hello-kernel.c -o my-init
+find . | cpio -o -H newc | gzip > root.cpio.gz
+
+### Making a hard disk (for root)
+```
 $ dd if=/dev/zero of=roorfs.ext2 bs=1024k count=256
 $ mkfs.ext2 rootfs.ext2
-$ qemu-system-x86_64 -kernel ./vmlinux -initrd ramdisk.img -hda rootfs.ext2 -nographic --append "console=tty0 console=ttyS0 root=/dev/sda init=/bin/sh" -m 512 -vga none -display none -serial mon:stdio
+```
+
+### Booting
+```
+$ qemu-system-x86_64 -kernel arch/x86_64/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1" -m 512 -vga none -d isplay none -serial mon:stdio -no-reboot
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda" -hda rootfs.ext2 -m 512 -vga none -display none -serial mon:stdio -no-reboot
 ```
 Doesnt seem to work right now
 
