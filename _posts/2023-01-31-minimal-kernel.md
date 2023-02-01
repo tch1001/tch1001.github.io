@@ -27,26 +27,37 @@ commit 2cb8e624295ffa0c4d659fcec7d9e7a6c48de156 (grafted, HEAD, tag: v6.1.4)
 $ apt install -y libncurses5 libncurses5-dev bison flex
 $ make menuconfig 
 # go enable PVH if u want to run in QEMU
-$ vim .config # remove "debian" things if they complain, and also the "certs/signing_key.pem"
+$ vim .config # remove "debian" things, and the "certs/signing_key.pem"
 $ apt install -y libssl-dev libelf-dev
-$ make -j12 # change -jN to your liking, my 32-core computer can take N=12 or more but my Thinkpad laptop could only take N=2 before crashing
+$ make -j$(nproc) # change -jN to your liking
 # if they prompt something involving certs, just press enter (default choices)
 ```
-
-## Running the Kernel in QEMU
 Important: Don't forget to enable `CONFIG_PVH=y` in `.config` if you want to run in QEMU.
 ```
 $ ls -lh vmlinux
 ```
 `vmlinux` should exist, if it doesn't, something went wrong and go back to [build](#building-the-kernel).
 
-Otherwise, let's run our kernel!
-### Make our initramfs
-Either use
+Otherwise, let's run our kernel! 
+
+## Running in QEMU
+We need an Initrd? 
+What's Init RAM Disk? 
+It is the first thing that the kernel looks for when it wakes up.
+
+You can try the following command and see it complain that it was unable to find an `init`.
 ```
-$ mkinitramfs -o ramdisk.img # doesn't work right now
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot 
+# Some kernel logs before we see
+[    1.512696] Run /sbin/init as init process
+[    1.513360] Run /etc/init as init process
+[    1.513575] Run /bin/init as init process
+[    1.513772] Run /bin/sh as init process
+[    1.514056] Kernel panic - not syncing: No working init found.  Try passing init= option to kernel.
 ```
-OR make your own
+The kernel was frantically looking for an `init` executable in `/sbin`,`/etc`,`/bin`. Really just any executable (can be a shell script, or a binary executable). 
+### Our own init
+Let's write our own init for now. The `sleep` is to prevent the kernel from panicing (it will panic if `init` exits).
 ```
 $ mkdir vfs && cd vfs
 $ cat << EOF > hello-kernel.c
@@ -58,29 +69,42 @@ int main(){
 }
 EOF
 $ gcc --static hello-kernel.c -o init
+```
+Now we just need to package it up into a `cpio` format.
+```
 $ find . | cpio -o -H newc | gzip > root.cpio.gz
+```
+Then we can run QEMU successfully
+```
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz
+[    1.461412] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.461651] Run /init as init process
+Hello, kernel!
+[    1.946056] tsc: Refined TSC clocksource calibration: 3399.960 MHz
+[    1.946430] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x3102293934f, max_idle_ns: 440795316s
+[    1.946791] clocksource: Switched to clocksource tsc
+```
+Great! But now we don't just want our init to say hello, we want our init to be able to put us into a shell and let us navigate and do productive work! That is where [busybox](https://busybox.net/) comes in!
 
-### Making a hard disk (for root)
-```
-$ dd if=/dev/zero of=roorfs.ext2 bs=1024k count=256
-$ mkfs.ext2 rootfs.ext2
-```
 ### Busybox
-Compile Busybox
+Git clone and compile Busybox
 ```
+$ cd .. # don't do stuff in the linux directory, git will be confused
 $ git clone --depth=1 https://github.com/mirror/busybox.git && cd busybox
 $ make defconfig 
 $ vi .config # set CONFIG_STATIC=y
 $ make -j$(nproc)
 $ make CONFIG_PREFIX=$PWD/BUSYBOX install
+$ ls BUSYBOX 
+bin  linuxrc  sbin  usr
 ```
 Then we make out initrd with busybox 
 ```
+$ cd ../linux # return back to linux directory
+$ mkdir initrd && cd initrd # like vfs (from previously), this will house our new initrd
 $ mkdir etc proc sys
-$ ls              
 $ cat << EOF > init                              
 #!/bin/sh
-
                            
 mount -t proc proc /proc
 mount -t sysfs none /sys
@@ -91,26 +115,29 @@ mknod /dev/ttyS0 c 4 64
 setsid sh -c 'exec sh </dev/ttyS0 >/dev/ttyS0 2>&1'
 EOF                                                   
 $ chmod +x init 
-$ cp ../../busybox/BUSYBOX/* .
-$ find . | cpio -o -H newc | gzip > root.cpio.gz
 ```
+The above `init` shell script will be our entrypoint
+```
+$ cp ../../busybox/BUSYBOX/* . # copy over our compiled busybox utilities
+$ find . | cpio -o -H newc | gzip > root.cpio.gz # package it
+```
+Basically, `init` will call our busybox utilities!
 
 ### Booting
 ```
-# for booting hello-kernel
-$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd vfs/root.cpio.gz 
-# for booting busybox
 $ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz 
-# qemu-system-x86_64 -kernel arch/x86_64/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1" -m 512 -vga none -d isplay none -serial mon:stdio -no-reboot
-# qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda" -hda rootfs.ext2 -m 512 -vga none -display none -serial mon:stdio -no-reboot
 ```
-My own init works now
+We should be dropped into a shell and now we can type `busybox` to see the commands we can use.
+
 
 ## Running the Kernel on Hardware
-If you're on ubuntu, you can do 
+If you're on ubuntu, you can replace your current kernel (`uname -r`) with the one you compiled
 ```
 $ update-grub2 # make sure you're using the grub bootloader
 $ make modules_install
 $ make install
 ```
 When booting up, press and hold `<Shift>` to go to the grub menu, then go to advanced options to select the kernel you want to boot with.
+
+# Happy Coding!
+If you run into any errors, you may drop me a text on telegram!
