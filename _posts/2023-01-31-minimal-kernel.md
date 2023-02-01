@@ -44,10 +44,11 @@ Otherwise, let's run our kernel!
 ### Make our initramfs
 Either use
 ```
-$ mkinitramfs -o ramdisk.img
+$ mkinitramfs -o ramdisk.img # doesn't work right now
 ```
 OR make your own
 ```
+$ mkdir vfs && cd vfs
 $ cat << EOF > hello-kernel.c
 #include <stdio.h>
 
@@ -56,21 +57,54 @@ int main(){
         sleep(9999999999999);
 }
 EOF
-$ gcc --static hello-kernel.c -o my-init
-find . | cpio -o -H newc | gzip > root.cpio.gz
+$ gcc --static hello-kernel.c -o init
+$ find . | cpio -o -H newc | gzip > root.cpio.gz
 
 ### Making a hard disk (for root)
 ```
 $ dd if=/dev/zero of=roorfs.ext2 bs=1024k count=256
 $ mkfs.ext2 rootfs.ext2
 ```
+### Busybox
+Compile Busybox
+```
+$ git clone --depth=1 https://github.com/mirror/busybox.git && cd busybox
+$ make defconfig 
+$ vi .config # set CONFIG_STATIC=y
+$ make -j$(nproc)
+$ make CONFIG_PREFIX=$PWD/BUSYBOX install
+```
+Then we make out initrd with busybox 
+```
+$ mkdir etc proc sys
+$ ls              
+$ cat << EOF > init                              
+#!/bin/sh
+
+                           
+mount -t proc proc /proc
+mount -t sysfs none /sys
+                                                      
+# https://busybox.net/FAQ.html#job_control
+                                                      
+mknod /dev/ttyS0 c 4 64
+setsid sh -c 'exec sh </dev/ttyS0 >/dev/ttyS0 2>&1'
+EOF                                                   
+$ chmod +x init 
+$ cp ../../busybox/BUSYBOX/* .
+$ find . | cpio -o -H newc | gzip > root.cpio.gz
+```
 
 ### Booting
 ```
-$ qemu-system-x86_64 -kernel arch/x86_64/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1" -m 512 -vga none -d isplay none -serial mon:stdio -no-reboot
-$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda" -hda rootfs.ext2 -m 512 -vga none -display none -serial mon:stdio -no-reboot
+# for booting hello-kernel
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd vfs/root.cpio.gz 
+# for booting busybox
+$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz 
+# qemu-system-x86_64 -kernel arch/x86_64/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1" -m 512 -vga none -d isplay none -serial mon:stdio -no-reboot
+# qemu-system-x86_64 -kernel arch/x86/boot/bzImage -initrd vfs/root.cpio.gz -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda" -hda rootfs.ext2 -m 512 -vga none -display none -serial mon:stdio -no-reboot
 ```
-Doesnt seem to work right now
+My own init works now
 
 ## Running the Kernel on Hardware
 If you're on ubuntu, you can do 
