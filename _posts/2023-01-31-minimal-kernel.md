@@ -1,17 +1,8 @@
 ---
 layout: post
-title: Compiling a Minimal Kernel
+title: Compiling and Running a Minimal Kernel with Busybox
 ---
 The exploration logs are found at [here](https://github.com/tch1001/kernel).
-Let's try to compile a kernel that is as small as possible.
-
-## Measuring Size
-The kernel size can be determined using 
-```bash
-$ ls -lh vmlinux
--rw-r--r--  1 tanchienhao  staff   2.2K Jan 31 12:12 	README.md
-```
-In this case, I will measure the size of `vmlinux` instead of `vmlinuz` since compression is cheating.
 
 ## Building the Kernel 
 Of course the small kernel must still be functional, so we will test it using [qemu](https://www.qemu.org/). One can also use virtualbox but I chose qemu because I will be working remotely using SSH and VNC takes too much mobile data lol.
@@ -47,7 +38,7 @@ It is the first thing that the kernel looks for when it wakes up.
 
 You can try the following command and see it complain that it was unable to find an `init`.
 ```
-$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot 
+$ qemu-system-x86_64 -kernel ./vmlinux -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot 
 # Some kernel logs before we see
 [    1.512696] Run /sbin/init as init process
 [    1.513360] Run /etc/init as init process
@@ -76,7 +67,7 @@ $ find . | cpio -o -H newc | gzip > root.cpio.gz
 ```
 Then we can run QEMU successfully
 ```
-$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz
+$ qemu-system-x86_64 -kernel ./vmlinux -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz
 [    1.461412] x86/mm: Checked W+X mappings: passed, no W+X pages found.
 [    1.461651] Run /init as init process
 Hello, kernel!
@@ -121,11 +112,13 @@ The above `init` shell script will be our entrypoint
 $ cp ../../busybox/BUSYBOX/* . # copy over our compiled busybox utilities
 $ find . | cpio -o -H newc | gzip > root.cpio.gz # package it
 ```
-Basically, `init` will call our busybox utilities!
+Basically, `init` will call our busybox utilities! Internally, `/bin/ls` is a symlink to `/bin/busybox ls`
+
+Fun fact: Alpine linux uses busybox, Alpine linux is popular in docker containers due to it's small size.
 
 ### Booting
 ```
-$ qemu-system-x86_64 -kernel arch/x86/boot/bzImage -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz 
+$ qemu-system-x86_64 -kernel ./vmlinux -nographic --append "console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2" -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz 
 ```
 We should be dropped into a shell and now we can type `busybox` to see the commands we can use.
 
@@ -138,6 +131,20 @@ $ make modules_install
 $ make install
 ```
 When booting up, press and hold `<Shift>` to go to the grub menu, then go to advanced options to select the kernel you want to boot with.
+
+# Minimizing the Kernel Size
+Let's try to compile a kernel that is as small as possible.
+
+## Measuring Size
+The kernel size can be determined using 
+```bash
+$ ls -lh vmlinux
+-rwxr-xr-x 1 tch tch 1.1G Jan 31 16:19 vmlinux
+```
+In this case, I will measure the size of `vmlinux` instead of `vmlinuz` since compression is cheating.
+
+Using the default, we get a size of `1103946480` or `1.1G`. 
+
 
 # Happy Coding!
 If you run into any errors, you may drop me a text on telegram!
