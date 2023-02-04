@@ -146,7 +146,7 @@ In this case, I will measure the size of `vmlinux` instead of `vmlinuz` since co
 Using the default, we get a size of `1103946480` or `1.1G`. 
 
 ## My Personal Best
-I managed to get it down to 51M with [this](https://tch1001.github.io/downloads/minimal.config) config.
+I managed to get it down to 51M with [this](/downloads/minimal.config) config.
 ```
 ls -lh vmlinux
 -rwxrwxr-x 1 tch tch 51M Feb  4 11:49 vmlinux
