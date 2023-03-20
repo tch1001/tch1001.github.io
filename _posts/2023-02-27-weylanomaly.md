@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Why D=26 in Bosonic String Theory
+title: Why $D=26$ in Bosonic String Theory
 Categories: [Physics, String Theory, QFT]
 ---
 I am taking a string theory module in NUS this semester. For my midterms, I have prepared a [presentation](/downloads/weylanomaly.pdf) explains the why bosonic string theory needs 26 dimensions for "the math to make sense". Enjoy!
