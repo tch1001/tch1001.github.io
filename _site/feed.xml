@@ -1,14 +1,495 @@
-<<<<<<< HEAD
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-01-31T16:35:13+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">TCH’s Lab Book</title><subtitle>Just a big nerd for almost everything STEM. 
-</subtitle><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><entry><title type="html">Compiling a Minimal Kernel</title><link href="http://localhost:4000/2023/01/31/minimal-kernel.html" rel="alternate" type="text/html" title="Compiling a Minimal Kernel" /><published>2023-01-31T00:00:00+08:00</published><updated>2023-01-31T00:00:00+08:00</updated><id>http://localhost:4000/2023/01/31/minimal-kernel</id><content type="html" xml:base="http://localhost:4000/2023/01/31/minimal-kernel.html">&lt;p&gt;The exploration logs are found at &lt;a href=&quot;https://github.com/tch1001/kernel&quot;&gt;here&lt;/a&gt;.
-Let’s try to compile a kernel that is as small as possible.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://0.0.0.0:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://0.0.0.0:4000/" rel="alternate" type="text/html" /><updated>2023-04-26T16:18:10+00:00</updated><id>http://0.0.0.0:4000/feed.xml</id><title type="html">TCH’s Lab Book</title><subtitle>Just a big nerd for almost everything STEM. 
+</subtitle><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><entry><title type="html">Adding Users to Kubernetes (RBAC)</title><link href="http://0.0.0.0:4000/kubernetes/ci/cd/2023/03/14/rbac.html" rel="alternate" type="text/html" title="Adding Users to Kubernetes (RBAC)" /><published>2023-03-14T00:00:00+00:00</published><updated>2023-03-14T00:00:00+00:00</updated><id>http://0.0.0.0:4000/kubernetes/ci/cd/2023/03/14/rbac</id><content type="html" xml:base="http://0.0.0.0:4000/kubernetes/ci/cd/2023/03/14/rbac.html">&lt;p&gt;Btw, I offer hosting services (&lt;em&gt;FREE&lt;/em&gt; if your project is open source and I like it!) and DevOps setup for small businesses or personal projects! Contact me on telegram &lt;a href=&quot;https://t.me/tch1001&quot;&gt;@tch1001&lt;/a&gt; any time for best web hosting practices!&lt;/p&gt;
 
-&lt;h2 id=&quot;measuring-size&quot;&gt;Measuring Size&lt;/h2&gt;
-&lt;p&gt;The kernel size can be determined using&lt;/p&gt;
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-lh&lt;/span&gt; vmlinux
-&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;  1 tanchienhao  staff   2.2K Jan 31 12:12 	README.md
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Why add users to Kubernetes? There are 2 main reasons.&lt;/p&gt;
+
+&lt;h3 id=&quot;security&quot;&gt;Security&lt;/h3&gt;
+&lt;p&gt;You work in a big team of developers. You’re the techlead so it’s your job to make sure that the team doesn’t mess up the cluster. You can’t just give everyone admin access. So you need to create a user for each developer. This way, junior developers will not be able to singlehandedly bring down production (that’s the job of senior developers!). And you can revoke access if someone leaves the company.&lt;/p&gt;
+
+&lt;h3 id=&quot;cicd&quot;&gt;CI/CD&lt;/h3&gt;
+&lt;p&gt;While I was setting up CI/CD, I ran into a need to add users. I rent a managed DigitalOcean Kubernetes cluster for my personal projects. It uses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doctl&lt;/code&gt; for authentication. Namely, in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubeconfig&lt;/code&gt; file,&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;users&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;do-sgp1-test-admin&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;user&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;exec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;client.authentication.k8s.io/v1beta1&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cluster&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubeconfig&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;exec-credential&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;--version=v1beta1&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;--context=k8_testing&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;REDACTED&lt;/span&gt; 
+      &lt;span class=&quot;na&quot;&gt;command&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;doctl&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;null&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;interactiveMode&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;IfAvailable&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;provideClusterInfo&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;In this case, I will measure the size of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmlinux&lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmlinuz&lt;/code&gt; since compression is cheating.&lt;/p&gt;
+&lt;p&gt;If I copied this kubeconfig file to GitHub actions, it would fail because GitHub actions doesn’t have &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doctl&lt;/code&gt; installed in the GH actions runner. So I needed to add a user to the cluster that uses a key and cert instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doctl&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-a-private-key-and-csr&quot;&gt;Creating a Private Key and CSR&lt;/h2&gt;
+&lt;p&gt;First, we need to create a private key and a certificate signing request (CSR). The CSR will be signed by the Kubernetes cluster to create a certificate. The certificate will be used to authenticate the user.&lt;/p&gt;
+
+&lt;h3 id=&quot;private-key&quot;&gt;Private Key&lt;/h3&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl genrsa &lt;span class=&quot;nt&quot;&gt;-out&lt;/span&gt; tom.key 2048
+&lt;span class=&quot;c&quot;&gt;# note whatever comes after CN= (CN stands for Common Name) will be the username of the user in kubernetes&lt;/span&gt;
+openssl req &lt;span class=&quot;nt&quot;&gt;-new&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-key&lt;/span&gt; tom.key &lt;span class=&quot;nt&quot;&gt;-out&lt;/span&gt; tom.csr &lt;span class=&quot;nt&quot;&gt;-subj&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/CN=tom&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;certificate-signing-request-csr&quot;&gt;Certificate Signing Request (CSR)&lt;/h3&gt;
+&lt;h4 id=&quot;self-hosted-kubernetes&quot;&gt;Self Hosted Kubernetes&lt;/h4&gt;
+&lt;p&gt;Note that if you host your &lt;strong&gt;own&lt;/strong&gt; kubernetes cluster and have direct SSH access to the master node, you can sign it manually using&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl x509 &lt;span class=&quot;nt&quot;&gt;-req&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-in&lt;/span&gt; tom.csr &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-CA&lt;/span&gt; /etc/kubernetes/pki/ca.crt &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-CAkey&lt;/span&gt; /etc/kubernetes/pki/ca.key &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-CAcreateserial&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-out&lt;/span&gt; tom.crt &lt;span class=&quot;nt&quot;&gt;-days&lt;/span&gt; 500
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h4 id=&quot;managed-kubernetes&quot;&gt;Managed Kubernetes&lt;/h4&gt;
+&lt;p&gt;Otherwise, you don’t have direct access to the CA cert so you have to create a CSR to send to the Kubernetes cluster via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;tom.csr | &lt;span class=&quot;nb&quot;&gt;base64&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tr&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;\n&apos;&lt;/span&gt;
+REDACTED_CSR_IN_BASE64
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then, create a file called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tom-csr.yaml&lt;/code&gt; with the following contents&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;certificates.k8s.io/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;CertificateSigningRequest&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;tom-csr&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;groups&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;system:authenticated&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# I found that using $(cat tom.csr | base64 | tr -d &apos;\n&apos;) doesn&apos;t work&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# so I just copy pasted the output of the command above&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;REDACTED_CSR_IN_BASE64&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;signerName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes.io/kube-apiserver-client&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;usages&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;digital signature&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;key encipherment&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;client auth&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;After that send it to the Kubernetes API server&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; tom-csr.yaml
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get csr
+NAME        AGE   SIGNERNAME                            REQUESTOR               REQUESTEDDURATION   CONDITION
+tom-csr     68m   kubernetes.io/kube-apiserver-client   your-email@gmail.com    &amp;lt;none&amp;gt;              Pending
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;approve-the-csr&quot;&gt;Approve the CSR&lt;/h2&gt;
+&lt;p&gt;Now we have to tell Kubernetes to approve the CSR and give us a certificate.&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl certificate approve tom-csr
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get csr
+NAME        AGE   SIGNERNAME                            REQUESTOR               REQUESTEDDURATION   CONDITION
+tom-csr     68m   kubernetes.io/kube-apiserver-client   your-email@gmail.com    &amp;lt;none&amp;gt;              Approved,Issued
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;k get csr testuser-authentication &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;{.status.certificate}&apos;&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;base64&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; tom.crt 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;add-it-to-a-context&quot;&gt;Add it to a context&lt;/h3&gt;
+&lt;p&gt;If you manage multiple clusters (or have multiple users in a cluster), you will be comfortable with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;KUBECONFIG&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;p&gt;The most common way of using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;KUBECONFIG&lt;/code&gt; is to set the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;KUBECONFIG&lt;/code&gt; environment variable to the path of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubeconfig&lt;/code&gt; file.&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/path/to/kubeconfig kubectl get node
+NAME                      STATUS   ROLES    AGE   VERSION
+node-default-pool-mk771   Ready    &amp;lt;none&amp;gt;   70d   v1.70.3
+node-default-pool-mk772   Ready    &amp;lt;none&amp;gt;   70d   v1.70.3
+&lt;span class=&quot;nv&quot;&gt;$ KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/another/kubeconfig kubectl get node 
+NAME                      STATUS   ROLES    AGE   VERSION
+some-other-pool           Ready    &amp;lt;none&amp;gt;   10d   v1.70.2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;A convenient way to manage kubenetes contexts is to use &lt;a href=&quot;https://github.com/ahmetb/kubectx&quot;&gt;kubectx&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The caveman way to edit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubeconfig&lt;/code&gt; files is to use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vim&lt;/code&gt;. A more civilised way is to use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl config&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config get-contexts
+CURRENT NAME         CLUSTER         AUTHINFO     NAMESPACE
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       ctx-name     cluster-name    authinfo     default
+        ctx-2        cluster-name    authinfo-2   other-namespace
+&lt;span class=&quot;c&quot;&gt;# if you didn&apos;t do --embed-certs then it will be a file path, which might cause portability issues (when copying it to CI/CD, for instance)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-credentials tom &lt;span class=&quot;nt&quot;&gt;--client-key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tom.key &lt;span class=&quot;nt&quot;&gt;--client-certificate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tom.crt &lt;span class=&quot;nt&quot;&gt;--embed-certs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# if you don&apos;t set the namespace, it will default to the namespace in the current context&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# namespace could be a source of errors! (see section below on errors)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-context tom-context &lt;span class=&quot;nt&quot;&gt;--cluster&lt;/span&gt; cluster-name &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tom &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tom-namespace
+Context &lt;span class=&quot;s2&quot;&gt;&quot;tom-context&quot;&lt;/span&gt; modified.
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config get-contexts
+CURRENT NAME         CLUSTER         AUTHINFO     NAMESPACE
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       ctx-name     cluster-name    authinfo     default
+        ctx-2        cluster-name    authinfo-2   other-namespace
+        tom-context  cluster-name    tom          tom-namespace
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config use-context tom-context
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config current-context 
+tom-context
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Awesome! so we have created our user. But unfortunately he can’t do anything at the moment&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ kubectl get pods
+Error from server (Forbidden): nodes is forbidden: User &quot;tom&quot; cannot list resource &quot;pods&quot; in API group &quot;&quot; at the cluster scope
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We need to give him some permissions using roles and role bindings.&lt;/p&gt;
+
+&lt;h2 id=&quot;create-role-and-role-binding&quot;&gt;Create Role and Role Binding&lt;/h2&gt;
+&lt;p&gt;There is also a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ClusterRole&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ClusterRoleBinding&lt;/code&gt; but we will stick to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Role&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RoleBinding&lt;/code&gt; for now. It’s more or less similar too just that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ClusterRole&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ClusterRoleBinding&lt;/code&gt; are cluster scoped while &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Role&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RoleBinding&lt;/code&gt; are namespace scoped.&lt;/p&gt;
+
+&lt;h3 id=&quot;switching-back-to-admin&quot;&gt;Switching back to admin&lt;/h3&gt;
+&lt;p&gt;We can’t create roles and role bindings as tom, so we have to switch back to the admin context&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config use-context ctx-name
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config current-context 
+ctx-name
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;role&quot;&gt;Role&lt;/h3&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create role developer &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;create &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;get &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;list &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;update &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;delete &lt;span class=&quot;nt&quot;&gt;--resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;pods &lt;span class=&quot;nt&quot;&gt;--resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;pods/exec &lt;span class=&quot;nt&quot;&gt;--resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;pods/attach
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;role-binding&quot;&gt;Role Binding&lt;/h3&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create rolebinding tom-rolebinding &lt;span class=&quot;nt&quot;&gt;--role&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;developer &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tom
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;testing&quot;&gt;Testing&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ kubectl config use-context tom-context
+$ kubectl config current-context 
+tom-context
+$ kubectl get pods
+NAME                                     READY   STATUS    RESTARTS      AGE
+some-prevly-created-pod-fb7dc94b-pr2x8   1/1     Running   7 (73m ago)   136m
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;common-errors&quot;&gt;Common Errors&lt;/h2&gt;
+&lt;h3 id=&quot;error-from-server-forbidden&quot;&gt;Error from server (Forbidden)&lt;/h3&gt;
+&lt;p&gt;Suppose after you switched context to the newly added user, you try to run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl get pods&lt;/code&gt; and you get the following error&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Error from server &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Forbidden&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: services is forbidden: User &lt;span class=&quot;s2&quot;&gt;&quot;tom&quot;&lt;/span&gt; cannot list resource &lt;span class=&quot;s2&quot;&gt;&quot;pods&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;API group &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;the namespace &lt;span class=&quot;s2&quot;&gt;&quot;default&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;There are a few things to check&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Role Binding and Roles are namespaced. You can check which namespace you created them in using&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get role &lt;span class=&quot;nt&quot;&gt;-A&lt;/span&gt;
+kubectl get rolebinding &lt;span class=&quot;nt&quot;&gt;-A&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then check that the context is bound to the correct namespace. Sometimes the namespace is not set.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl config get-contexts | less &lt;span class=&quot;nt&quot;&gt;-S&lt;/span&gt;
+CURRENT NAME         CLUSTER         AUTHINFO     NAMESPACE
+&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       ctx-name     cluster-name    authinfo     default
+        ctx-2        cluster-name    authinfo-2   other-namespace
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;You can check for authorization using&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl auth can-i list pods &lt;span class=&quot;nt&quot;&gt;--as&lt;/span&gt; tom
+&lt;span class=&quot;nb&quot;&gt;yes&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl auth can-i list pods &lt;span class=&quot;nt&quot;&gt;--as&lt;/span&gt; tommy
+no
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Check the Role. Stare at your previous kubectl command for a while.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create role developer &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;create &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;get &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;list &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;update &lt;span class=&quot;nt&quot;&gt;--verb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;delete &lt;span class=&quot;nt&quot;&gt;--resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;pods
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Check the Role Binding. Stare at your previous kubectl command for a while. &lt;strong&gt;Especially&lt;/strong&gt; the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--user&lt;/code&gt; field. It must match the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CN=&lt;/code&gt; in the CSR.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create rolebinding testuser-authentication-rolebinding-2 &lt;span class=&quot;nt&quot;&gt;--role&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;developer &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tom
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Kubernetes" /><category term="CI/CD" /><summary type="html">Btw, I offer hosting services (FREE if your project is open source and I like it!) and DevOps setup for small businesses or personal projects! Contact me on telegram @tch1001 any time for best web hosting practices!</summary></entry><entry><title type="html">Setting Up SSL Manually on Kubernetes Traefik</title><link href="http://0.0.0.0:4000/kubernetes/traefik/ssl/2023/03/06/ssl.html" rel="alternate" type="text/html" title="Setting Up SSL Manually on Kubernetes Traefik" /><published>2023-03-06T00:00:00+00:00</published><updated>2023-03-06T00:00:00+00:00</updated><id>http://0.0.0.0:4000/kubernetes/traefik/ssl/2023/03/06/ssl</id><content type="html" xml:base="http://0.0.0.0:4000/kubernetes/traefik/ssl/2023/03/06/ssl.html">&lt;p&gt;Btw, I will &lt;em&gt;guide&lt;/em&gt; you in setting up SSL for any site for $25 (around 1h meeting online), contact me at &lt;a href=&quot;https://t.me/tch1001&quot;&gt;@tch1001&lt;/a&gt; and save yourself alot of pain in the ass :)&lt;/p&gt;
+
+&lt;p&gt;Today, I will show you how to setup SSL on Kubernetes the manual way. I will be using Traefik as the Ingress Controller and Let’s Encrypt as the Certificate Authority.&lt;/p&gt;
+
+&lt;h2 id=&quot;kubernetes-setup&quot;&gt;Kubernetes Setup&lt;/h2&gt;
+&lt;p&gt;Suppose we have created a service (with accompanying deployment, pods, and all that) called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my-service&lt;/code&gt; and we want to expose it to the internet.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  selector:
+    matchLabels:
+      app: my-webserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-webserver
+    spec:
+      containers:
+      - name: my-container
+        image: username/my-image
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-webserver
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+#      nodePort: 30002
+  type: ClusterIP
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We can expose it to the internet by creating an IngressRoute resource. (&lt;strong&gt;Note&lt;/strong&gt;: This is not the final version)&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-ingressroute
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`my.domain.com`)
+      priority: 1000
+      kind: Rule
+      services:
+        - name: my-service
+          port: 80
+          namespace: my-namespace
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then over on your DNS provider, you just need to point &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my.domain.com&lt;/code&gt; to your &lt;em&gt;Traefik&lt;/em&gt; Service’s External IP address, which you can obtain using&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt; kubectl get svc -A # -A for all namespaces
+NAME         TYPE          CLUSTER-IP       EXTERNAL-IP       PORT(S)                   AGE
+traefik      LoadBalancer  10.245.211.251   137.184.250.51    80/TCP,8080/TCP,443/TCP   20d
+my-service   ClusterIP     10.245.210.243   &amp;lt;none&amp;gt;            80/TCP                    20d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Traefik will point to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my-service&lt;/code&gt; through the IngressRoute, and you can check the ingressroutes by going to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://&amp;lt;traefik-service-ip&amp;gt;:8080/dashboard/#/http/routers&lt;/code&gt;.
+After adding a DNS record (&lt;strong&gt;note&lt;/strong&gt;: use DNS only first (if you’re using Cloudflare), we will get to SSL later) &lt;br /&gt; &lt;br /&gt;
+&lt;img src=&quot;/assets/images/dnsrecord.png&quot; /&gt;
+Going to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://my.domain.com&lt;/code&gt; will show you the website (note the &lt;strong&gt;http&lt;/strong&gt;, we have not setup SSL yet).&lt;/p&gt;
+
+&lt;h2 id=&quot;setting-up-ssl&quot;&gt;Setting up SSL&lt;/h2&gt;
+&lt;p&gt;There are 2 different ways I will cover. The first being significantly easier but not without some drawbacks.&lt;/p&gt;
+
+&lt;h3 id=&quot;bless-cloudflare-flexible-ssl&quot;&gt;Bless Cloudflare (Flexible SSL)&lt;/h3&gt;
+&lt;p&gt;If you’re using cloudflare, you’re in luck, because you just need to use “Proxied” instead of “DNS only” and you’re done. &lt;br /&gt;
+&lt;img src=&quot;/assets/images/dnsrecord2.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: If you run into errors, chances are that caching is the issue. I haven’t figured out where this caching occurs exactly. What I do is just create a &lt;em&gt;new&lt;/em&gt; record, using a different domain name (e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my.domain.com&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my2.domain.com&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;This is known as a “Flexible SSL Setup”, where the SSL is terminated at Cloudflare’s edge servers. This means that the traffic between the browser and Cloudflare is encrypted, but the traffic between Cloudflare and your site is not. This is okay for non-security-critical applications like blogs, but is not okay for things that require sensitive traffic like login credentials.  &lt;br /&gt;&lt;br /&gt;
+&lt;img src=&quot;/assets/images/ssl-flexible.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This is the easiest way to setup SSL, but another drawback is you will not be able to use HTTP/2, which is a newer version of HTTP that is much faster than HTTP/1.1. This is because Cloudflare does not support HTTP/2 for Flexible SSL. If you want to use HTTP/2, you will need to use a different method.&lt;/p&gt;
+
+&lt;p&gt;One upside is that using “Proxied” will hide your server’s IP address (increased security), and you can check this by running&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt; ping my2.domain.com
+PING my2.domain.com (104.21.39.182): 56 data bytes
+64 bytes from 104.21.39.182: icmp_seq=0 ttl=49 time=84.412 ms
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;104.21.39.182&lt;/code&gt; is not my IP! It is Cloudflare’s IP.&lt;/p&gt;
+
+&lt;h3 id=&quot;certbot-ssl-setup&quot;&gt;Certbot SSL Setup&lt;/h3&gt;
+&lt;p&gt;If you want to use “DNS only” and still have SSL, or you want “Proxied” with Full encryption mode, you need to create a certificate using &lt;a href=&quot;https://certbot.eff.org/&quot;&gt;Certbot&lt;/a&gt;. Certbot is a free, open-source tool for automatically using Let’s Encrypt certificates on manually-configured HTTPS servers.&lt;/p&gt;
+
+&lt;p&gt;Usually, people use certbot because it’s very automatic, but in this case I have chosen to manually obtain my certificates and upload it because I want to learn how it works, and have greater control over the process. I have found that when I try to do it automatically using Traefik, there is a lot of fiddling and restarting the services, possibly resulting in downtime.  Through the manual method, you don’t need to touch the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my-service&lt;/code&gt; Service, and just need to update the IngressRoutes.&lt;/p&gt;
+
+&lt;p&gt;First, you need to install certbot. After that you can run&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo certbot certonly --manual --preferred-challenge dns -d my3.domain.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--manual&lt;/code&gt; is required if we want to use the DNS acme challenge.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-d my3.domain.com&lt;/code&gt; indicates the domain (leaving it out will prompt you to input it manually).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You will see something like&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Please deploy a DNS TXT record under the name:
+_acme-challenge.my3.domain.com
+with the following value:
+NaeXRxo_oQnpUzeZQ1xj3mhSGaAJ_NXN0wTcOo-_wdA
+
+Before continuing, verify the TXT record has been deployed. Depending on the DNS
+provider, this may take some time, from a few seconds to multiple minutes. You can
+check if it has finished deploying with aid of online tools, such as the Google
+Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.my3.domain.com.
+Look for one or more bolded line(s) below the line &apos;;ANSWER&apos;. It should show the
+value(s) you&apos;ve just added.
+
+Press Enter to Continue
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;You need to create a TXT record with the value &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NaeXRxo_oQnpUzeZQ1xj3mhSGaAJ_NXN0wTcOo-_wdA&lt;/code&gt; under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_acme-challenge.my3.domain.com&lt;/code&gt;. Then check using Google Admin Toolbox (&lt;a href=&quot;https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.my3.domain.com.&quot;&gt;https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.my3.domain.com.&lt;/a&gt;) whether the TXT record is up. If it is, then press Enter&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/my3.domain.com/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/my3.domain.com/privkey.pem
+This certificate expires on 2023-06-04.
+These files will be updated when the certificate renews.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now we need to upload it to Kubernetes and let IngressRoute access it. This is done via &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/secret/&quot;&gt;Secrets&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir certs
+sudo cat /etc/letsencrypt/live/my3.domain.com/fullchain.pem &amp;gt; certs/fullchain.pem
+sudo cat /etc/letsencrypt/live/my3.domain.com/privkey.pem &amp;gt; certs/privkey.pem
+# do the above if you can&apos;t access /etc
+sudo kubectl create secret generic my-secret \
+    --from-file=tls.crt=/etc/letsencrypt/live/my3.domain.com/fullchain.pem \
+    --from-file=tls.key=/etc/letsencrypt/live/my3.domain.com/privkey.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;All that remains is to update the IngressRoute.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-ingressroute
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`my3.domain.com`)
+      priority: 1000
+      kind: Rule
+      services:
+        - name: my-service
+          port: 80
+          namespace: my-namespace
+  tls:
+    secretName: my-secret
+    domains:
+    - main: my3.domain.com
+      sans:
+      - blah.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Host(`my.domain.com`)&lt;/code&gt; changed to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Host(`my3.domain.com`)&lt;/code&gt; and added part is&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  tls:
+    secretName: my-secret
+    domains:
+    - main: my3.domain.com
+      sans:
+      - blah.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now add the DNS record for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;my3.domain.com&lt;/code&gt;, change your encryption mode to “Full” and visit the site and all should be good!&lt;/p&gt;
+
+&lt;p&gt;SANS is just alternative DNS names.&lt;/p&gt;
+
+&lt;h2 id=&quot;setting-http-redirection-to-https&quot;&gt;Setting HTTP redirection to HTTPS&lt;/h2&gt;
+&lt;p&gt;Great so now if you visit the site &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;https://my3.domain.com&lt;/code&gt; you get a nicely secured site! But if you visit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://my3.domain.com&lt;/code&gt; you get &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;404&lt;/code&gt; error. Oh no. The fix is simple, simply create another &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IngressRoute&lt;/code&gt; that accepts the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- web&lt;/code&gt; entrypoint, and use a redirection middleware.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirection-middleware
+spec:
+  redirectScheme:
+    scheme: https
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-ingressroute-no-tls
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`my3.domain.com`)
+      priority: 1000
+      middlewares:
+        - name: redirection-middleware
+      kind: Rule
+      services:
+        - name: my-service
+          port: 80
+          namespace: my-namespace
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;common-errors&quot;&gt;Common errors&lt;/h2&gt;
+
+&lt;h3 id=&quot;too-many-redirects&quot;&gt;Too many redirects&lt;/h3&gt;
+&lt;p&gt;Most likely your SSL encryption mode is “Off” in Cloudflare.&lt;/p&gt;
+&lt;h3 id=&quot;404&quot;&gt;404&lt;/h3&gt;
+&lt;p&gt;Most likely your SSL encryption mode is “Flexible”. Cloudflare is trying to access the non-SSL version of your site while your site is forcing it to use SSL (redirecting it to https, which confuses Cloudflare).&lt;/p&gt;
+&lt;h3 id=&quot;502-bad-gateway&quot;&gt;502 Bad Gateway&lt;/h3&gt;
+&lt;p&gt;It could also be that your encryption mode is “Full” or “Full (Strict)” but the SSL on your Kubernetes Traefik end is not setup properly. Cloudflare is trying to establish an encrypted connection with Traefik but Traefik can’t provide one. Check that your Service is running too (can be done using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NodePort&lt;/code&gt; on Kubernetes, or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;port-forward&lt;/code&gt; tunneling).&lt;/p&gt;
+
+&lt;h3 id=&quot;still-not-working-&quot;&gt;Still not working :(&lt;/h3&gt;
+&lt;p&gt;Try setting up on a different domain name. I know that’s dumb but it seems like either the browser or some intermediate server along the way has cached the SSL settings. In other words, when working with SSL, you either get it the first time round or you never get it (because updating the configs don’t seem to affect much).&lt;/p&gt;
+
+&lt;p&gt;What I do personally is try out a bunch of test domains first, before finding out the process that works for the actual one.&lt;/p&gt;
+
+&lt;h2 id=&quot;renewing&quot;&gt;Renewing&lt;/h2&gt;
+&lt;p&gt;By manual provisioning method, the certificates will not auto-renew. I will write another blog on this when I have time.&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Kubernetes" /><category term="Traefik" /><category term="SSL" /><summary type="html">Btw, I will guide you in setting up SSL for any site for $25 (around 1h meeting online), contact me at @tch1001 and save yourself alot of pain in the ass :)</summary></entry><entry><title type="html">Counting Supersymmetry Generators</title><link href="http://0.0.0.0:4000/physics/qft/2023/02/28/susy.html" rel="alternate" type="text/html" title="Counting Supersymmetry Generators" /><published>2023-02-28T00:00:00+00:00</published><updated>2023-02-28T00:00:00+00:00</updated><id>http://0.0.0.0:4000/physics/qft/2023/02/28/susy</id><content type="html" xml:base="http://0.0.0.0:4000/physics/qft/2023/02/28/susy.html">&lt;p&gt;We primarily see 2 types of notation
+\(\mathcal{N}=(2,2)\) and \(\mathcal{N} = 2\). The ambiguity is resolved by considering the spacetime dimensions we are working in. David Tong’s notes on &lt;a href=&quot;http://www.damtp.cam.ac.uk/user/tong/susy/susy.pdf&quot;&gt;supersymmetry&lt;/a&gt; has a chapter “Counting Supersymmetries” which explains this in greater detail. I aim to summarise.&lt;/p&gt;
+
+&lt;h2 id=&quot;spinor-supercharges-vs-supersymmetry-generatorssupercharge&quot;&gt;“Spinor supercharges” vs “Supersymmetry Generators/Supercharge”&lt;/h2&gt;
+&lt;p&gt;\(Q^I_\alpha\) (collecting the \(\alpha\) components into a column vector) is said to be a &lt;em&gt;spinor&lt;/em&gt; supercharge. Index \(I\) goes from \(1,...,(\mathcal{N} \text{ or } L \text{ or } R)\) (more on this ambiguity later), and index \(\alpha\) goes from \(1,...,\text{dim of Weyl spinor representation in dim }D\). Each component of the spinor supercharge is a SUSY generator. SUSY generators are also called supercharges confusingly. Therefore I find it important to state whether a quantity is a “&lt;em&gt;spinor&lt;/em&gt; supercharge” or a “supercharge”. A &lt;em&gt;spinor&lt;/em&gt; supercharge consists of a few component supercharges. Actually, I prefer to use supercharge to exclusively mean “spinor supercharge” and use “SUSY generator” to mean the individual components.&lt;/p&gt;
+
+&lt;p&gt;We use \(N\) (non-curly N) to denote the number of SUSY generators. And \(\mathcal{N}\) (mathcal N) to denote the number of &lt;em&gt;spinor supercharges&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;mathcaln--lr-vs-mathcaln--n&quot;&gt;\(\mathcal{N} = (L,R)\) vs \(\mathcal{N} = n\)&lt;/h2&gt;
+&lt;p&gt;And then we see things like \(\mathcal{N} = (2,2)\) vs \(\mathcal{N} = 1\). What’s going on? Again Tong’s notes explains it well.&lt;/p&gt;
+
+&lt;p&gt;In dimensions \(D \equiv 2 \text{ mod } 4\), left and right handed Weyl spinors are NOT related by complex conjugation, meaning that we can have a left handed spinor supercharge without corresponding right handed spinor supercharge. That is why we use 2 numbers to describe   the number of spinor supercharges, each one being possible left or right handed.&lt;/p&gt;
+
+&lt;p&gt;On the contrary, in \(D\equiv 0 \text{ mod } 4\), left and right handed spinors are related by complex conjugation. They come in pairs. Existence of left implies existence of right and vice versa. Hence one number describes the number of spinor supercharges. If we wanted to express \(\mathcal{N} = n\) in terms of \((L,R)\) notation, it would be \((n,n)\).&lt;/p&gt;
+
+&lt;p&gt;So if you see something like \((L,R), \text{dim }D\), the number of SUSY generators are \(N=(L+R)\times (\text{dim of Weyl spinor representation in dim }D)\).&lt;/p&gt;
+
+&lt;p&gt;And if you see something like \(\mathcal{N}, \text{dim }D\), the number of SUSY generators are \(N=\mathcal{N} \times 2 \times (\text{dim of Weyl spinor representation in dim }D)\).&lt;/p&gt;
+
+&lt;p&gt;I have a question: What happens in odd dimensions?&lt;/p&gt;
+
+&lt;h2 id=&quot;some-examples&quot;&gt;Some Examples&lt;/h2&gt;
+&lt;p&gt;The following examples are taken from David Tong “Counting Supersymmetries” Chapter.&lt;/p&gt;
+
+&lt;p&gt;\(N=32\):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;\(\mathcal{N} = 1\), \(D=11\)  &lt;br /&gt;
+The spinor representation in \(11\) dimensions consists of \(16\) component generators. So \(N=32\) is obtained by \(\mathcal{N} \times 2 \times 16\).&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (1,1)\), \(D=10\) &lt;br /&gt;
+The spinor representation in \(10\) dimensions consists of \(16\) component generators. So \(N=32\) is obtained by \((L+R) \times 16\).&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (2,2)\), \(D=6\)  &lt;br /&gt;
+The spinor representation in \(6\) dimensions consists of \(8\) component generators. So \(N=32\) is obtained by \((L+R) \times 8\).&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = 8\), \(D=4\)  &lt;br /&gt;
+The spinor representation in \(4\) dimensions consists of \(2\) component generators. So \(N=32\) is obtained by \(\mathcal{N} \times 2 \times 2\).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(N=16\):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;\(\mathcal{N} = (1,0)\), \(D=10\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (1,1)\), \(D=6\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = 4\), \(D=4\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = 8\), \(D=3\)  &lt;br /&gt;
+The spinor representation in \(3\) dimensions consists of \(1\) component generators. So \(N=16\) is obtained by \(\mathcal{N} \times 2 \times 1\).&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (8,8)\), \(D=2\)  &lt;br /&gt;
+The spinor representation in \(2\) dimensions consists of \(1\) component generators. So \(N=16\) is obtained by \((L+R) \times 1\).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(N=8\)&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;\(\mathcal{N} = (1,0)\), \(D=6\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = 2\), \(D=4\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = 4\), \(D=3\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (4,4)\), \(D=2\) (check yourself)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(N=4\)&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;\(\mathcal{N} = 1\), \(D=4\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = 2\), \(D=3\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (2,2)\), \(D=2\) (check yourself)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;\(N=2\)&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;\(\mathcal{N} = 1\), \(D=3\) (check yourself)&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (2,0)\), \(D=3\)
+(check yourself) This arises from twisting, and we usually say \((0,2)\) to avoid confusion with the \((2,0), D=6\) theory&lt;/li&gt;
+  &lt;li&gt;\(\mathcal{N} = (1,1)\), \(D=2\) (check yourself)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;weyl-spinor-representation&quot;&gt;Weyl Spinor Representation&lt;/h3&gt;
+&lt;p&gt;This can be understood by reading &lt;a href=&quot;https://en.wikipedia.org/wiki/Classification_of_Clifford_algebras&quot;&gt;Clifford Algebra&lt;/a&gt;.&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Physics" /><category term="QFT" /><summary type="html">We primarily see 2 types of notation \(\mathcal{N}=(2,2)\) and \(\mathcal{N} = 2\). The ambiguity is resolved by considering the spacetime dimensions we are working in. David Tong’s notes on supersymmetry has a chapter “Counting Supersymmetries” which explains this in greater detail. I aim to summarise.</summary></entry><entry><title type="html">Why $D=26$ in Bosonic String Theory</title><link href="http://0.0.0.0:4000/2023/02/27/weylanomaly.html" rel="alternate" type="text/html" title="Why $D=26$ in Bosonic String Theory" /><published>2023-02-27T00:00:00+00:00</published><updated>2023-02-27T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2023/02/27/weylanomaly</id><content type="html" xml:base="http://0.0.0.0:4000/2023/02/27/weylanomaly.html">&lt;p&gt;I am taking a string theory module in NUS this semester. For my midterms, I have prepared a &lt;a href=&quot;/downloads/weylanomaly.pdf&quot;&gt;presentation&lt;/a&gt; explains the why bosonic string theory needs 26 dimensions for “the math to make sense”. Enjoy!&lt;/p&gt;
+
+&lt;p&gt;Abstract:
+In summary, to quantise the Polyakov action for a bosonic string,
+we had to insert the Faddeev-Popov determinant into the path
+integral, which ended up being calculated by the bc ghost CFT. bc
+CFT alone had central charge of −26, but we need the total
+central charge of Polyakov + bc to be 0 due to the Weyl anomaly.
+So the Polyakov action needed to have a ”critical central charge”
+of 26, which corresponded to the coordinates of the string being
+26-dimensional.&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><summary type="html">I am taking a string theory module in NUS this semester. For my midterms, I have prepared a presentation explains the why bosonic string theory needs 26 dimensions for “the math to make sense”. Enjoy!</summary></entry><entry><title type="html">Operator Product Expansion for $T\phi$</title><link href="http://0.0.0.0:4000/physics/qft/2023/02/22/Tphi-OPE.html" rel="alternate" type="text/html" title="Operator Product Expansion for $T\phi$" /><published>2023-02-22T00:00:00+00:00</published><updated>2023-02-22T00:00:00+00:00</updated><id>http://0.0.0.0:4000/physics/qft/2023/02/22/Tphi-OPE</id><content type="html" xml:base="http://0.0.0.0:4000/physics/qft/2023/02/22/Tphi-OPE.html">&lt;p&gt;I have worked out in great detail the OPE. &lt;a href=&quot;/downloads/Tphi_OPE.pdf&quot;&gt;PDF&lt;/a&gt;&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Physics" /><category term="QFT" /><summary type="html">I have worked out in great detail the OPE. PDF</summary></entry><entry><title type="html">Propagators in Massive Scalar Field Theory (Poster)</title><link href="http://0.0.0.0:4000/physics/qft/2023/02/19/propagator.html" rel="alternate" type="text/html" title="Propagators in Massive Scalar Field Theory (Poster)" /><published>2023-02-19T00:00:00+00:00</published><updated>2023-02-19T00:00:00+00:00</updated><id>http://0.0.0.0:4000/physics/qft/2023/02/19/propagator</id><content type="html" xml:base="http://0.0.0.0:4000/physics/qft/2023/02/19/propagator.html">&lt;p&gt;I have prepared a &lt;a href=&quot;/downloads/propagator.pdf&quot;&gt;poster&lt;/a&gt; that evaluates the propagators for Retarded Propagator, Advanced Propagator, and Feynman Propagator. Enjoy!&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Physics" /><category term="QFT" /><summary type="html">I have prepared a poster that evaluates the propagators for Retarded Propagator, Advanced Propagator, and Feynman Propagator. Enjoy!</summary></entry><entry><title type="html">Compiling and Running a Minimal Kernel with Busybox</title><link href="http://0.0.0.0:4000/linux/kernel/2023/01/31/minimal-kernel.html" rel="alternate" type="text/html" title="Compiling and Running a Minimal Kernel with Busybox" /><published>2023-01-31T00:00:00+00:00</published><updated>2023-01-31T00:00:00+00:00</updated><id>http://0.0.0.0:4000/linux/kernel/2023/01/31/minimal-kernel</id><content type="html" xml:base="http://0.0.0.0:4000/linux/kernel/2023/01/31/minimal-kernel.html">&lt;p&gt;The exploration logs are found at &lt;a href=&quot;https://github.com/tch1001/kernel&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&quot;building-the-kernel&quot;&gt;Building the Kernel&lt;/h2&gt;
 &lt;p&gt;Of course the small kernel must still be functional, so we will test it using &lt;a href=&quot;https://www.qemu.org/&quot;&gt;qemu&lt;/a&gt;. One can also use virtualbox but I chose qemu because I will be working remotely using SSH and VNC takes too much mobile data lol.&lt;/p&gt;
@@ -23,39 +504,132 @@ commit 2cb8e624295ffa0c4d659fcec7d9e7a6c48de156 &lt;span class=&quot;o&quot;&gt;
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;apt &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; libncurses5 libncurses5-dev bison flex
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;make menuconfig 
 &lt;span class=&quot;c&quot;&gt;# go enable PVH if u want to run in QEMU&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;vim .config &lt;span class=&quot;c&quot;&gt;# remove &quot;debian&quot; things if they complain, and also the &quot;certs/signing_key.pem&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;vim .config &lt;span class=&quot;c&quot;&gt;# remove &quot;debian&quot; things, and the &quot;certs/signing_key.pem&quot;&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;apt &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; libssl-dev libelf-dev
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;make &lt;span class=&quot;nt&quot;&gt;-j12&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# change -jN to your liking, my 32-core computer can take N=12 or more but my Thinkpad laptop could only take N=2 before crashing&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;make &lt;span class=&quot;nt&quot;&gt;-j&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;nproc&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# change -jN to your liking&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# if they prompt something involving certs, just press enter (default choices)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;running-the-kernel-in-qemu&quot;&gt;Running the Kernel in QEMU&lt;/h2&gt;
 &lt;p&gt;Important: Don’t forget to enable &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CONFIG_PVH=y&lt;/code&gt; in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.config&lt;/code&gt; if you want to run in QEMU.&lt;/p&gt;
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ ls -lh vmlinux
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmlinux&lt;/code&gt; should exist, if it doesn’t, something went wrong and go back to &lt;a href=&quot;#building-the-kernel&quot;&gt;build&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Otherwise, let’s run our kernel!&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ mkinitramfs -o ramdisk.img
-$ dd if=/dev/zero of=roorfs.ext2 bs=1024k count=256
-$ mkfs.ext2 rootfs.ext2
-$ qemu-system-x86_64 -kernel ./vmlinux -initrd ramdisk.img -hda rootfs.ext2 -nographic --append &quot;console=tty0 console=ttyS0 root=/dev/sda init=/bin/sh&quot; -m 512 -vga none -display none -serial mon:stdio
+
+&lt;h2 id=&quot;running-in-qemu&quot;&gt;Running in QEMU&lt;/h2&gt;
+&lt;p&gt;We need an Initrd? 
+What’s Init RAM Disk? 
+It is the first thing that the kernel looks for when it wakes up.&lt;/p&gt;
+
+&lt;p&gt;You can try the following command and see it complain that it was unable to find an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;init&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ qemu-system-x86_64 -kernel ./vmlinux -nographic --append &quot;console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2&quot; -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot 
+# Some kernel logs before we see
+[    1.512696] Run /sbin/init as init process
+[    1.513360] Run /etc/init as init process
+[    1.513575] Run /bin/init as init process
+[    1.513772] Run /bin/sh as init process
+[    1.514056] Kernel panic - not syncing: No working init found.  Try passing init= option to kernel.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Doesnt seem to work right now&lt;/p&gt;
+&lt;p&gt;The kernel was frantically looking for an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;init&lt;/code&gt; executable in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/sbin&lt;/code&gt;,&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc&lt;/code&gt;,&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin&lt;/code&gt;. Really just any executable (can be a shell script, or a binary executable).&lt;/p&gt;
+&lt;h3 id=&quot;our-own-init&quot;&gt;Our own init&lt;/h3&gt;
+&lt;p&gt;Let’s write our own init for now. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sleep&lt;/code&gt; is to prevent the kernel from panicing (it will panic if &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;init&lt;/code&gt; exits).&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ mkdir vfs &amp;amp;&amp;amp; cd vfs
+$ cat &amp;lt;&amp;lt; EOF &amp;gt; hello-kernel.c
+#include &amp;lt;stdio.h&amp;gt;
+
+int main(){
+        printf(&quot;Hello, kernel!\n&quot;);
+        sleep(9999999999999);
+}
+EOF
+$ gcc --static hello-kernel.c -o init
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now we just need to package it up into a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cpio&lt;/code&gt; format.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ find . | cpio -o -H newc | gzip &amp;gt; root.cpio.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then we can run QEMU successfully&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ qemu-system-x86_64 -kernel ./vmlinux -nographic --append &quot;console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2&quot; -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz
+[    1.461412] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.461651] Run /init as init process
+Hello, kernel!
+[    1.946056] tsc: Refined TSC clocksource calibration: 3399.960 MHz
+[    1.946430] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x3102293934f, max_idle_ns: 440795316s
+[    1.946791] clocksource: Switched to clocksource tsc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Great! But now we don’t just want our init to say hello, we want our init to be able to put us into a shell and let us navigate and do productive work! That is where &lt;a href=&quot;https://busybox.net/&quot;&gt;busybox&lt;/a&gt; comes in!&lt;/p&gt;
+
+&lt;h3 id=&quot;busybox&quot;&gt;Busybox&lt;/h3&gt;
+&lt;p&gt;Git clone and compile Busybox&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cd .. # don&apos;t do stuff in the linux directory, git will be confused
+$ git clone --depth=1 https://github.com/mirror/busybox.git &amp;amp;&amp;amp; cd busybox
+$ make defconfig 
+$ vi .config # set CONFIG_STATIC=y
+$ make -j$(nproc)
+$ make CONFIG_PREFIX=$PWD/BUSYBOX install
+$ ls BUSYBOX 
+bin  linuxrc  sbin  usr
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then we make out initrd with busybox&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cd ../linux # return back to linux directory
+$ mkdir initrd &amp;amp;&amp;amp; cd initrd # like vfs (from previously), this will house our new initrd
+$ mkdir etc proc sys
+$ cat &amp;lt;&amp;lt; EOF &amp;gt; init                              
+#!/bin/sh
+                           
+mount -t proc proc /proc
+mount -t sysfs none /sys
+                                                      
+# https://busybox.net/FAQ.html#job_control
+                                                      
+mknod /dev/ttyS0 c 4 64
+setsid sh -c &apos;exec sh &amp;lt;/dev/ttyS0 &amp;gt;/dev/ttyS0 2&amp;gt;&amp;amp;1&apos;
+EOF                                                   
+$ chmod +x init 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The above &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;init&lt;/code&gt; shell script will be our entrypoint&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cp ../../busybox/BUSYBOX/* . # copy over our compiled busybox utilities
+$ find . | cpio -o -H newc | gzip &amp;gt; root.cpio.gz # package it
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Basically, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;init&lt;/code&gt; will call our busybox utilities! Internally, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/ls&lt;/code&gt; is a symlink to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/busybox ls&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Fun fact: Alpine linux uses busybox, Alpine linux is popular in docker containers due to it’s small size.&lt;/p&gt;
+
+&lt;h3 id=&quot;booting&quot;&gt;Booting&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ qemu-system-x86_64 -kernel ./vmlinux -nographic --append &quot;console=tty0 console=ttyS0 panic=1 root=/dev/sda rootfstype=ext2&quot; -hda rootfs.ext2 -m 1024 -vga none -display none -serial mon:stdio -no-reboot -initrd initrd/root.cpio.gz 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We should be dropped into a shell and now we can type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;busybox&lt;/code&gt; to see the commands we can use.&lt;/p&gt;
 
 &lt;h2 id=&quot;running-the-kernel-on-hardware&quot;&gt;Running the Kernel on Hardware&lt;/h2&gt;
-&lt;p&gt;If you’re on ubuntu, you can do&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ update-grub2 # make sure you're using the grub bootloader
+&lt;p&gt;If you’re on ubuntu, you can replace your current kernel (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;uname -r&lt;/code&gt;) with the one you compiled&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ update-grub2 # make sure you&apos;re using the grub bootloader
 $ make modules_install
 $ make install
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;When booting up, press and hold &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;Shift&amp;gt;&lt;/code&gt; to go to the grub menu, then go to advanced options to select the kernel you want to boot with.&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><summary type="html">The exploration logs are found at here. Let’s try to compile a kernel that is as small as possible.</summary></entry></feed>
-=======
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-01-31T14:33:22+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">TCH’s Lab Book</title><subtitle>Just a big nerd for almost everything STEM. 
-</subtitle><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><entry><title type="html">Teaching Quantum Field Theory</title><link href="http://localhost:4000/physics/qft/2023/01/31/teaching-qft.html" rel="alternate" type="text/html" title="Teaching Quantum Field Theory" /><published>2023-01-31T00:00:00+08:00</published><updated>2023-01-31T00:00:00+08:00</updated><id>http://localhost:4000/physics/qft/2023/01/31/teaching-qft</id><content type="html" xml:base="http://localhost:4000/physics/qft/2023/01/31/teaching-qft.html">&lt;p&gt;I’ve started trying to teach quantum field theory casually. The lessons take place roughly fortnightly (every &lt;a href=&quot;https://www.timeanddate.com/worldclock/fixedtime.html?msg=TCH%27s+QFT+Lectures&amp;amp;iso=20230129T20&amp;amp;p1=%3A&amp;amp;ah=2&quot;&gt;Sunday 8pm&lt;/a&gt; on Zoom). &lt;a href=&quot;https://www.tchlabs.net/#contact&quot;&gt;Contact&lt;/a&gt; me on telegram to sit in! Hopefully I can get enough practice and refine my material such that when I am actually required to teach QFT in a university, I will be confident enough to be a good lecturer!&lt;/p&gt;
+&lt;p&gt;When booting up, press and hold &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;Shift&amp;gt;&lt;/code&gt; to go to the grub menu, then go to advanced options to select the kernel you want to boot with.&lt;/p&gt;
+
+&lt;h1 id=&quot;minimizing-the-kernel-size&quot;&gt;Minimizing the Kernel Size&lt;/h1&gt;
+&lt;p&gt;Let’s try to compile a kernel that is as small as possible.&lt;/p&gt;
+
+&lt;h2 id=&quot;measuring-size&quot;&gt;Measuring Size&lt;/h2&gt;
+&lt;p&gt;The kernel size can be determined using&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-lh&lt;/span&gt; vmlinux
+&lt;span class=&quot;nt&quot;&gt;-rwxr-xr-x&lt;/span&gt; 1 tch tch 1.1G Jan 31 16:19 vmlinux
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;In this case, I will measure the size of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmlinux&lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vmlinuz&lt;/code&gt; since compression is cheating.&lt;/p&gt;
+
+&lt;p&gt;Using the default, we get a size of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1103946480&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1.1G&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;my-personal-best&quot;&gt;My Personal Best&lt;/h2&gt;
+&lt;p&gt;I managed to get it down to 51M with &lt;a href=&quot;/downloads/minimal.config&quot;&gt;this&lt;/a&gt; config.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ls -lh vmlinux
+-rwxrwxr-x 1 tch tch 51M Feb  4 11:49 vmlinux
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Theoretically it should be able to get down to around 10M as that is what I saw on some embedded linux forums. But I have other projects on hand that require my immediate attention, I’ll come back to it one day…&lt;/p&gt;
+
+&lt;h1 id=&quot;happy-coding&quot;&gt;Happy Coding!&lt;/h1&gt;
+&lt;p&gt;If you run into any errors, you may drop me a text on telegram!&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Linux" /><category term="Kernel" /><summary type="html">The exploration logs are found at here.</summary></entry><entry><title type="html">Teaching Quantum Field Theory</title><link href="http://0.0.0.0:4000/physics/qft/2023/01/31/teaching-qft.html" rel="alternate" type="text/html" title="Teaching Quantum Field Theory" /><published>2023-01-31T00:00:00+00:00</published><updated>2023-01-31T00:00:00+00:00</updated><id>http://0.0.0.0:4000/physics/qft/2023/01/31/teaching-qft</id><content type="html" xml:base="http://0.0.0.0:4000/physics/qft/2023/01/31/teaching-qft.html">&lt;p&gt;I’ve started trying to teach quantum field theory casually. The lessons take place roughly fortnightly (every &lt;a href=&quot;https://www.timeanddate.com/worldclock/fixedtime.html?msg=TCH%27s+QFT+Lectures&amp;amp;iso=20230129T20&amp;amp;p1=%3A&amp;amp;ah=2&quot;&gt;Sunday 8pm&lt;/a&gt; on Zoom). &lt;a href=&quot;https://www.tchlabs.net/#contact&quot;&gt;Contact&lt;/a&gt; me on telegram to sit in! Hopefully I can get enough practice and refine my material such that when I am actually required to teach QFT in a university, I will be confident enough to be a good lecturer!&lt;/p&gt;
 
 &lt;p&gt;Here are the &lt;a href=&quot;/downloads/TanChienHao_Slides.pdf&quot;&gt;slides&lt;/a&gt;
 and &lt;a href=&quot;https://youtube.com/&quot;&gt;recordings&lt;/a&gt; (TODO to be uploaded).&lt;/p&gt;
 
 &lt;p&gt;Special thanks to &lt;a href=&quot;https://victoris.org/&quot;&gt;Victoris.org&lt;/a&gt; for supporting my lessons!&lt;/p&gt;</content><author><name>tch1001</name><email>tanchienhao@gmail.com</email></author><category term="Physics" /><category term="QFT" /><summary type="html">I’ve started trying to teach quantum field theory casually. The lessons take place roughly fortnightly (every Sunday 8pm on Zoom). Contact me on telegram to sit in! Hopefully I can get enough practice and refine my material such that when I am actually required to teach QFT in a university, I will be confident enough to be a good lecturer!</summary></entry></feed>
->>>>>>> 29d9f12e14704cb153f54b51a8d54d521f316c7b
