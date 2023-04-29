@@ -38,14 +38,14 @@ We **want** this covariant derivative to satisfy various properties, which we ca
 2. $$\nabla_T \sigma_1 + \sigma_2 = \nabla_T \sigma_1 + \nabla_T \sigma_2$$
 3. $$\nabla_T (f \sigma) = T(f) \sigma + f \nabla_T \sigma $$
 
-The definition that we work towards is the following: for a *local* section $s:\mathcal U \sub M \rightarrow P_V$, a *local* trivialisation $\varphi : \mathcal U \sub M \rightarrow P$, the exterior covariant derivative on $P$, and a $V$-valued function $\phi:P\rightarrow V$, a $\mathfrak g$-valued connection one-form $\omega:P \rightarrow \mathfrak g$
+The definition that we work towards is the following: for a *local* section $$s:\mathcal U \subset M \rightarrow P_V$$, a *local* trivialisation $$\varphi : \mathcal U \subset M \rightarrow P$$, the exterior covariant derivative on $P$, and a $V$-valued function $\phi:P\rightarrow V$, a $\mathfrak g$-valued connection one-form $\omega:P \rightarrow \mathfrak g$
 
-$$\nabla_T s := (\varphi^* D \phi) (T) = ds(T) + (\varphi^* \omega)(T) \bullet_L s$$
+$$\nabla_T s := (\varphi^* D \phi) (T) = ds(T) + (\varphi^* \omega)(T) \bullet_{d\rho} s$$
 
 It is a definition dump for now but let's explain the details.
 
 ## Exterior Covariant Derivative on $P$
-Definition: For any function $f$ on $\bigotimes^n TP$ (meaning any number $n$ of tensor products of $TP$)
+Definition: For an any-valued $n$-form $f$ on $\Omega^n(P)$,
 
 $$Df := df \circ \text{hor}$$
 
@@ -57,7 +57,7 @@ Special case 2: if $\phi$ is a $F$-valued function on $P$ ($n=0$), for any $X\in
 
 $$D\phi(X) := d\phi(\text{hor}(X))$$
 
-## Correspondence between $F$-valued functions on $P$ \& global sections of associated bundle $P_F$
+## Correspondence between $F$-valued functions on $P$ & global sections of associated bundle $P_F$
 One can define the covariant derivative using parallel transport on the associated vector bundle $P_V$ but that definition is difficult to work with. Instead we seek to define things by using the principal $G$-bundle $P$ and defining objects on it, then pulling them over to the associated bundle $P_V$.
 
 We are going to work with a general fiber $F$ (not necessarily a vector bundle).
@@ -89,4 +89,81 @@ $$
 One can check (watch Lec 25) that $$\phi_{\sigma_\phi} = \phi$$ and $$\sigma_{\phi_\sigma} = \sigma$$ 
 
 ## Exterior Covariant Derivative of $\phi:P\rightarrow V$
-**Only if** we set the fiber $F$ to be some vector space $V$, a (left) representation of $G$, then the 
+**Only if** we set the fiber $F$ to be some finite dimensional vector space $V$ (isomorphic to $\mathbb R^{\text{dim }V}$), a (left) representation of $G$, then the $G$-equivariance condition 
+
+$$\phi(p\bullet_R \exp(At)) = \exp(-At) \bullet_\rho \phi(p) \quad \forall t\in \mathbb{R},A\in \mathfrak g$$
+
+can be differentiated (because the vector space has an addition). So fixing $A\in \mathfrak g$ and differentiating wrt $t$,
+
+$$ 
+\begin{aligned}
+\left. \frac{d}{dt}\phi(p\bullet_R \exp(At)) \right\vert_{t=0}  & = \left. \frac{d}{dt} \exp(-At) \bullet_{\rho} \phi(p) \right\vert_{t=0} \\
+d\phi(X_p^{A}) & = -A \bullet_{d\rho} \phi(p) \in T_{\phi(p)} V
+\end{aligned}
+$$
+
+where $d\phi : T_p P \to T_{\phi(p)} V$ is the pushforward of $\phi: P \to V$. The $\bullet_{d\rho}:\mathfrak g \times T_v V \rightarrow T_v V$ action is the [pushforward of the Lie group representation](https://en.wikipedia.org/wiki/Lie_algebra_representation#Infinitesimal_Lie_group_representations). Actually to be more precise it is the restriction of the pushforward to the tangent space at the identity of the group. To spell it out, we take the pushforward of $\rho: G \times V \to V$, namely $d\rho: T_g G \times T_v V \to T_{\rho(g, v)} V$ and restrict it to the subspace $T_g G \supset T_e G \cong \mathfrak g$. So the codomain becomes $T_{\rho(e,v)}V = T_{v} V$. 
+
+If we had a connection on $P$, then $\omega(X^{A}) = A$ so we can rewrite the above as
+
+$$d\phi(X^{A}_p ) + \omega(X^{A}_p)\bullet_{d\rho} \phi(p) = 0$$
+
+Now using the above, we can show that $D\phi := d\phi \circ \text{hor}$ is equals to 
+
+$$D\phi(X_p) = d\phi(X_p) + \omega(X_p) \bullet_{d\rho} \phi(p)$$
+
+by decomposing $X=H+V$ and showing that the above holds for $H,V$ separately. 
+
+## Pulling back $D\phi(X)$ to $$\nabla_{\pi_* X}\sigma$$
+
+We have a good expression for $D\phi : TP \rightarrow \Gamma(P_V)$ (sections of the $P_V$ associated bundle), or pointwise a $V$-valued one-form $D\phi_p: T_p P \rightarrow V$. Suppose we have a local section $\varphi : \mathcal U \rightarrow P$, then we can pullback the $D\phi$ one-form to a one-form on the base manifold $\mathcal U \subset M$. For a vector $T\in  T_x \mathcal U$
+
+$$
+\begin{aligned}
+\underbrace{(\varphi^{*} D\phi) (T)}_{:=} &= (\varphi^{*} d\phi) T + (\varphi^{*}\omega)(T) \bullet_{d\rho} (\varphi^* \phi) (x)\\
+\nabla_T (\phi \circ \varphi) &= d(\phi \circ \varphi) T + \Gamma(T) \bullet_{d\rho} \phi(\varphi (x))\\
+\nabla_T s&= ds (T) + \Gamma(T) \bullet_{d\rho} s(x)
+\end{aligned}
+$$
+
+where we $\phi \circ \varphi \equiv s : \mathcal U \rightarrow V$. The last line is just the usual definition we see for covariant derivative! 
+
+One can check that all the properties below hold true given the above definition.
+
+For $f \in C^{\infty} (M),\ T,S \in T M$
+
+1. $$\nabla_{fT+S} \sigma = f \nabla_T \sigma+ \nabla_S \sigma$$
+2. $$\nabla_T \sigma_1 + \sigma_2 = \nabla_T \sigma_1 + \nabla_T \sigma_2$$
+3. $$\nabla_T (f \sigma) = T(f) \sigma + f \nabla_T \sigma $$
+
+## Examples
+### General Relativity
+In General Relativity, the principal bundle is the frame bundle $LM$, with gauge group $GL(d)$. The associated bundle is the tangent bundle $TM$. Since $GL(d)$ is a matrix group, the action $\bullet_{d\rho}$ is just matrix multiplication. The section $s:\mathcal U \rightarrow TM$ is a vector field. If there is a coordinate chart $x:\mathcal U \rightarrow \mathbb R ^ d$, then the section can be decomposed as $s^j (x) \partial_j$ where $s^j :\mathcal U \rightarrow \mathbb R$ are functions on $\mathcal U$.
+
+$$
+\begin{aligned}
+(\nabla_{\partial_\mu} s)^i & = [ds(\partial_\mu)]^i + {\Gamma^i}_{j\mu} s^j \\ 
+& = \partial_\mu (s^i) + {\Gamma^i}_{j\mu} s^j
+\end{aligned}
+$$
+
+To unpack what we just wrote above, note that $\mathbf \Gamma_\mu$ is a matrix. If we represent $\mathbf s = s^j \partial_j$ as a column vector with entries $s^j$, then the action of $\mathbf \Gamma_\mu$ on $\mathbf s$ is just matrix multiplication $(\mathbf \Gamma_\mu \mathbf s)^i = {\Gamma^i}_{j\mu} s^j$ 
+
+We have used property (1) to decompose $\nabla_T$ into 
+
+$$\nabla_{T^\mu \partial_\mu} = T^\mu \nabla_{\partial_\mu} $$ 
+
+
+On the LHS, $$ \nabla_{\partial_\mu} \mathbf s$$ is a vector in $T_xM$ so we can extract components $$(\nabla_{\partial_\mu} \mathbf s)^i$$. Do note that this is NOT the same as $$\nabla_{\partial_\mu} (\mathbf s^i)$$. The latter is interpreting $s^i$ as functions, and the associated bundle would be the line bundle $\mathbb R$. In our case we are dealing with an associated vector bundle, and elements living in the fiber are $\mathbf s(x) \in T_x M$.
+
+The $\partial_\mu(s^i)$ term is admittedly very ambiguous (my fault). We start from the definition of the pushforward
+
+$$ds(\partial_\mu) := \partial_\mu (\_ \circ s)$$
+
+The function on $\mathcal U$, $$\_ \circ s: \mathcal U \to \mathbb R$$, is eaten by $$\partial_\mu \in T_x \mathcal U$$ to yield a real number. But this $ds(\partial_\mu)$ has a blank slot $$\_$$, and is waiting for a function on $TM$.
+
+The $ds(\partial_\mu)$ eats a function on $TM$ and outputs a real number. In other words, it is a vector **on** $TM$ (meaning it lives **in** $TTM$, yea!). $$\nabla_{\partial_\mu} s$$ on the LHS is a vector on $TM$ too. All that remains to settle are the components: to show that 
+
+$$[ds(\partial_\mu)]^i = [\partial_\mu(\_ \circ s)]^i \stackrel{!}{=} \partial_\mu (s^i)$$
+
+Actually this doesn't make sense, because $i$ goes from $1$ to $d$ on the RHS, whereas the dimension of the $ds(\partial_\mu)$ vector is $2d$. The resolution to this is to note that $ds(\partial_\mu)$ is a horizontal vector since $d(\pi \circ s) = \text{id}_{TM}$, so it has effective dimension $d$. 
