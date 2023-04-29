@@ -140,6 +140,10 @@ For $f \in C^{\infty} (M),\ T,S \in T M$
 ### General Relativity
 In General Relativity, the principal bundle is the frame bundle $LM$, with gauge group $GL(d)$. The associated bundle is the tangent bundle $TM$. Since $GL(d)$ is a matrix group, the action $\bullet_{d\rho}$ is just matrix multiplication. The section $s:\mathcal U \rightarrow TM$ is a vector field. If there is a coordinate chart $x:\mathcal U \rightarrow \mathbb R ^ d$, then the section can be decomposed as $s^j (x) \partial_j$ where $s^j :\mathcal U \rightarrow \mathbb R$ are functions on $\mathcal U$.
 
+$$\nabla_T s= ds (T) + \Gamma(T) \bullet_{d\rho} s(x)$$ 
+
+becomes
+
 $$
 \begin{aligned}
 (\nabla_{\partial_\mu} s)^i & = [ds(\partial_\mu)]^i + {\Gamma^i}_{j\mu} s^j \\ 
@@ -166,4 +170,43 @@ The $ds(\partial_\mu)$ eats a function on $TM$ and outputs a real number. In oth
 
 $$[ds(\partial_\mu)]^i = [\partial_\mu(\_ \circ s)]^i \stackrel{!}{=} \partial_\mu (s^i)$$
 
-Actually this doesn't make sense, because $i$ goes from $1$ to $d$ on the RHS, whereas the dimension of the $ds(\partial_\mu)$ vector is $2d$. The resolution to this is to note that $ds(\partial_\mu)$ is a horizontal vector since $d(\pi \circ s) = \text{id}_{TM}$, so it has effective dimension $d$. 
+Actually this doesn't make sense, because $i$ goes from $1$ to $d$ on the RHS, whereas the dimension of the $ds(\partial_\mu)$ vector is $2d$. The resolution to this is to note that $$ds(\partial_\mu)$$ is a horizontal vector since $$d(\pi \circ s) = \text{id}_{TM}$$, so it has effective dimension $d$. Since $d$ is a linear functional, $(ds)^i = d(s^i)$. Then $d(s^i) \partial_\mu$ is just $\partial_\mu(s^i)$ by definition. QED
+
+I'm sorry to leave you on the edge but I do not know how to make the above argument more rigorous. It matches with the GR definition of covariant derivative so I'm sure there is some valid explanation. I think it has to do with the isomorphism $T_v V \cong V$ but I can't make this precise. Might update the blog next time (TODO).
+
+### [Scalar Electrodynamics](https://en.wikipedia.org/wiki/Scalar_electrodynamics)
+We switch to the convention that the $\exp$ map from Lie algebra to Lie group has a factor of $i$, so $\exp(i \mathfrak g) = G$. This is so that the Lie algebra is real to match physics convention.
+
+The section $s:M \to \mathbb C$ is the complex line bundle. The action $\rho:G \to GL(\mathbb C)$ is given by complex rotation $\exp{(i \lambda)} \bullet_\rho \phi = \exp{(i\lambda)} \phi$. The pushforward of that action is $\bullet_{d\rho}: \mathfrak u(1) \rightarrow GL(\mathbb C)$, given by complex multiplication ${\lambda} \bullet_{d\rho} \phi = i \lambda \phi$. $\Gamma$ is the electromagnetic 4-potential $A = A_\mu dx^\mu$, with $A_\mu \in \mathbb R \cong \mathfrak g$.
+
+$$\nabla_T s= ds (T) + \Gamma(T) \bullet_{d\rho} s(x)$$ 
+
+becomes
+
+$$
+\begin{aligned}
+D_{\partial_\mu}\phi & = d\phi(\partial_\mu) + A_\mu \bullet_{d\rho} \phi\\
+& = \partial_\mu \phi + i A_\mu \phi\\
+\end{aligned}
+$$
+
+If we had chosen the action to be $\exp(i \lambda) \bullet_\rho \phi = \exp(-i\lambda) \phi$ then we would have arrived at $- i A_\mu \phi$ instead of $+$ (a more common convention). It is just a matter of convention / choice of action.
+
+The Dirac Electrodynamics version is not too different since $U(1)$ just acts on individual components (scalar multiplication as opposed to matrix multiplication) of the Dirac spinor.
+
+## Gauge Transformations
+You hear this in GR: "the covariant derivative transforms like a tensor". You also see things like $D_\mu' U(x) = U(x) D_\mu$ in electrodynamics. It turns out this is unified under the following
+
+$$
+\begin{aligned}
+\nabla' \Omega^{-1} s &= d(\Omega^{-1} s) + (\Omega^{-1} \Gamma \Omega + \Omega^{-1} d \Omega) \Omega^{-1} s \\
+& = d\Omega^{-1} ds + \Omega^{-1} s + \Omega^{-1}\Gamma s + \Omega^{-1} d \Omega \Omega^{-1} s \\
+& = d\Omega^{-1} ds + \Omega^{-1} s + \Omega^{-1}\Gamma s - d\Omega^{-1} s \\
+& = \Omega^{-1} (ds + \Gamma s) \\
+& = \Omega^{-1} \nabla s
+\end{aligned}
+$$
+
+where we used $d\Omega^{-1} \Omega + \Omega^{-1} d \Omega  = d(\Omega^{-1} \Omega) = 0$. 
+
+I find it slightly odd that $s$ transforms under $\Omega^{-1}$ (from the left). I could have made a mistake, or maybe it's just interpreted as a right action (left vs right differs under composition of actions).
