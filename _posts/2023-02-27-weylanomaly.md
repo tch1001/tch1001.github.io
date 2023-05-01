@@ -13,4 +13,8 @@ CFT alone had central charge of −26, but we need the total
 central charge of Polyakov + bc to be 0 due to the Weyl anomaly.
 So the Polyakov action needed to have a ”critical central charge”
 of 26, which corresponded to the coordinates of the string being
-26-dimensional.
+26-dimensional. 
+
+There are other ways to derive the critical dimension, such as using Lorentz invariance.
+
+Update: Here is a [recording](https://youtu.be/a6mXuDIJ8V8)
