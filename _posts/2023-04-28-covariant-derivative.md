@@ -200,8 +200,8 @@ You hear this in GR: "the covariant derivative transforms like a tensor". You al
 $$
 \begin{aligned}
 \nabla' \Omega^{-1} s &= d(\Omega^{-1} s) + (\Omega^{-1} \Gamma \Omega + \Omega^{-1} d \Omega) \Omega^{-1} s \\
-& = d\Omega^{-1} ds + \Omega^{-1} s + \Omega^{-1}\Gamma s + \Omega^{-1} d \Omega \Omega^{-1} s \\
-& = d\Omega^{-1} ds + \Omega^{-1} s + \Omega^{-1}\Gamma s - d\Omega^{-1} s \\
+& = d\Omega^{-1} s + \Omega^{-1} ds + \Omega^{-1}\Gamma s + \Omega^{-1} d \Omega \Omega^{-1} s \\
+& = d\Omega^{-1} s + \Omega^{-1} ds + \Omega^{-1}\Gamma s - d\Omega^{-1} s \\
 & = \Omega^{-1} (ds + \Gamma s) \\
 & = \Omega^{-1} \nabla s
 \end{aligned}
