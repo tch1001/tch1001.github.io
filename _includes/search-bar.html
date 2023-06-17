@@ -1,0 +1,109 @@
+<i class="fa fa-search" aria-hidden="true"></i>
+<input id="search" type="text" placeholder="Search..." />
+<div id="search-result">
+</div>
+<style>
+  /* make id search nicer */
+  #search {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 12px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+  }
+</style>
+<script>
+
+  var posts = [];
+  // obtain posts from /search.json using pure javascript 
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "/search.json", true);
+  xhr.onload = function () {
+    if (this.status === 200) {
+      var escapedText = this.responseText.replace(/[\u0000-\u001F]/g, '')
+      posts = JSON.parse(escapedText);
+    }
+  };
+  xhr.send();
+  function expandSearchBar() {
+    // expand the search result to fill the whole row,
+    // this is a little hacky, but it works
+    var pagelinks = document.getElementsByClassName('page-link');
+    for (var i = 0; i < pagelinks.length; i++) {
+      pagelinks[i].style.display = "none";
+    }
+    document.getElementsByClassName('site-title')[0].style.display = "none";
+    document.getElementById('search').style.width = "100%";
+    // make the search go left
+    document.getElementById('search').style.float = "left";
+  }
+  function collapseSearchBar() {
+    var pagelinks = document.getElementsByClassName('page-link');
+    for (var i = 0; i < pagelinks.length; i++) {
+      pagelinks[i].style.display = "inline-block";
+    }
+    document.getElementsByClassName('site-title')[0].style.display = "inline-block";
+    document.getElementById('search').style.width = "auto";
+    // also clear the search result
+    // 
+    document.getElementById("search-result").innerHTML = "";
+  }
+  function populateSearch(event) {
+    expandSearchBar()
+    var query = this.value;
+    var result = document.getElementById("search-result");
+    result.innerHTML = "";
+    if (query.length < 3) {
+      return;
+    }
+    // perform the search with keywords from the title only
+    posts.forEach(function (post) {
+      if (post.title.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+        var div = document.createElement("div");
+        // bold the searched words
+        var titleIndex = post.title.toLowerCase().indexOf(query.toLowerCase());
+        const size = 40;
+        var titleStart = Math.max(titleIndex - size, 0)
+        var titleEnd = Math.min(titleIndex + query.length + size, post.title.length);
+        var titleSnippet = post.title.substring(titleStart, titleEnd);
+        var titleSnippetIndex = titleSnippet.toLowerCase().indexOf(query.toLowerCase());
+        titleSnippet = titleSnippet.substring(0, titleSnippetIndex) + "<b>" + titleSnippet.substring(titleSnippetIndex, titleSnippetIndex + query.length) + "</b>" + titleSnippet.substring(titleSnippetIndex + query.length);
+        div.innerHTML = "<a href='" + post.url + "'><h4>" + titleSnippet + "</h4></a>";
+        result.appendChild(div);
+      }
+    });
+    // add a h3 element to show how many results in titles
+    var h3 = document.createElement("h3");
+    var numberOfResults = result.childElementCount;
+    h3.innerHTML = "Results in titles: " + numberOfResults;
+    result.insertBefore(h3, result.firstChild);
+    var lastTitle = result.lastChild;
+    // bolding the searched words
+    posts.forEach(function (post) {
+      var content = post.content.toLowerCase();
+      if (content.indexOf(query.toLowerCase()) !== -1) {
+        var div = document.createElement("div");
+        var contentIndex = content.indexOf(query.toLowerCase());
+        const size = 40;
+        var contentStart = Math.max(contentIndex - size, 0)
+        var contentEnd = Math.min(contentIndex + query.length + size, content.length);
+        var contentSnippet = post.content.substring(contentStart, contentEnd);
+        var contentSnippetIndex = contentSnippet.toLowerCase().indexOf(query.toLowerCase());
+        contentSnippet = contentSnippet.substring(0, contentSnippetIndex) + "<b>" + contentSnippet.substring(contentSnippetIndex, contentSnippetIndex + query.length) + "</b>" + contentSnippet.substring(contentSnippetIndex + query.length);
+        div.innerHTML = "<a href='" + post.url + "'><h4>" + post.title + "</h4></a>" + contentSnippet + "...";
+        result.appendChild(div);
+      }
+    });
+    // add a h3 element to show how many results in contents
+    var contenth3 = document.createElement("h3");
+    contenth3.innerHTML = "Results in contents: " + (result.childElementCount - 1 - numberOfResults);
+    result.insertBefore(contenth3, lastTitle.nextSibling);
+
+  }
+  // add an key up event listener to the search input
+  document.getElementById("search").addEventListener("keyup", populateSearch);
+  // when id search is typing, expand it to fill the whole row
+  document.getElementById("search").addEventListener("focus", populateSearch);
+  // and collapse it when id search is not typing
+  document.getElementById("search").addEventListener("blur", collapseSearchBar);
+</script>
