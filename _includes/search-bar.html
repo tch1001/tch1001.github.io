@@ -34,8 +34,6 @@
     }
     document.getElementsByClassName('site-title')[0].style.display = "none";
     document.getElementById('search').style.width = "100%";
-    // make the search go left
-    document.getElementById('search').style.float = "left";
   }
   function collapseSearchBar() {
     var pagelinks = document.getElementsByClassName('page-link');
@@ -54,6 +52,7 @@
     var result = document.getElementById("search-result");
     result.innerHTML = "";
     if (query.length < 3) {
+      collapseSearchBar();
       return;
     }
     // perform the search with keywords from the title only
@@ -104,6 +103,4 @@
   document.getElementById("search").addEventListener("keyup", populateSearch);
   // when id search is typing, expand it to fill the whole row
   document.getElementById("search").addEventListener("focus", populateSearch);
-  // and collapse it when id search is not typing
-  document.getElementById("search").addEventListener("blur", collapseSearchBar);
 </script>
