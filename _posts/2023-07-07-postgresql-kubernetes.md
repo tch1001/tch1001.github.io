@@ -9,7 +9,12 @@ Btw, I will personally *guide* you in setting up these stuff for $25 (around 1h 
 If you already have a psql database running, then skip this section. If not, you can do the following
 ```
 helm template postgresql bitnami/postgresql > postgresql-rendered.yaml
+
+# mac: needs file extension
 sed -i .yaml 's/cpu: 250m//g' postgresql-rendered.yaml
+# linux: doesnt need file extension
+sed -i 's/cpu: 250m//g' postgresql-rendered.yaml
+
 sed -i .yaml 's/memory: 256Mi//g' postgresql-rendered.yaml
 sed -i .yaml 's/storage: "8Gi"/storage: "1Gi"/g' postgresql-rendered.yaml
 k apply -f postgresql-rendered.yaml
