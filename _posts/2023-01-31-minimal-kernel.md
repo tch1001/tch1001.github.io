@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Compiling and Running a Minimal Kernel with Busybox
+categories: [Linux, Kernel]
 ---
 The exploration logs are found at [here](https://github.com/tch1001/kernel).
 
