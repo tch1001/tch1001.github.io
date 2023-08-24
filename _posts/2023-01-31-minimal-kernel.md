@@ -110,7 +110,7 @@ $ chmod +x init
 ```
 The above `init` shell script will be our entrypoint
 ```
-$ cp ../../busybox/BUSYBOX/* . # copy over our compiled busybox utilities
+$ cp -r ../../busybox/BUSYBOX/* . # copy over our compiled busybox utilities
 $ find . | cpio -o -H newc | gzip > root.cpio.gz # package it
 ```
 Basically, `init` will call our busybox utilities! Internally, `/bin/ls` is a symlink to `/bin/busybox ls`
