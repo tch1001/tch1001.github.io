@@ -251,6 +251,9 @@ VV p
 dc
 <F7> # to step 
 . # to return to %rip
+db* > bps
+. bps # load saved breakpoints
+~.. # "less"
 ```
 
 ### Cache me outside
