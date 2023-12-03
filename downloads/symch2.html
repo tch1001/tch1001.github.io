@@ -1,16 +1,28 @@
 <style>
-    .latex-input {
-        visibility: hidden;
+    .actions-panel {
+        position: absolute;
+        top: 0;
+        right: 0;
     }
+    .input-panel {
+        position: relative;
+        right: 120px;
+    }
+    .add-entity {
+
+    }
+    .toggle-textarea {
+        top: 0;
+        right: 0;
+        width: 120px;
+    }
+
     .overlay {
         position: absolute;
         top: 0;
-        left: 0;
+        right: 0;
     }
-    .add-entity {
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1;
-    }
+
     body {
         margin: 0;
         padding: 0;
@@ -37,12 +49,12 @@
             this.mouse_state = MouseState.NONE;
         }
         onmouseover(e) {
-            if(this.mouse_state != MouseState.DRAGGING) this.mouse_state = MouseState.HOVER;
+            if (this.mouse_state != MouseState.DRAGGING) this.mouse_state = MouseState.HOVER;
             this.node.style.border = '1px solid red';
         }
         onmousedown(e) {
             if (e.button == 0) { // left click
-                if(this.mouse_state != MouseState.DRAGGING) this.mouse_state = MouseState.SELECTED;
+                if (this.mouse_state != MouseState.DRAGGING) this.mouse_state = MouseState.SELECTED;
             }
             this.node.style.border = '1px solid blue';
         }
@@ -96,33 +108,58 @@
             console.log("err")
         })
     }
-    function init(){
-        document.onmouseup = function(e){
-            for(var i = 0; i < entities.length; i++){
+    function init() {
+        document.onmouseup = function (e) {
+            for (var i = 0; i < entities.length; i++) {
                 entities[i].onmouseup(e);
             }
         }
-        document.onmousemove = function(e){
-            for(var i = 0; i < entities.length; i++){
+        document.onmousemove = function (e) {
+            for (var i = 0; i < entities.length; i++) {
                 entities[i].onmousemove(e);
             }
         }
+        document.getElementById('latex').style.visibility = 'hidden';
+    }
+    function add_entity(){
+        const raw_latex = document.getElementById('latex').value;
+        // wrap with aligned
+        const aligned = '\\begin{aligned}' + raw_latex + '\\end{aligned}';
+        math_render(aligned);
     }
     function render() {
         init()
-        math_render(document.getElementById('latex').value);
+        add_entity()
+    }
+    function toggle_textarea() {
+        var textarea = document.getElementById('latex');
+        if (textarea.style.visibility == 'hidden') {
+            textarea.style.visibility = 'visible';
+            textarea.style.width = '400px';
+            textarea.style.height = '500px';
+        } else {
+            textarea.style.visibility = 'hidden';
+            textarea.style.width = '0px';
+            textarea.style.height = '0px';
+        }
     }
 </script>
 
 <body onload='render()'>
-    <textarea class="latex-input" id='latex'>\begin{aligned}
-  W_\alpha &= -\frac{1}{4} \bar{D}^2 D_\alpha V \\
-  &= -\frac{1}{4} \bar{D}^2 (-\sigma^\nu_{\alpha\dot\beta} \bar\theta^{\dot\beta} A_\nu + i\theta_\alpha \overline{\theta\lambda} - i \bar\theta^2 \lambda_\alpha + \frac{1}{2} \theta_\alpha \bar{\theta}^2 D - i \sigma_{\alpha \dot\alpha}^\mu \bar\theta^{\dot\alpha} \theta^\beta \sigma_{\beta\dot\beta}^\nu \bar\theta^{\dot\beta} \partial_\mu A_\nu - \sigma_{\alpha \dot \alpha}^\mu \bar\theta^{\dot\alpha} \theta^\beta \theta_\beta \bar\theta^{\dot\beta} \partial_\mu \bar\lambda_{\dot\beta}) \\
-  &= (a+b-c) (d-e +f)\\
-\end{aligned}</textarea>
+
     <!-- <canvas class='workspace' id='output' width='500' height='500'></canvas> -->
     <div id='output'></div>
     <div class="overlay add-entity">
-        <button onclick="math_render(document.getElementById('latex').value)">Add Entity</button>
+        <div class="input-panel">
+            <textarea class="latex-input" id='latex'>
+  W_\alpha &= -\frac{1}{4} \bar{D}^2 D_\alpha V \\
+  &= -\frac{1}{4} \bar{D}^2 (-\sigma^\nu_{\alpha\dot\beta} \bar\theta^{\dot\beta} A_\nu + i\theta_\alpha \overline{\theta\lambda} - i \bar\theta^2 \lambda_\alpha + \frac{1}{2} \theta_\alpha \bar{\theta}^2 D - i \sigma_{\alpha \dot\alpha}^\mu \bar\theta^{\dot\alpha} \theta^\beta \sigma_{\beta\dot\beta}^\nu \bar\theta^{\dot\beta} \partial_\mu A_\nu - \sigma_{\alpha \dot \alpha}^\mu \bar\theta^{\dot\alpha} \theta^\beta \theta_\beta \bar\theta^{\dot\beta} \partial_\mu \bar\lambda_{\dot\beta}) \\
+  &= (a+b-c) (d-e +f)\\
+</textarea><br>
+        </div>
+        <div class="actions-panel">
+            <button class="toggle-textarea" onclick="toggle_textarea()">Toggle Textarea</button><br>
+            <button class="add-entity" onclick="add_entity()">Add Entity</button>
+        </div>
     </div>
 </body>
