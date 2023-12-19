@@ -24,6 +24,20 @@
         margin: 0;
         padding: 0;
     }
+
+    .buffers {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+    }
+    .buffer {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+    #delimiter-textfield {
+        width: 30px;
+    }
 </style>
 <script>
     MathJax = {
@@ -204,6 +218,8 @@
             }
         }
         document.getElementById('latex').style.visibility = 'hidden';
+        math_render('\\begin{aligned} \\left(d+e-\\left[f-g\\right]\\right)\\end{aligned}')
+        math_render('\\begin{aligned} -(a+b) \\end{aligned}')
     }
     function add_entity(){
         const raw_latex = document.getElementById('latex').value;
@@ -222,7 +238,10 @@
         document.getElementById('latex').value = '';
         focused_entity = null;
     }
-    var old_textarea_style = {};
+    var old_textarea_style = {
+        width: '400px',
+        height: '150px',
+    };
     function save_old_textarea_style(){
         var textarea = document.getElementById('latex');
         old_textarea_style = {
@@ -251,6 +270,163 @@
             textarea.style.height = '0px';
         }
     }
+    class AST {
+        constructor(){
+            this.operation = null;
+            // for binary
+            this.left = null;
+            this.right = null;
+            // for unary
+            this.term = null;
+        }
+        tree(indent=0){
+            var output = '';
+            const blah = '.'.repeat(indent);
+            output += blah;
+            output += this.operation;
+            output += '\n';
+            output += blah;
+            if(this.left instanceof AST){
+                output += this.left.tree(indent+1);
+            }else{
+                output += this.left;
+            }
+            output += '\n';
+            output += blah;
+            if(this.right instanceof AST){
+                output += this.right.tree(indent+1);
+            }else{
+                output += this.right;
+            }
+            return output;
+        }
+        propagate_minus(){
+        }
+        infix(){
+            var infix = '';
+            if(this.left instanceof AST){
+                infix += '(' + this.left.infix() + ')';
+            }else{
+                infix += this.left;
+            }
+            if(this.operation == '-'){
+                console.error('minus sign should have been propagated')
+            }
+            infix += this.operation;
+            if(this.right instanceof AST){
+                infix += '(' + this.right.infix() + ')';
+            }else{
+                infix += this.right;
+            }
+        }
+    }
+    function construct_AST(postfix, firstDelimiter, secondDelimiter){
+        var stack = [];
+        for(var i = 0; i < postfix.length; i++){
+            if(postfix[i] == ' ') continue;
+            if(postfix[i] == firstDelimiter){
+                // pop two things from stack
+                var right = stack.pop();
+                var left = stack.pop();
+                // construct AST
+                var ast = new AST();
+                ast.operation = firstDelimiter;
+                ast.left = left;
+                ast.right = right;
+                // push AST to stack
+                stack.push(ast);
+            }else if(postfix[i] == secondDelimiter){
+                // pop two things from stack
+                var right = stack.pop();
+                var left = null;
+                if(stack.length > 0){
+                    left = stack.pop();
+                }
+                // construct AST
+                var ast = new AST();
+                if(left == null){
+                    ast.operation = 'neg';
+                    ast.term = right;
+                }else{
+                    ast.operation = secondDelimiter;
+                    ast.left = left;
+                    ast.right = right;
+                }
+                // push AST to stack
+                stack.push(ast);
+            }else{
+                // push to stack
+                stack.push(postfix[i]);
+            }
+            console.log(stack)
+        }
+        return stack[0];
+    }
+    function separate(){
+        console.log('separate')
+        const delimiter = document.getElementById('delimiter-textfield').value;
+        const firstDelimiter = delimiter.split(',')[0];
+        const secondDelimiter = delimiter.split(',')[1]; // the minus sign
+        var [start, end, sel] = get_selection();
+        if(sel.length == 0) sel = removedAligned(focused_entity.code); // if nothing selected, entire thing is selected
+        // split sel by firstDelimiter (plus sign) and secondDelimiter (minus sign)
+        // taking good care of brackets
+        const brackets = [['(', ')'], ['{', '}'], ['[', ']']];
+        var operator_stack = [];
+        var terms_queue = [];
+        // shunt yard algorithm
+        for(var i = 0; i < sel.length; i++){
+            var is_number = true;
+            for(var j = 0; j < brackets.length; j++){
+                // if it's a bracket 
+                if(sel[i] == '\\'){
+                    // skip to the bracket
+                    if(sel.substring(i, i+5) == '\\left'){
+                        i += 5;
+                    }else if(sel.substring(i, i+6) == '\\right'){
+                        i += 6;
+                    }
+                }
+                if(sel[i] == brackets[j][0]){ // left bracket
+                    operator_stack.push(brackets[j][0]);
+                    is_number = false;
+                }else if(sel[i] == brackets[j][1]){ // right bracket
+                    // pop all operators until left bracket
+                    while(operator_stack.length > 0 && operator_stack[operator_stack.length - 1] != brackets[j][0]){
+                        terms_queue.push(operator_stack.pop());
+                    }
+                    operator_stack.pop(); // pop the left bracket
+                    is_number = false;
+                }
+            }
+            if (sel[i] == firstDelimiter) {
+                // is an operator
+                // pop all operators with higher precedence (none)
+                operator_stack.push(sel[i]);
+                is_number = false;
+            } else if (sel[i] == secondDelimiter) {
+                operator_stack.push(sel[i]);
+                is_number = false;
+            }
+            if (is_number) {
+                // is a term
+                terms_queue.push(sel[i]);
+            }
+        }
+        while (operator_stack.length > 0) {
+            terms_queue.push(operator_stack.pop());
+        }
+        console.log(terms_queue);
+        // construct an AST
+        var ast = construct_AST(terms_queue, firstDelimiter, secondDelimiter);
+        // propagate the minus signs to the leafs
+        console.log(ast.tree())
+        ast.propagate_minus();
+        console.log(ast.tree())
+        // convert the AST to a infix notation
+        var infix = ast.infix();
+        console.log(infix);
+    }
 </script>
 
 <body onload='render()'>
@@ -270,6 +446,48 @@
             <button class="add-entity" onclick="add_entity()">Add Entity</button><br>
             <button class="delete-entity" onclick="delete_entity()">Delete</button><br>
             <input type="checkbox" id="auto-render" checked onchange="latex_onkeyup()"> Auto-Render
+        </div>
+        <div class="buffers">
+            <input type="button" value="Copy Buffer" onclick=""> <br> 
+            <input type="button" value="Expand" onclick=""> <br> 
+            <input type="button" value="Separate" onclick="separate()"> 
+            <input type="text" placeholder="Delimiter" value="+,-" id="delimiter-textfield"><br>
+            <div class="buffer">
+                A:
+                <input type="button" value="Rename" onclick=""> 
+                <input type="button" value="Delete" onclick=""> 
+                <input type="button" value="Render" onclick=""> 
+                <select class="buffer-select">
+                    <option value="1">Buffer 1</option>
+                    <option value="2">Buffer 2</option>
+                    <option value="3">Buffer 3</option>
+                    <option value="4">Buffer 4</option>
+                </select>
+            </div><br>
+            <div class="buffer">
+                B:
+                <input type="button" value="Rename" onclick=""> 
+                <input type="button" value="Delete" onclick=""> 
+                <input type="button" value="Render" onclick=""> 
+                <select class="buffer-select">
+                    <option value="1">Buffer 1</option>
+                    <option value="2">Buffer 2</option>
+                    <option value="3">Buffer 3</option>
+                    <option value="4">Buffer 4</option>
+                </select>
+            </div><br>
+            <div class="buffer">
+                O:
+                <input type="button" value="Rename" onclick=""> 
+                <input type="button" value="Delete" onclick=""> 
+                <input type="button" value="Render" onclick=""> 
+                <select class="buffer-select">
+                    <option value="1">Buffer 1</option>
+                    <option value="2">Buffer 2</option>
+                    <option value="3">Buffer 3</option>
+                    <option value="4">Buffer 4</option>
+                </select>
+            </div>
         </div>
     </div>
 </body>
