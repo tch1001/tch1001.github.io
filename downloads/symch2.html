@@ -112,7 +112,7 @@
     function latex_onmouseup(e) {
         // get selection
         save_old_textarea_style();
-        const [start, end, sel] = get_selection();
+        var [start, end, sel] = get_selection();
         if (sel.length == 0) {
             return;
         }
@@ -120,9 +120,23 @@
         var textarea = document.getElementById('latex');
         var before = textarea.value.substring(0, start);
         var after = textarea.value.substring(end, textarea.value.length);
-        var underbraced = before + "\\underbrace{" + sel + "}" + after;
+        // trim whitespaces at the back of sel
+        var i = sel.length - 1;
+        while (sel[i] == ' ') {
+            i--;
+        }
+        sel = sel.substring(0, i + 1);
+        // if the last 2 characters of sel are newlines \\
+        var hadNewline = false;
+        if (sel[sel.length - 1] == '\\' && sel[sel.length - 2] == '\\') {
+            sel = sel.substring(0, sel.length - 2);
+            hadNewline = true;
+        }
+        var underbraced = before + (sel.includes('&') ? '&' : '' ) 
+                                    + "\\underbrace{" + sel.replaceAll('&','') + "}" 
+                                    + (hadNewline ? '\\\\' : '')
+                                    + after;
         underbraced = "\\begin{aligned}" + removedAligned(underbraced) + "\\end{aligned}"
-        console.log(underbraced)
         math_rerender(underbraced, focused_entity);
     }
     class Entity {
@@ -190,14 +204,19 @@
     var entities = [];
     document.addEventListener('contextmenu', event => event.preventDefault());
 
-    function math_render(code) {
+    function math_render(code, location=null) { // optional location
         MathJax.tex2svgPromise(code).then((guy) => {
             // console.log(node.children[0])
             // absolute positioning for node 
             var node = guy.children[0];
             node.style.position = 'absolute';
-            node.style.top = 0;
-            node.style.right = 0;
+            if(location == null){
+                node.style.top = 0;
+                node.style.right = 0;
+            }else{
+                node.style.top = location.top;
+                node.style.right = location.right;
+            }
             const entity = new Entity(code, node);
             decorateNode(entity,node);
             entities.push(entity);
@@ -218,19 +237,19 @@
             }
         }
         document.getElementById('latex').style.visibility = 'hidden';
-        math_render('\\begin{aligned} \\left(d+e-\\left[f-g\\right]\\right)\\end{aligned}')
-        math_render('\\begin{aligned} -(a+b) \\end{aligned}')
+        math_render('\\begin{aligned} \\left(d+e-\\left[f-g\\right]\\right)\\end{aligned}', {top: 200, right: 150})
+        math_render('\\begin{aligned} -(a+b) \\end{aligned}', {top: 160, right: 230})
     }
-    function add_entity(){
+    function add_entity(location=null){
         const raw_latex = document.getElementById('latex').value;
         if(raw_latex.length == 0) return;
         // wrap with aligned
         const aligned = '\\begin{aligned}' + removedAligned(raw_latex) + '\\end{aligned}';
-        math_render(aligned);
+        math_render(aligned, location);
     }
     function render() {
         init()
-        add_entity()
+        add_entity({top: 200, right: 200})
     }
     function delete_entity(){
         if(focused_entity == null) return;
@@ -270,98 +289,6 @@
             textarea.style.height = '0px';
         }
     }
-    class AST {
-        constructor(){
-            this.operation = null;
-            // for binary
-            this.left = null;
-            this.right = null;
-            // for unary
-            this.term = null;
-        }
-        tree(indent=0){
-            var output = '';
-            const blah = '.'.repeat(indent);
-            output += blah;
-            output += this.operation;
-            output += '\n';
-            output += blah;
-            if(this.left instanceof AST){
-                output += this.left.tree(indent+1);
-            }else{
-                output += this.left;
-            }
-            output += '\n';
-            output += blah;
-            if(this.right instanceof AST){
-                output += this.right.tree(indent+1);
-            }else{
-                output += this.right;
-            }
-            return output;
-        }
-        propagate_minus(){
-        }
-        infix(){
-            var infix = '';
-            if(this.left instanceof AST){
-                infix += '(' + this.left.infix() + ')';
-            }else{
-                infix += this.left;
-            }
-            if(this.operation == '-'){
-                console.error('minus sign should have been propagated')
-            }
-            infix += this.operation;
-            if(this.right instanceof AST){
-                infix += '(' + this.right.infix() + ')';
-            }else{
-                infix += this.right;
-            }
-        }
-    }
-    function construct_AST(postfix, firstDelimiter, secondDelimiter){
-        var stack = [];
-        for(var i = 0; i < postfix.length; i++){
-            if(postfix[i] == ' ') continue;
-            if(postfix[i] == firstDelimiter){
-                // pop two things from stack
-                var right = stack.pop();
-                var left = stack.pop();
-                // construct AST
-                var ast = new AST();
-                ast.operation = firstDelimiter;
-                ast.left = left;
-                ast.right = right;
-                // push AST to stack
-                stack.push(ast);
-            }else if(postfix[i] == secondDelimiter){
-                // pop two things from stack
-                var right = stack.pop();
-                var left = null;
-                if(stack.length > 0){
-                    left = stack.pop();
-                }
-                // construct AST
-                var ast = new AST();
-                if(left == null){
-                    ast.operation = 'neg';
-                    ast.term = right;
-                }else{
-                    ast.operation = secondDelimiter;
-                    ast.left = left;
-                    ast.right = right;
-                }
-                // push AST to stack
-                stack.push(ast);
-            }else{
-                // push to stack
-                stack.push(postfix[i]);
-            }
-            console.log(stack)
-        }
-        return stack[0];
-    }
     function separate(){
         console.log('separate')
         const delimiter = document.getElementById('delimiter-textfield').value;
@@ -372,60 +299,77 @@
         // split sel by firstDelimiter (plus sign) and secondDelimiter (minus sign)
         // taking good care of brackets
         const brackets = [['(', ')'], ['{', '}'], ['[', ']']];
-        var operator_stack = [];
-        var terms_queue = [];
-        // shunt yard algorithm
-        for(var i = 0; i < sel.length; i++){
-            var is_number = true;
-            for(var j = 0; j < brackets.length; j++){
-                // if it's a bracket 
-                if(sel[i] == '\\'){
-                    // skip to the bracket
-                    if(sel.substring(i, i+5) == '\\left'){
-                        i += 5;
-                    }else if(sel.substring(i, i+6) == '\\right'){
-                        i += 6;
+        var bracket_stack = [];
+        /*
+        task: split sel by firstDelimiter and secondDelimiter, but only up to the first level, meaning
+        if there are brackets, don't split inside the brackets
+        e.g. (a+b+c) + (d+e+f) - x should be split into (a+b+c), (d+e+f) and x
+
+        algorithm: every character has a "level", which is the number of brackets that it is inside
+        at the end, we just split by the delimiters of level 0
+        */
+        var terms = [];
+        var prev_idx = 0;
+        for(var i=0;i<sel.length;i++){
+            var char = sel[i];
+            const level = bracket_stack.length;
+            if(char == firstDelimiter && level == 0){
+                // split here
+                terms.push(sel.substring(prev_idx, i));
+                prev_idx = i+1;
+            }else if(char == secondDelimiter && level == 0){
+                // split here
+                terms.push(sel.substring(prev_idx, i));
+                prev_idx = i+1;
+            }else{
+                // check if char is a bracket
+                for(var j=0;j<brackets.length;j++){
+                    if(char == brackets[j][0]){
+                        // push to stack
+                        bracket_stack.push(char);
+                    }else if(char == brackets[j][1]){
+                        // pop from stack
+                        bracket_stack.pop();
                     }
                 }
-                if(sel[i] == brackets[j][0]){ // left bracket
-                    operator_stack.push(brackets[j][0]);
-                    is_number = false;
-                }else if(sel[i] == brackets[j][1]){ // right bracket
-                    // pop all operators until left bracket
-                    while(operator_stack.length > 0 && operator_stack[operator_stack.length - 1] != brackets[j][0]){
-                        terms_queue.push(operator_stack.pop());
-                    }
-                    operator_stack.pop(); // pop the left bracket
-                    is_number = false;
-                }
-            }
-            if (sel[i] == firstDelimiter) {
-                // is an operator
-                // pop all operators with higher precedence (none)
-                operator_stack.push(sel[i]);
-                is_number = false;
-            } else if (sel[i] == secondDelimiter) {
-                operator_stack.push(sel[i]);
-                is_number = false;
-            }
-            if (is_number) {
-                // is a term
-                terms_queue.push(sel[i]);
             }
         }
-        while (operator_stack.length > 0) {
-            terms_queue.push(operator_stack.pop());
+        // add the last term
+        terms.push(sel.substring(prev_idx, sel.length));
+        console.log(terms)
+        document.getElementById('buffer-a-display').innerHTML = '';
+        function term_onclick(e){
+            var target = e.target;
+            var timeout = 100;
+            while(target.getElementsByClassName('code').length == 0){
+                if(timeout-- < 0) break; // prevent infinite loop
+                target = target.parentElement;
+            }
+            const code = target.getElementsByClassName('code')[0].innerHTML;
+            document.getElementById('latex').value = code;
+            toggle_textarea(1);
+            focused_entity = null;
         }
-        console.log(terms_queue);
-        // construct an AST
-        var ast = construct_AST(terms_queue, firstDelimiter, secondDelimiter);
-        // propagate the minus signs to the leafs
-        console.log(ast.tree())
-        ast.propagate_minus();
-        console.log(ast.tree())
-        // convert the AST to a infix notation
-        var infix = ast.infix();
-        console.log(infix);
+        for(var i=0;i<terms.length;i++){
+            // if all whitespaces
+            const current_term = terms[i];
+            if(current_term.replace(/\s/g, '').length == 0) continue;
+            // render
+            const term_placeholder = document.getElementById('buffer-a-display').appendChild(document.createElement('span'));
+            MathJax.tex2svgPromise('\\begin{aligned}' + current_term + '\\end{aligned}').then((node) => {
+                term_placeholder.appendChild(node.children[0]);
+                term_placeholder.style = 'border: 1px solid black; padding: 5px; margin: 5px;';
+                // store the latex code in the placeholder in metadata
+                const metadata = term_placeholder.appendChild(document.createElement('span'))
+                metadata.style = 'display: none;'
+                metadata.classList.add('code');
+                metadata.innerHTML = current_term;
+                term_placeholder.onclick = term_onclick;
+                console.log('success')
+            }).catch((err) => {
+                console.log('err')
+            })
+        }
     }
 </script>
 
@@ -438,7 +382,7 @@
             <textarea class="latex-input" id='latex' onkeyup="latex_onkeyup()" onmouseup="latex_onmouseup()">
   W_\alpha &= -\frac{1}{4} \bar{D}^2 D_\alpha V \\
   &= -\frac{1}{4} \bar{D}^2 (-\sigma^\nu_{\alpha\dot\beta} \bar\theta^{\dot\beta} A_\nu + i\theta_\alpha \overline{\theta\lambda} - i \bar\theta^2 \lambda_\alpha + \frac{1}{2} \theta_\alpha \bar{\theta}^2 D - i \sigma_{\alpha \dot\alpha}^\mu \bar\theta^{\dot\alpha} \theta^\beta \sigma_{\beta\dot\beta}^\nu \bar\theta^{\dot\beta} \partial_\mu A_\nu - \sigma_{\alpha \dot \alpha}^\mu \bar\theta^{\dot\alpha} \theta^\beta \theta_\beta \bar\theta^{\dot\beta} \partial_\mu \bar\lambda_{\dot\beta}) \\
-  &= (a+b-c) (d-e +f)\\
+  &= (a+b-c) + (d-e+f) - x \\
 </textarea><br>
         </div>
         <div class="actions-panel">
@@ -463,6 +407,7 @@
                     <option value="3">Buffer 3</option>
                     <option value="4">Buffer 4</option>
                 </select>
+                <span id="buffer-a-display">hi</span>
             </div><br>
             <div class="buffer">
                 B:
