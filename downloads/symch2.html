@@ -335,7 +335,7 @@
             expanded_buffer[0] = expanded_buffer[0].substring(1, expanded_buffer[0].length);
         }
         // render
-        add_buffer('expand-'+equation_buffers.length, expanded_buffer);
+        add_buffer('exp-'+equation_buffers.length, expanded_buffer);
         render_buffer(document.getElementById('buffer-o-display'), expanded_buffer, 'o');
     }
     function copy_into_buffer(){
@@ -474,9 +474,19 @@
                 target = target.parentElement;
             }
             const code = target.getElementsByClassName('code')[0].innerHTML;
-            document.getElementById('latex').value = code;
+            const firstDelimiter = document.getElementById('delimiter-textfield').value.split(',')[0];
+            const secondDelimiter = document.getElementById('delimiter-textfield').value.split(',')[1]; // the minus sign
+            if(document.getElementById('append-checkbox').checked){
+                if(code[0] == secondDelimiter){
+                    document.getElementById('latex').value += code;
+                }else{
+                    document.getElementById('latex').value += firstDelimiter + code;
+                }
+            }else{
+                document.getElementById('latex').value = code;
+                focused_entity = null;
+            }
             toggle_textarea(1);
-            focused_entity = null;
     }
     function render_buffer(buffer_display_element, equation_buffer, display='a', idx=equation_buffers.length-1){
         // clear the buffer
@@ -492,6 +502,12 @@
                 metadata.classList.add('code');
                 metadata.innerHTML = code;
                 child_element.onclick = term_onclick;
+                child_element.onmouseover = function(e){
+                    child_element.style.border = '1px solid red';
+                }
+                child_element.onmouseout = function(e){
+                    child_element.style.border = '1px solid black';
+                }
             }).catch((err) => {
                 console.error(error)
             })
@@ -506,8 +522,10 @@
     function keyboard_keydown(e){
         if(e.key == 'Alt'){
             shortcut_state.alt = true;
+            document.getElementById('append-checkbox').checked = true;
         }else{
-            shortcut_state.keys.push(e.key);
+            shortcut_state.keys = shortcut_state.keys.filter((key) => key != e.key); // in case there are duplicates
+            shortcut_state.keys.push(e.key); 
         }
         if(shortcut_state.alt && shortcut_state.keys.includes('a')){
             add_entity();
@@ -524,6 +542,7 @@
     function keyboard_keyup(e){
         if(e.key == 'Alt'){
             shortcut_state.alt = false;
+            document.getElementById('append-checkbox').checked = false;
         }else{
             shortcut_state.keys = shortcut_state.keys.filter((key) => key != e.key);
         }
@@ -567,6 +586,7 @@
             <input type="checkbox" id="auto-render" checked onchange="latex_onkeyup()"> Auto-Render
         </div>
         <div class="buffers">
+            <input type="checkbox" id="append-checkbox"> Append (Hold Alt)
             <span class="tooltip">
                 <input type="button" value="Expand" onclick="expand()"> <br> 
                 <span class="tooltiptext">Alt + X</span>
