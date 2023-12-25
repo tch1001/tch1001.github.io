@@ -289,6 +289,7 @@
             textarea.style.height = '0px';
         }
     }
+    var equation_buffers = [];
     function separate(){
         console.log('separate')
         const delimiter = document.getElementById('delimiter-textfield').value;
@@ -337,8 +338,49 @@
         // add the last term
         terms.push(sel.substring(prev_idx, sel.length));
         console.log(terms)
-        document.getElementById('buffer-a-display').innerHTML = '';
-        function term_onclick(e){
+        var equation_buffer = [];
+        for(var i=0;i<terms.length;i++){
+            // if all whitespaces
+            const current_term = terms[i];
+            if(current_term.replace(/\s/g, '').length == 0) continue;
+            // render
+            equation_buffer.push(current_term);
+        }
+        add_buffer('sep-'+equation_buffers.length, equation_buffer);
+        render_buffer(document.getElementById('buffer-a-display'), equation_buffer);
+    }
+    function add_buffer(name, equation_buffer=[]){
+        const buffer = {
+            name: name,
+            equations: equation_buffer,
+        }
+        equation_buffers.push(buffer);
+        // add new option in dropdown list
+        const buffer_selects = document.getElementsByClassName('buffer-select')
+        for(var i=0;i<buffer_selects.length;i++){
+            const buffer_select = buffer_selects[i];
+            const option = document.createElement('option');
+            option.value = equation_buffers.length - 1;
+            option.innerHTML = name;
+            buffer_select.appendChild(option);
+        }
+    }
+    function buffer_display_onselect(){
+        // className buffer-select
+        const buffer_selects = document.getElementsByClassName('buffer-select')
+        for(var i=0; i< buffer_selects.length;i++){
+            const buffer_select = buffer_selects[i];
+            const buffer_idx = buffer_select.value;
+            const buffer = equation_buffers[buffer_idx];
+            const which_buffer = buffer_select.id.split('-')[1]; // a,b,o
+            const buffer_display_element = document.getElementById('buffer-' + which_buffer + '-display');
+            render_buffer(buffer_display_element, buffer.equations, which_buffer, buffer_idx);
+        }
+    }
+    function buffer_display_onscroll(e){
+        console.log('scroll')
+    }
+    function term_onclick(e){
             var target = e.target;
             var timeout = 100;
             while(target.getElementsByClassName('code').length == 0){
@@ -349,27 +391,28 @@
             document.getElementById('latex').value = code;
             toggle_textarea(1);
             focused_entity = null;
-        }
-        for(var i=0;i<terms.length;i++){
-            // if all whitespaces
-            const current_term = terms[i];
-            if(current_term.replace(/\s/g, '').length == 0) continue;
-            // render
-            const term_placeholder = document.getElementById('buffer-a-display').appendChild(document.createElement('span'));
-            MathJax.tex2svgPromise('\\begin{aligned}' + current_term + '\\end{aligned}').then((node) => {
-                term_placeholder.appendChild(node.children[0]);
-                term_placeholder.style = 'border: 1px solid black; padding: 5px; margin: 5px;';
-                // store the latex code in the placeholder in metadata
-                const metadata = term_placeholder.appendChild(document.createElement('span'))
+    }
+    function render_buffer(buffer_display_element, equation_buffer, display='a', idx=equation_buffers.length-1){
+        // clear the buffer
+        buffer_display_element.innerHTML = '';
+        // render the buffer
+        console.log('rendering buffer', equation_buffer)
+        for(var i=0;i<equation_buffer.length;i++){
+            const code = equation_buffer[i];
+            MathJax.tex2svgPromise('\\begin{aligned}' + code + '\\end{aligned}').then((node) => {
+                const child_element = buffer_display_element.appendChild(node.children[0]);
+                child_element.style = 'border: 1px solid black; padding-left: 5px; padding-right: 5px; margin-right: 5px; margin-left: 5px;';
+                const metadata = child_element.appendChild(document.createElement('span'))
                 metadata.style = 'display: none;'
                 metadata.classList.add('code');
-                metadata.innerHTML = current_term;
-                term_placeholder.onclick = term_onclick;
-                console.log('success')
+                metadata.innerHTML = code;
+                child_element.onclick = term_onclick;
             }).catch((err) => {
-                console.log('err')
+                console.error(error)
             })
         }
+        // display the correct thing in the dropdown 
+        document.getElementById('buffer-' + display).getElementsByClassName('buffer-select')[0].value = idx
     }
 </script>
 
@@ -396,42 +439,32 @@
             <input type="button" value="Expand" onclick=""> <br> 
             <input type="button" value="Separate" onclick="separate()"> 
             <input type="text" placeholder="Delimiter" value="+,-" id="delimiter-textfield"><br>
-            <div class="buffer">
+            <div id="buffer-a">
                 A:
                 <input type="button" value="Rename" onclick=""> 
                 <input type="button" value="Delete" onclick=""> 
                 <input type="button" value="Render" onclick=""> 
-                <select class="buffer-select">
-                    <option value="1">Buffer 1</option>
-                    <option value="2">Buffer 2</option>
-                    <option value="3">Buffer 3</option>
-                    <option value="4">Buffer 4</option>
+                <select id="buffer-a-select" class="buffer-select" onchange="buffer_display_onselect()" onscroll="buffer_display_onscroll">
                 </select>
-                <span id="buffer-a-display">hi</span>
+                <span id="buffer-a-display">Choose a Buffer</span>
             </div><br>
-            <div class="buffer">
+            <div id="buffer-b">
                 B:
                 <input type="button" value="Rename" onclick=""> 
                 <input type="button" value="Delete" onclick=""> 
                 <input type="button" value="Render" onclick=""> 
-                <select class="buffer-select">
-                    <option value="1">Buffer 1</option>
-                    <option value="2">Buffer 2</option>
-                    <option value="3">Buffer 3</option>
-                    <option value="4">Buffer 4</option>
+                <select id="buffer-b-select" class="buffer-select" onchange="buffer_display_onselect()" onscroll="buffer_display_onscroll">
                 </select>
+                <span id="buffer-b-display">Choose a Buffer</span>
             </div><br>
-            <div class="buffer">
+            <div id="buffer-o">
                 O:
                 <input type="button" value="Rename" onclick=""> 
                 <input type="button" value="Delete" onclick=""> 
                 <input type="button" value="Render" onclick=""> 
-                <select class="buffer-select">
-                    <option value="1">Buffer 1</option>
-                    <option value="2">Buffer 2</option>
-                    <option value="3">Buffer 3</option>
-                    <option value="4">Buffer 4</option>
+                <select id="buffer-o-select" class="buffer-select" onchange="buffer_display_onselect()" onscroll="buffer_display_onscroll">
                 </select>
+                <span id="buffer-o-display">Choose a Buffer</span>
             </div>
         </div>
     </div>
