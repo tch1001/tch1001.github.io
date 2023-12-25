@@ -343,7 +343,7 @@
         // expand the buffers, joining with the first delimiter
         const delimiter = document.getElementById('delimiter-textfield').value;
         const firstDelimiter = delimiter.split(',')[0];
-        const secondDelimiter = delimiter.split(',')[1]; // the minus sign (TODO implement negation awareness)
+        const secondDelimiter = delimiter.split(',')[1]; 
         var expanded_buffer_terms = [];
         for(var i=0;i<buffer_a.equations.length;i++){
             const a = buffer_a.equations[i];
@@ -502,6 +502,14 @@
                 Math.min(this.getElementsByClassName('buffer-select')[0].value + 1, equation_buffers.length - 1));
         refresh_buffer_display();
     }
+    function insert_into_latex_field(text, cursor_offset=0){
+        console.log(text)
+        const textarea = document.getElementById('latex');
+        const [start, end, sel] = get_selection();
+        textarea.value = textarea.value.substring(0, start) + text + textarea.value.substring(end, textarea.value.length);
+        textarea.selectionStart = start + cursor_offset;
+        textarea.selectionEnd = start + cursor_offset;
+    }
     function term_onclick(e){
             var target = e.target;
             var timeout = 100;
@@ -509,24 +517,21 @@
                 if(timeout-- < 0) break; // prevent infinite loop
                 target = target.parentElement;
             }
-            const code = target.getElementsByClassName('code')[0].innerHTML;
+            var code = target.getElementsByClassName('code')[0].innerHTML;
             const firstDelimiter = document.getElementById('delimiter-textfield').value.split(',')[0];
             const secondDelimiter = document.getElementById('delimiter-textfield').value.split(',')[1]; // the minus sign
             const insert_delimiter = document.getElementById('append-insert-delimiter').checked;
             if(document.getElementById('append-checkbox').checked){
                 if(code[0] == secondDelimiter){
-                    if(insert_delimiter){ // additive
-                        document.getElementById('latex').value += code; 
-                    }else{ // multiplicative
-                        document.getElementById('latex').value += '\\left(' + code + '\\right)';
+                    if(!insert_delimiter){ // multiplicative
+                        code = '\\left(' + code + '\\right)'
                     }
                 }else{
                     if(insert_delimiter){ // additive
-                        document.getElementById('latex').value += '+' + code;
-                    }else{ // multiplicative
-                        document.getElementById('latex').value += code;
+                        code = '+' + code;
                     }
                 }
+                insert_into_latex_field(code, code.length)
             }else{
                 document.getElementById('latex').value = code;
                 focused_entity = null;
@@ -589,47 +594,23 @@
         textarea.selectionStart = start + 6;
     }
     function add_partial(){
-        const textarea = document.getElementById('latex')
-        const [start, end, sel] = get_selection();
-        // insert \partial at the start of sel
-        textarea.value = textarea.value.substring(0, start) + '\\partial ' + textarea.value.substring(end, textarea.value.length);
-        // move cursor to end of \partial 
-        textarea.selectionEnd = start + 9;
-        textarea.selectionStart = start + 9;
+        insert_into_latex_field('\\partial ', 9)
     }
     function add_integral(){
-        const textarea = document.getElementById('latex')
-        const [start, end, sel] = get_selection();
-        // insert \int at the start of sel
-        textarea.value = textarea.value.substring(0, start) + '\\int_{}^{} ' + textarea.value.substring(end, textarea.value.length);
-        // move cursor to end of inserted text
-        textarea.selectionEnd = start + 10;
-        textarea.selectionStart = start + 10;
+        insert_into_latex_field('\\int_{}^{} ', 10)
     }
     function add_sigma(){
-        const textarea = document.getElementById('latex')
-        const [start, end, sel] = get_selection();
-        // insert \sum at the start of sel
-        textarea.value = textarea.value.substring(0, start) + '\\sum_{}^{} ' + textarea.value.substring(end, textarea.value.length);
-        // move cursor to end of inserted text
-        textarea.selectionEnd = start + 10;
-        textarea.selectionStart = start + 10;
+        insert_into_latex_field('\\sigma ', 10)
     }
     function add_bracket(bracket){
         const textarea = document.getElementById('latex')
         const [start, end, sel] = get_selection();
         if(sel.length == 0){
             // insert \left(\right)
-            textarea.value = textarea.value.substring(0, start) + '\\left' + bracket[0] + '\\right' + bracket[1] + textarea.value.substring(end, textarea.value.length);
-            // move cursor to between the brackets
-            textarea.selectionStart = start + 6;
-            textarea.selectionEnd = start + 6;
+            insert_into_latex_field('\\left' + bracket[0] + '\\right' + bracket[1], 6)
         }else{
             // insert bracket at the start of sel
-            textarea.value = textarea.value.substring(0, start) + '\\left' + bracket[0] + sel + '\\right' + bracket[1] + textarea.value.substring(end, textarea.value.length);
-            // move cursor to end of inserted text
-            textarea.selectionStart = start + sel.length + 13;
-            textarea.selectionEnd = start + sel.length + 13;
+            insert_into_latex_field('\\left' + bracket[0] + sel + '\\right' + bracket[1], sel.length + 13)
         }
     }
     function add_subsuperscript(subsuperscript){
@@ -637,16 +618,10 @@
         const [start, end, sel] = get_selection();
         if(sel.length == 0){
             // insert {}_{}
-            textarea.value = textarea.value.substring(0, start) + '{}_{}' + textarea.value.substring(end, textarea.value.length);
-            // move cursor to end of inserted text
-            textarea.selectionEnd = start + 1;
-            textarea.selectionStart = start + 1;
+            insert_into_latex_field('{}_{}', 1)
         }else{
             // insert subsuperscript at the start of sel
-            textarea.value = textarea.value.substring(0, start) + '{' + sel + '}' + subsuperscript + '{}' + textarea.value.substring(end, textarea.value.length);
-            // move cursor to end of inserted text
-            textarea.selectionEnd = start + sel.length + 4;
-            textarea.selectionStart = start + sel.length + 4;
+            insert_into_latex_field('{' + sel + '}' + subsuperscript + '{}', sel.length + 4)
         }
     }
     function append_to_buffer(which_buffer='b'){
