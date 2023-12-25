@@ -38,6 +38,29 @@
     #delimiter-textfield {
         width: 30px;
     }
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
 </style>
 <script>
     MathJax = {
@@ -58,7 +81,6 @@
     }
     focused_entity = null;
     function decorateNode(entity,node){
-        console.log('inside decorate', entity)
         node.style.position = 'absolute';
         node.style.right = entity.position.right;
         node.style.top = entity.position.top;
@@ -78,9 +100,9 @@
         }
     }
     function math_rerender(code, entity){
+        if(entity == null) return;
         document.getElementById('output').removeChild(entity.node);
         MathJax.tex2svgPromise(code).then((node) => {
-            console.log(node.children[0])
             entity.node = node.children[0];
             decorateNode(entity, entity.node);
             document.getElementById('output').appendChild(entity.node)
@@ -89,13 +111,11 @@
         })
     }
     function latex_onkeyup() {
-        console.log('keyup')
         if(document.getElementById('auto-render').checked){
             var textarea = document.getElementById('latex');
             var code = textarea.value;
             code = removedAligned(code);
             code = "\\begin{aligned}" + code + "\\end{aligned}"
-            console.log(code)
             if(focused_entity != null){
                 focused_entity.code = code;
                 math_rerender(code, focused_entity);
@@ -167,13 +187,11 @@
             }
         }
         onmouseout(e) {
-            // console.log('out', e);
             if(focused_entity != this){
                 this.node.style.border = '1px solid white';
             }
         }
         onmouseup(e) {
-            // console.log('up', e)
             if (e.button == 0) { // left click
                 this.mouse_state = MouseState.NONE;
             }
@@ -206,7 +224,6 @@
 
     function math_render(code, location=null) { // optional location
         MathJax.tex2svgPromise(code).then((guy) => {
-            // console.log(node.children[0])
             // absolute positioning for node 
             var node = guy.children[0];
             node.style.position = 'absolute';
@@ -290,13 +307,44 @@
         }
     }
     var equation_buffers = [];
+    function expand(){
+        // get idx of buffer-a-select and buffer-b-select
+        const buffer_a_idx = document.getElementById('buffer-a-select').value;
+        const buffer_b_idx = document.getElementById('buffer-b-select').value;
+        // get the buffers
+        const buffer_a = equation_buffers[buffer_a_idx];
+        const buffer_b = equation_buffers[buffer_b_idx];
+        // expand the buffers, joining with the first delimiter
+        const delimiter = document.getElementById('delimiter-textfield').value;
+        const firstDelimiter = delimiter.split(',')[0];
+        const secondDelimiter = delimiter.split(',')[1]; // the minus sign (TODO implement negation awareness)
+        var expanded_buffer_terms = [];
+        for(var i=0;i<buffer_a.equations.length;i++){
+            const a = buffer_a.equations[i];
+            for(var j=0;j<buffer_b.equations.length;j++){
+                const b = buffer_b.equations[j];
+                expanded_buffer_terms.push(a+b);
+            }
+        }
+        const expanded_buffer = [expanded_buffer_terms.join(firstDelimiter)];
+        // render
+        add_buffer('expand-'+equation_buffers.length, expanded_buffer);
+        render_buffer(document.getElementById('buffer-o-display'), expanded_buffer, 'o');
+    }
+    function copy_into_buffer(){
+        var [start, end, sel] = get_selection();
+
+        if(sel.length == 0) sel = removedAligned(document.getElementById('latex').value); // if nothing selected, entire thing is selected
+        // render
+        add_buffer('copy-'+equation_buffers.length, [sel]);
+        render_buffer(document.getElementById('buffer-a-display'), [sel]);
+    }
     function separate(){
-        console.log('separate')
         const delimiter = document.getElementById('delimiter-textfield').value;
         const firstDelimiter = delimiter.split(',')[0];
         const secondDelimiter = delimiter.split(',')[1]; // the minus sign
         var [start, end, sel] = get_selection();
-        if(sel.length == 0) sel = removedAligned(focused_entity.code); // if nothing selected, entire thing is selected
+        if(sel.length == 0) sel = removedAligned(document.getElementById('latex').value); // if nothing selected, entire thing is selected
         // split sel by firstDelimiter (plus sign) and secondDelimiter (minus sign)
         // taking good care of brackets
         const brackets = [['(', ')'], ['{', '}'], ['[', ']']];
@@ -337,7 +385,23 @@
         }
         // add the last term
         terms.push(sel.substring(prev_idx, sel.length));
-        console.log(terms)
+        if(terms.length == 1){
+            // remove whitespace around the term
+            terms[0] = terms[0].trim();
+            // remove surrounding brackets
+            const first_char = terms[0][0];
+            const last_char = terms[0][terms[0].length-1];
+            var remove_brackets = false;
+            for(var j=0;j<brackets.length;j++){
+                if(first_char == brackets[j][0] && last_char == brackets[j][1]){
+                    remove_brackets = true;
+                    break;
+                }
+            }
+            if(remove_brackets){
+                terms[0] = terms[0].substring(1, terms[0].length-1);
+            }
+        }
         var equation_buffer = [];
         for(var i=0;i<terms.length;i++){
             // if all whitespaces
@@ -396,7 +460,6 @@
         // clear the buffer
         buffer_display_element.innerHTML = '';
         // render the buffer
-        console.log('rendering buffer', equation_buffer)
         for(var i=0;i<equation_buffer.length;i++){
             const code = equation_buffer[i];
             MathJax.tex2svgPromise('\\begin{aligned}' + code + '\\end{aligned}').then((node) => {
@@ -414,6 +477,40 @@
         // display the correct thing in the dropdown 
         document.getElementById('buffer-' + display).getElementsByClassName('buffer-select')[0].value = idx
     }
+    var shortcut_state = {
+        alt: false,
+        keys: [],
+    }
+    function keyboard_keydown(e){
+        if(e.key == 'Alt'){
+            shortcut_state.alt = true;
+        }else{
+            shortcut_state.keys.push(e.key);
+        }
+        if(shortcut_state.alt && shortcut_state.keys.includes('a')){
+            add_entity();
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('t')){
+            toggle_textarea();
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('x')){
+            expand();
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('c')){
+            copy_into_buffer();
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('s')){
+            separate();
+        }
+    }
+    function keyboard_keyup(e){
+        if(e.key == 'Alt'){
+            shortcut_state.alt = false;
+        }else{
+            shortcut_state.keys = shortcut_state.keys.filter((key) => key != e.key);
+        }
+    }
+    document.onkeydown = keyboard_keydown;
+    document.onkeyup = keyboard_keyup;
+    function help_menu(){
+        alert("Hover over buttons for keyboard shortcut")
+    }
 </script>
 
 <body onload='render()'>
@@ -429,15 +526,37 @@
 </textarea><br>
         </div>
         <div class="actions-panel">
-            <button class="toggle-textarea" onclick="toggle_textarea()">Toggle Textarea</button><br>
-            <button class="add-entity" onclick="add_entity()">Add Entity</button><br>
-            <button class="delete-entity" onclick="delete_entity()">Delete</button><br>
+            <span class="tooltip">
+                <button class="toggle-textarea" onclick="toggle_textarea()">Toggle Textarea</button>
+                <span class="tooltiptext">Alt + T</span>
+            </span>
+            <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_entity()">Add Entity</button>
+                <span class="tooltiptext">Alt + A</span>
+            </span>
+            <br>
+            <!-- <span class="tooltip"> -->
+                <button class="delete-entity" onclick="delete_entity()">Delete</button>
+                <!-- <span class="tooltiptext">Alt + D</span> -->
+            <!-- </span> -->
+            <br>
+            <button onclick="help_menu()">Help</button><br>
             <input type="checkbox" id="auto-render" checked onchange="latex_onkeyup()"> Auto-Render
         </div>
         <div class="buffers">
-            <input type="button" value="Copy Buffer" onclick=""> <br> 
-            <input type="button" value="Expand" onclick=""> <br> 
-            <input type="button" value="Separate" onclick="separate()"> 
+            <span class="tooltip">
+                <input type="button" value="Expand" onclick="expand()"> <br> 
+                <span class="tooltiptext">Alt + X</span>
+            </span> 
+            <span class="tooltip">
+                <input type="button" value="Copy" onclick="copy_into_buffer()"> 
+                <span class="tooltiptext">Alt + C</span>
+            </span> 
+            <span class="tooltip">
+                <input type="button" value="Separate" onclick="separate()"> 
+                <span class="tooltiptext">Alt + S</span>
+            </span> 
             <input type="text" placeholder="Delimiter" value="+,-" id="delimiter-textfield"><br>
             <div id="buffer-a">
                 A:
@@ -459,6 +578,7 @@
             </div><br>
             <div id="buffer-o">
                 O:
+                <!-- <span class="tooltip"><input type="button" value="Rename" onclick=""> <span class="tooltiptext">meow</span></span> -->
                 <input type="button" value="Rename" onclick=""> 
                 <input type="button" value="Delete" onclick=""> 
                 <input type="button" value="Render" onclick=""> 
