@@ -476,11 +476,20 @@
             const code = target.getElementsByClassName('code')[0].innerHTML;
             const firstDelimiter = document.getElementById('delimiter-textfield').value.split(',')[0];
             const secondDelimiter = document.getElementById('delimiter-textfield').value.split(',')[1]; // the minus sign
+            const insert_delimiter = document.getElementById('append-insert-delimiter').checked;
             if(document.getElementById('append-checkbox').checked){
                 if(code[0] == secondDelimiter){
-                    document.getElementById('latex').value += code;
+                    if(insert_delimiter){ // additive
+                        document.getElementById('latex').value += code; 
+                    }else{ // multiplicative
+                        document.getElementById('latex').value += '\\left(' + code + '\\right)';
+                    }
                 }else{
-                    document.getElementById('latex').value += firstDelimiter + code;
+                    if(insert_delimiter){ // additive
+                        document.getElementById('latex').value += '+' + code;
+                    }else{ // multiplicative
+                        document.getElementById('latex').value += code;
+                    }
                 }
             }else{
                 document.getElementById('latex').value = code;
@@ -519,10 +528,81 @@
         alt: false,
         keys: [],
     }
+    function add_fraction(){
+        const textarea = document.getElementById('latex')
+        const [start, end, sel] = get_selection();
+        // insert \frac{}{} at the start of sel
+        textarea.value = textarea.value.substring(0, start) + '\\frac{}{}' + textarea.value.substring(end, textarea.value.length);
+        // move cursor to the first {
+        textarea.selectionEnd = start + 6;
+        textarea.selectionStart = start + 6;
+    }
+    function add_partial(){
+        const textarea = document.getElementById('latex')
+        const [start, end, sel] = get_selection();
+        // insert \partial at the start of sel
+        textarea.value = textarea.value.substring(0, start) + '\\partial ' + textarea.value.substring(end, textarea.value.length);
+        // move cursor to end of \partial 
+        textarea.selectionEnd = start + 9;
+        textarea.selectionStart = start + 9;
+    }
+    function add_integral(){
+        const textarea = document.getElementById('latex')
+        const [start, end, sel] = get_selection();
+        // insert \int at the start of sel
+        textarea.value = textarea.value.substring(0, start) + '\\int_{}^{} ' + textarea.value.substring(end, textarea.value.length);
+        // move cursor to end of inserted text
+        textarea.selectionEnd = start + 10;
+        textarea.selectionStart = start + 10;
+    }
+    function add_sigma(){
+        const textarea = document.getElementById('latex')
+        const [start, end, sel] = get_selection();
+        // insert \sum at the start of sel
+        textarea.value = textarea.value.substring(0, start) + '\\sum_{}^{} ' + textarea.value.substring(end, textarea.value.length);
+        // move cursor to end of inserted text
+        textarea.selectionEnd = start + 10;
+        textarea.selectionStart = start + 10;
+    }
+    function add_bracket(bracket){
+        const textarea = document.getElementById('latex')
+        const [start, end, sel] = get_selection();
+        if(sel.length == 0){
+            // insert \left(\right)
+            textarea.value = textarea.value.substring(0, start) + '\\left' + bracket[0] + '\\right' + bracket[1] + textarea.value.substring(end, textarea.value.length);
+            // move cursor to between the brackets
+            textarea.selectionStart = start + 6;
+            textarea.selectionEnd = start + 6;
+        }else{
+            // insert bracket at the start of sel
+            textarea.value = textarea.value.substring(0, start) + '\\left' + bracket[0] + sel + '\\right' + bracket[1] + textarea.value.substring(end, textarea.value.length);
+            // move cursor to end of inserted text
+            textarea.selectionStart = start + sel.length + 13;
+            textarea.selectionEnd = start + sel.length + 13;
+        }
+    }
+    function add_subsuperscript(subsuperscript){
+        const textarea = document.getElementById('latex')
+        const [start, end, sel] = get_selection();
+        if(sel.length == 0){
+            // insert {}_{}
+            textarea.value = textarea.value.substring(0, start) + '{}_{}' + textarea.value.substring(end, textarea.value.length);
+            // move cursor to end of inserted text
+            textarea.selectionEnd = start + 1;
+            textarea.selectionStart = start + 1;
+        }else{
+            // insert subsuperscript at the start of sel
+            textarea.value = textarea.value.substring(0, start) + '{' + sel + '}' + subsuperscript + '{}' + textarea.value.substring(end, textarea.value.length);
+            // move cursor to end of inserted text
+            textarea.selectionEnd = start + sel.length + 4;
+            textarea.selectionStart = start + sel.length + 4;
+        }
+    }
     function keyboard_keydown(e){
         if(e.key == 'Alt'){
             shortcut_state.alt = true;
             document.getElementById('append-checkbox').checked = true;
+            return; // prevent the bug where pressing alt alone will trigger the shortcut
         }else{
             shortcut_state.keys = shortcut_state.keys.filter((key) => key != e.key); // in case there are duplicates
             shortcut_state.keys.push(e.key); 
@@ -537,7 +617,22 @@
             copy_into_buffer();
         }else if(shortcut_state.alt && shortcut_state.keys.includes('s')){
             separate();
-        }
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('q')){ // for quotient
+            add_fraction();
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('p')){ // partial
+            add_partial()
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('i')){ // integral
+            add_integral()
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('9')){ // brackets
+            add_bracket('()')
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('6')){ // subscripts
+            add_subsuperscript('^')
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('[')){ // brackets
+            add_bracket('[]')
+        }else if(shortcut_state.alt && shortcut_state.keys.includes('-')){ // subscripts
+            add_subsuperscript('_')
+        } 
+
     }
     function keyboard_keyup(e){
         if(e.key == 'Alt'){
@@ -570,13 +665,35 @@
             <span class="tooltip">
                 <button class="toggle-textarea" onclick="toggle_textarea()">Toggle Textarea</button>
                 <span class="tooltiptext">Alt + T</span>
-            </span>
-            <br>
+            </span> <br>
             <span class="tooltip">
                 <button class="add-entity" onclick="add_entity()">Add Entity</button>
                 <span class="tooltiptext">Alt + A</span>
-            </span>
-            <br>
+            </span> <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_integral()">Integral</button>
+                <span class="tooltiptext">Alt + I</span>
+            </span> <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_fraction()">Fraction</button>
+                <span class="tooltiptext">Alt + Q</span>
+            </span> <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_partial()">Partial</button>
+                <span class="tooltiptext">Alt + P</span>
+            </span> <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_sigma()">Sum</button>
+                <!-- <span class="tooltiptext">Alt + P</span> -->
+            </span> <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_bracket('()')">Brackets</button>
+                <span class="tooltiptext">Alt + 9, Alt + [</span>
+            </span> <br>
+            <span class="tooltip">
+                <button class="add-entity" onclick="add_subsuperscript('_')">Subscripts</button>
+                <span class="tooltiptext">Alt + 6, Alt + -</span>
+            </span> <br>
             <!-- <span class="tooltip"> -->
                 <!-- <button class="delete-entity" onclick="delete_entity()">Delete</button> -->
                 <!-- <span class="tooltiptext">Alt + D</span> -->
@@ -586,7 +703,8 @@
             <input type="checkbox" id="auto-render" checked onchange="latex_onkeyup()"> Auto-Render
         </div>
         <div class="buffers">
-            <input type="checkbox" id="append-checkbox"> Append (Hold Alt)
+            <input type="checkbox" id="append-checkbox"> Append (Hold Alt)<br>
+            <input type="checkbox" id="append-insert-delimiter"> Insert + <br>
             <span class="tooltip">
                 <input type="button" value="Expand" onclick="expand()"> <br> 
                 <span class="tooltiptext">Alt + X</span>
