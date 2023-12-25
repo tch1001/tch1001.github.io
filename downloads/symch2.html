@@ -641,31 +641,31 @@
             shortcut_state.keys = shortcut_state.keys.filter((key) => key != e.key); // in case there are duplicates
             shortcut_state.keys.push(e.key); 
         }
-        if(shortcut_state.alt && shortcut_state.keys.includes('a')){
+        if(shortcut_state.alt &&       e.key == 'a'){
             add_entity();
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('t')){
+        }else if(shortcut_state.alt && e.key == 't'){
             toggle_textarea();
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('x')){
+        }else if(shortcut_state.alt && e.key == 'x'){
             expand();
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('c')){
+        }else if(shortcut_state.alt && e.key == 'c'){
             copy_into_buffer();
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('s')){
+        }else if(shortcut_state.alt && e.key == 's'){
             separate();
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('q')){ // for quotient
+        }else if(shortcut_state.alt && e.key == 'q'){ // for quotient
             add_fraction();
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('p')){ // partial
+        }else if(shortcut_state.alt && e.key == 'p'){ // partial
             add_partial()
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('i')){ // integral
+        }else if(shortcut_state.alt && e.key == 'i'){ // integral
             add_integral()
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('9')){ // brackets
+        }else if(shortcut_state.alt && e.key == '9'){ // brackets
             add_bracket('()')
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('6')){ // subscripts
+        }else if(shortcut_state.alt && e.key == '6'){ // subscripts
             add_subsuperscript('^')
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('[')){ // brackets
+        }else if(shortcut_state.alt && e.key == '['){ // brackets
             add_bracket('[]')
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('-')){ // subscripts
+        }else if(shortcut_state.alt && e.key == '-'){ // subscripts
             add_subsuperscript('_')
-        }else if(shortcut_state.alt && shortcut_state.keys.includes('b')){ // add to buffer B
+        }else if(shortcut_state.alt && e.key == 'b'){ // add to buffer B
             append_to_buffer('b')
         }
     }
