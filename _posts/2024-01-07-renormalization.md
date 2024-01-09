@@ -5,6 +5,8 @@ categories: [Physics, QFT, Renormalization]
 ---
 There are many resources on renormalization in Quantum Field Theory (QFT). I have been reading a few of them and I will review them here. This is roughly in the order I recommend reading them (as a complete beginner), with the first few being the best.
 
+Find my recommended reading order below.
+
 Note this blog doesn't cover renormalization group and solid state physics. I will cover that in a separate post. The focus here is QFT.
 
 # Zee QFT 
@@ -12,7 +14,7 @@ Anthony Zee's textbook [Quantum Field Theory in a Nutshell](http://home.ustc.edu
 
 It is worth mentioning [Zee's Lectures](https://www.youtube.com/watch?v=_AZdvtf6hPU) although it is abit blurry. 
 
-## Conceptual
+## Chap III.1: Conceptual
 
 In $\phi^4$ theory, 2 particle scattering up to 1 loop with hard cutoff $\Lambda$:
 
@@ -55,13 +57,13 @@ As Nabil Iqbal puts it, "you want to relate measureable quantities to the measur
 
 Zee then covers Pauli-Villars regularization, and dimensional regularization in the Appendix of Chapter III.1.
 
-## Renormalizable vs Non-renormalizable (using Dimensional Analysis)
+## Chap III.2: Renormalizable vs Non-renormalizable (using Dimensional Analysis)
 Zee covers it quite well. I especially like his example of a vector boson theory being the UV completion of Fermi theory (equation 1, page 157).
 
-## Counterterms and Physical Perturbation Theory
+## Chap III.3: Counterterms and Physical Perturbation Theory
 I'll be honest I don't really like his explanation of mass renormalization that much. 
 
-## Polarizing the Vacuum and Renormalizing the Charge
+## Chap III.7: Polarizing the Vacuum and Renormalizing the Charge
 No comments
 
 # Nabil Iqbal Lectures
@@ -98,7 +100,7 @@ I like the examples he introduced.
 [Tobias Osborne Lectures](https://youtu.be/J563CtQWpaY) from his [Advanced QFT Series](https://www.youtube.com/playlist?list=PLDfPUNusx1ErSu1JDVV1KKGQkJQCkzL9u). Tobias approaches renormalization in a very philosophical manner. He covers $\phi^4$ theory. 
 
 ## Lecture 8: Philosophy of Renormalization
-He spends a good 40 minutes talking about philosophy of physics. I especially like [56:00](https://www.youtube.com/watch?v=J563CtQWpaY&t=56m0s) where he says we can declare victory even if the (bare) parameters of our theory are not necessarily observables, and can totally depend on a cut-off $\Lambda$, and he labels them $z_i(\Lambda)$ to emphasise it. My takeaway is that the unrenormalized/bare parameters are merely a means to an end, and the end is to predict observables. 
+He spends a good 40 minutes talking about philosophy of physics. I especially like [56:00](https://www.youtube.com/watch?v=J563CtQWpaY&t=56m0s) where he says we can declare victory even if the (bare) parameters of our theory are not necessarily observables, and they can totally depend on a cut-off $\Lambda$, and he labels them $z_i(\Lambda)$ to emphasise it. My takeaway is that the unrenormalized/bare parameters are merely a means to an end, and the end is to predict observables. 
 
 ## Lecture 9: Renormalization of $\phi^4$ theory
 No comments
@@ -124,7 +126,7 @@ I like his use of examples, especially examples in solid state physics.
 From here onwards, the resources are more detailed and less conceptual. They are good if you already know the conceptual idea and want to apply it to real calculations.
 
 # Lewis Ryder QFT
-Lewis Ryder's textbook [Quantum Field Theory](https://www.amazon.com/Quantum-Field-Theory-Lewis-Ryder/dp/0521478146) writes about renormalization of gauge theories in  Chapter 9. This is good if you already have a decent conceptual understanding of renormalization and want to see how it works in phenomenology.
+Lewis Ryder's textbook [Quantum Field Theory](https://www.amazon.com/Quantum-Field-Theory-Lewis-Ryder/dp/0521478146) writes mostly about renormalization of gauge theories in Chapter 9. This is good if you already have a decent conceptual understanding of renormalization and want to see how it works in phenomenology.
 
 # Ricardo D. Matheus Lectures
 [QFT2](https://www.youtube.com/playlist?list=PL5-Gs_CjccK51MURXy4_Fgy9ihSul3-h5) from IFT UNESP (Sao Paulo) is a great series if you want to dive into QED and QCD calculations in gory detail. I especially like his [Kallen-Lehmann Lecture](https://www.youtube.com/watch?v=hiROq3bAr2g&list=PL5-Gs_CjccK51MURXy4_Fgy9ihSul3-h5&index=2) and his [LSZ Lecture](https://www.youtube.com/watch?v=tWezNBXXZfk&list=PL5-Gs_CjccK51MURXy4_Fgy9ihSul3-h5&index=4). 
@@ -135,6 +137,21 @@ Lewis Ryder's textbook [Quantum Field Theory](https://www.amazon.com/Quantum-Fie
 # Francois David Lectures
 [Francois David Lectures](https://youtu.be/9ggGqyvwzSY) from [QFT2 at Saclay](https://pirsa.org/C22037). 
 
-# Ashoke Sen Lecture
-[Ashoke Sen Lecture](https://youtu.be/1Qsf1ARZuo0) from [QFT2](https://www.youtube.com/playlist?list=PLfHqWfSignon_EFyk5Wuw6glhJi5FtPas)
+# Ashoke Sen Lectures
+[Ashoke Sen Lectures](https://youtu.be/1Qsf1ARZuo0) from [QFT2](https://www.youtube.com/playlist?list=PLfHqWfSignon_EFyk5Wuw6glhJi5FtPas)
 
+# == Recommended Reading Order ==
+If you are completely new to renormalization, I recommend the following resources in this order:
+
+#### Conceptual Understanding / Vertex Renormalization
+- Zee QFT Chapter III.1 (Conceptual)
+- Zee QFT Chapter III.2 (Dimensional Analysis)
+- Nabil Iqbal Lecture 3d (Intro to Renormalization)
+- Tobias Osborne Lecture 8 (Philosophy of Renormalization)
+- Tobias Osborne Lecture 9 (Dimensional Analysis)
+
+#### Counterterms
+- Lancaster QFT Chap 32 (Renormalization)
+
+#### Mass Renormalization
+- idk, I don't like any of the explanations so far

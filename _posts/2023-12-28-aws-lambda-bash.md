@@ -137,3 +137,162 @@ sed -i 's/scratch/amazonlinux:2/g' Dockerfile.provided.al2
 docker build -f Dockerfile.provided.al2 -t lambda_image:1.0.0 .
 ```
 We had to replace the `FROM scratch` with `FROM public.ecr.aws/lambda/nodejs:18` because we want to `docker exec` into the container later and have a nice shell, and `scratch` does not have a shell. Also because it seems like we can't run `/lambda-entrypoint.sh` the scratch image (either this is bug in Amazon's GitHub, or Lambda loads containers differently from our local Docker `runc`).
+
+
+
+### Creating our image
+Then we can run our build environment
+```
+docker run -d -v $PWD:/tmp/meow --name lambda_image lambda_image:1.0.0
+docker exec -it lambda_image bash
+```
+
+### Writing our binary
+Install build environment in the interative shell
+```
+yum install -y gcc-c++ vim
+```
+Or you could bake it into the image by adding it to the Dockerfile 
+
+### Compiling our binary
+Then we can write a simple C++ program
+```
+cat > test.cpp << EOF
+#include <stdio.h>
+int main(){
+    printf("Hello, world!\n");
+}
+EOF
+```
+And compile it
+```
+g++ test.cpp -o my_binary
+cp my_binary /tmp/meow
+```
+Exit the container and zip it up
+```
+chmod +x my_binary
+zip my_binary.zip my_binary
+```
+
+### Uploading our binary
+Then we can upload it to our Lambda function
+
+![Adding Layer](/assets/images/cr15.png)
+
+We use `hello.sh` to make sure it works
+
+![hello.sh](/assets/images/cr16.png)
+
+The output is
+```
+total 8
+-rwxr-xr-x 1 root root 8176 Dec 27 18:01 my_binary
+Hello, world!
+```
+
+# Extra: Understanding AWS Lambda Runtime
+Nice that you are here at the end! Let's have some fun and dig deep into AWS Lambda.
+```
+docker exec -it --entrypoint bash lambda_image:1.0.0 
+cat /lambda-entrypoint.sh
+```
+
+We see that 
+```
+#!/bin/sh
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+if [ $# -ne 1 ]; then
+  echo "entrypoint requires the handler name to be the first argument" 1>&2
+  exit 142
+fi
+export _HANDLER="$1"
+
+RUNTIME_ENTRYPOINT=/var/runtime/bootstrap
+if [ -z "${AWS_LAMBDA_RUNTIME_API}" ]; then
+  exec /usr/local/bin/aws-lambda-rie $RUNTIME_ENTRYPOINT
+else
+  exec $RUNTIME_ENTRYPOINT
+fi
+```
+
+Curiously, 
+```
+cat /usr/local/bin/aws-lambda-rie # binary file garbage
+cat /var/runtime/bootstrap 
+```
+We see 
+```
+#!/bin/sh
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+if [ -z "$NODE_PATH" ]; then
+  nodejs_mods="/opt/nodejs/node_modules"
+  nodejs18_mods="/opt/nodejs/node18/node_modules"
+  runtime_mods="/var/runtime/node_modules"
+  task="/var/runtime:/var/task"
+  export NODE_PATH="$nodejs18_mods:$nodejs_mods:$runtime_mods:$task"
+fi
+
+if [ -n "$AWS_LAMBDA_FUNCTION_MEMORY_SIZE" ]; then
+  new_space=$(expr $AWS_LAMBDA_FUNCTION_MEMORY_SIZE / 10)
+  semi_space=$(expr $new_space / 2)
+  old_space=$(expr $AWS_LAMBDA_FUNCTION_MEMORY_SIZE - $new_space)
+  MEMORY_ARGS=(
+    "--max-semi-space-size=$semi_space"
+    "--max-old-space-size=$old_space"
+  )
+fi
+
+# If NODE_EXTRA_CA_CERTS is being set by the customer, don't override. Else, include RDS CA
+if [ -z "${NODE_EXTRA_CA_CERTS+set}" ]; then
+  # Use the default CA bundle in CN regions and regions that have 3 dashes in their name
+  if [ "${AWS_REGION:0:3}" == "cn-" ] || [ "${AWS_REGION//[^-]}" == "---" ]; then
+    export NODE_EXTRA_CA_CERTS=/etc/pki/tls/certs/ca-bundle.crt
+  else
+    # /var/runtime/ca-cert.pem contains all certs in "/etc/pki/tls/certs/ca-bundle.crt" that
+    # are not already embedded in the node binary.
+    export NODE_EXTRA_CA_CERTS=/var/runtime/ca-cert.pem
+  fi
+fi
+
+export AWS_EXECUTION_ENV=AWS_Lambda_nodejs18.x
+
+NODE_ARGS=(
+    --expose-gc
+    --max-http-header-size 81920
+    "${MEMORY_ARGS[@]}"
+    /var/runtime/index.mjs
+    )
+
+if [ -z "$AWS_LAMBDA_EXEC_WRAPPER" ]; then
+  exec /var/lang/bin/node "${NODE_ARGS[@]}"
+else
+  wrapper="$AWS_LAMBDA_EXEC_WRAPPER"
+  if [ ! -f "$wrapper" ]; then
+    echo "$wrapper: does not exist"
+    exit 127
+  fi
+  if [ ! -x "$wrapper" ]; then
+    echo "$wrapper: is not an executable"
+    exit 126
+  fi
+    exec -- "$wrapper" /var/lang/bin/node "${NODE_ARGS[@]}"
+fi
+```
+It seems to be invoking nodejs. I wonder if other images will have different `bootstrap` files. Let's go to the Amazon Lambda console and use `hello.sh` to probe around.
+
+With my `hello.sh` file as
+```
+function handler () {
+    ls -l /var/runtime
+}
+```
+I get a funny result that
+```
+total 9852
+-rwxr-xr-x 1 root root 10085351 Oct 19 17:20 init
+```
+
+I tried to `cat` it but it timed out (since it's 10Mb afterall).
