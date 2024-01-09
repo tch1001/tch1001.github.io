@@ -1,9 +1,11 @@
 ---
 layout: post
-title: "Reviewing Renormalization Resources"
-categories: [Physics, QFT]
+title: "Reviewing Renormalization Resources (in QFT)"
+categories: [Physics, QFT, Renormalization]
 ---
-There are many resources on renormalization. I have been reading a few of them and I will review them here. This is roughly in the order I recommend reading them (as a complete beginner), with the first few being the best.
+There are many resources on renormalization in Quantum Field Theory (QFT). I have been reading a few of them and I will review them here. This is roughly in the order I recommend reading them (as a complete beginner), with the first few being the best.
+
+Note this blog doesn't cover renormalization group and solid state physics. I will cover that in a separate post. The focus here is QFT.
 
 # Zee QFT 
 Anthony Zee's textbook [Quantum Field Theory in a Nutshell](http://home.ustc.edu.cn/~gengb/200923/A.%20Zee,%20Quantum%20Field%20Theory%20in%20a%20Nutshell.pdf) Part III Renormalization has great exposition. I especially like the dialogue between the experimentalist and the theorist. 
@@ -60,20 +62,63 @@ Zee covers it quite well. I especially like his example of a vector boson theory
 I'll be honest I don't really like his explanation of mass renormalization that much. 
 
 ## Polarizing the Vacuum and Renormalizing the Charge
-TODO
+No comments
 
 # Nabil Iqbal Lectures
 [Nabil Iqbal Lectures](https://youtu.be/UNVV2suXsEA) from [QFT2 at Durham](https://www.youtube.com/playlist?list=PL_kQfq_5BKqq1xPQe3LHeAuAoLyCMZx4Y).
 
+## Lecture 3d: Intro to Renormalization
+He mentions the problem of infinity if we take the limit $\Lambda \rightarrow \infty$ in the $\phi^4$ theory. 
 
+[2:59](https://youtu.be/UNVV2suXsEA?t=2m59s) I especially like his analogy of ideal gas law and how we relate 2 observable things to each other.
+
+[7:10](https://youtu.be/UNVV2suXsEA?t=7m10s) I also like that he explicitly says that $\lambda_P \equiv i\mathcal{M}(s_0,t_0,u_0)$ is a definition. In Zee's book, he says $\lambda_P$ is measured, but doesn't explicitly say that it is definitionally equal to $\mathcal{M}(s_0,t_0,u_0)$, and it must instead be inferred by looking at the equations 3-4.
+
+[10:20](https://youtu.be/UNVV2suXsEA?t=10m20s) He inverts $\lambda_P(\lambda)$ to get $\lambda(\lambda_P)$, but leaves it to the viewer to verify. I prefer Zee for the explicit working in this regard.
+
+## Lecture 4a: Renormalized Perturbation Theory
+To be honest, I don't like this lecture that much. He explains the renormalization conditions (pole of 2-point function at $p^2 = m^2$ must have residue 1). 
+
+He derives the same result
+
+$$i \mathcal{M}\left(s, t, u\right)=-i \lambda+\frac{i \lambda^2}{32 \pi^2} \left[ \log \left(\frac{s_0}{s}\right)+\log \left(\frac{t_0}{t}\right)+\log \left(\frac{u_0}{u}\right) \right]$$
+
+(equation at [18:12](https://www.youtube.com/watch?v=Mqrv22DExX8&t=18m12s)) 
+
+using counterterms and renormalization conditions. 
+
+## Lecture 4b: Renormalization of the two-point function
+No comments
+## Lecture 4c: Which Theories Are Renormalizable
+No comments
+## Lecture 4d: non-renormalizable theories
+I like the examples he introduced.
 
 # Tobias Osborne Lectures
 [Tobias Osborne Lectures](https://youtu.be/J563CtQWpaY) from his [Advanced QFT Series](https://www.youtube.com/playlist?list=PLDfPUNusx1ErSu1JDVV1KKGQkJQCkzL9u). Tobias approaches renormalization in a very philosophical manner. He covers $\phi^4$ theory. 
+
+## Lecture 8: Philosophy of Renormalization
+He spends a good 40 minutes talking about philosophy of physics. I especially like [56:00](https://www.youtube.com/watch?v=J563CtQWpaY&t=56m0s) where he says we can declare victory even if the (bare) parameters of our theory are not necessarily observables, and can totally depend on a cut-off $\Lambda$, and he labels them $z_i(\Lambda)$ to emphasise it. My takeaway is that the unrenormalized/bare parameters are merely a means to an end, and the end is to predict observables. 
+
+## Lecture 9: Renormalization of $\phi^4$ theory
+No comments
 
 # Lancaster QFT
 [Quantum Field Theory for the Gifted Amateur](https://www.amazon.com/Quantum-Field-Theory-Gifted-Amateur/dp/019969933X) Part VIII Renormalization. He introduces renormalization using counterterms first, then explaining the philosophy of "what is physically observable", mirroring the historical development of renormalization. 
 
 I think the historical way is not a good way to learn it though. I much rather learn it from the modern perspective of effective field theory first, and then learn the historical development. This is because physicists were confused about renormalization for a long time, before a drastic change in perspective made it clearer. It would thus make more sense to use the benefit of hindsight when teaching renormalization.
+
+## Chap 31: Quasiparticles
+I don't really like the explanations here.
+
+## Chap 32: Renormalization
+He works with $\phi^4$ theory. While I like that he covers a lot of detailed mathematical steps, I don't really like the explanations here. This is a useful resource if you are already familiar with the conceptual understanding and wish to revise it.
+
+## Chap 33: Propagators and Feynman Diagrams
+I somewhat like his derivation of mass renormalization, as well as renormalization conditions for counterterms.
+
+## Chap 34 & 35: Renormalization Group
+I like his use of examples, especially examples in solid state physics.
 
 # == Detailed Calculations == 
 From here onwards, the resources are more detailed and less conceptual. They are good if you already know the conceptual idea and want to apply it to real calculations.

@@ -56,3 +56,84 @@ If you create a new file instead of renaming, you will see this error
 After you make changes to the files (including renaming), you need to deploy the function. Otherwise the old files will still be used. And they will say they cannot find the `bootstrap` file.
 
 ![bootstrap not found](/assets/images/customruntime9.png)
+
+## Common Error: I accidentally deleted the bootstrap file
+
+If you accidentally deleted the old `bootstrap.sh.sample` file, and now you can't create one that has executable permissions, you must do the following
+
+```
+cat > bootstrap << EOF
+#!/bin/sh
+set -euo pipefail
+
+# Handler format: <script_name>.<bash_function_name>
+#
+# The script file <script_name>.sh  must be located at the root of your
+# function's deployment package, alongside this bootstrap executable.
+source $(dirname "$0")/"$(echo $_HANDLER | cut -d. -f1).sh"
+
+while true
+do
+    # Request the next event from the Lambda runtime
+    HEADERS="$(mktemp)"
+    EVENT_DATA=$(curl -v -sS -LD "$HEADERS" -X GET "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/next")
+    INVOCATION_ID=$(grep -Fi Lambda-Runtime-Aws-Request-Id "$HEADERS" | tr -d '[:space:]' | cut -d: -f2)
+
+    # Execute the handler function from the script
+    RESPONSE=$($(echo "$_HANDLER" | cut -d. -f2) "$EVENT_DATA")
+
+    # Send the response to Lambda runtime
+    curl -v -sS -X POST "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/$INVOCATION_ID/response" -d "$RESPONSE"
+done
+EOF
+
+cat > hello.sh << EOF
+function handler () {
+    EVENT_DATA=$1
+
+    RESPONSE="{\"statusCode\": 200, \"body\": \"Hello from Lambda!\"}"
+    echo $RESPONSE
+}
+EOF
+```
+
+Change the permissions
+```
+chmod +x bootstrap
+chmod +x hello.sh
+```
+
+Then zip it up and upload it
+```
+zip my_bootstrap.zip bootstrap hello.sh
+```
+
+![Uploading the bootstrap](/assets/images/customruntime10.png)
+![Uploading the bootstrap](/assets/images/customruntime11.png)
+![Works now](/assets/images/customruntime12.png)
+
+# Custom Binary
+
+Do note that whatever scripts or binaries you want to run, you need to compile it on the same OS as the Lambda runtime. In this case, it is Amazon Linux 2. So I will be using a Docker container to compile my binary.
+
+## Docker Container
+
+First setup our build environment. By looking at our runtime image, we can refer to the docs to find the Dockerfile for the image. 
+
+![Runtime Image](/assets/images/cr13.png)
+
+Which we can find the image for [here](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#runtimes-images-provided)
+
+![Documentation](/assets/images/cr14.png)
+
+We go ahead and clone the repo 
+
+```
+git clone --branch provided.al2 --depth 1 https://github.com/aws/aws-lambda-base-images.git 
+cd aws-lambda-base-images
+# either of the following
+sed -i 's/scratch/public.ecr.aws\/lambda\/nodejs:18/g' Dockerfile.provided.al2
+sed -i 's/scratch/amazonlinux:2/g' Dockerfile.provided.al2
+docker build -f Dockerfile.provided.al2 -t lambda_image:1.0.0 .
+```
+We had to replace the `FROM scratch` with `FROM public.ecr.aws/lambda/nodejs:18` because we want to `docker exec` into the container later and have a nice shell, and `scratch` does not have a shell. Also because it seems like we can't run `/lambda-entrypoint.sh` the scratch image (either this is bug in Amazon's GitHub, or Lambda loads containers differently from our local Docker `runc`).
