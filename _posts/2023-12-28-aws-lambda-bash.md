@@ -296,3 +296,58 @@ total 9852
 ```
 
 I tried to `cat` it but it timed out (since it's 10Mb afterall).
+
+## Where is layers uploaded to?
+
+AWS Lambda Layers are uploaded to `/opt` in the container. We can verify this by creating a layer and uploading it to our function. 
+
+```
+echo "meow" > test.txt
+zip test.zip test.txt
+```
+
+Then after uploading, we can use `hello.sh` to again probe around.
+
+```
+function handler () {
+    ls -l /opt
+}
+```
+and we see
+```
+total 1
+-rwxr-xr-x 1 root root 5 Dec 27 17:37 test.txt
+```
+
+Now what if we wanted to upload it to a different path? Idk
+
+## Environment variables
+I used `env` in `hello.sh` to see the environment variables. I redacted some of the values.
+```
+AWS_LAMBDA_FUNCTION_VERSION=$LATEST
+AWS_SESSION_TOKEN=REDACTED
+LAMBDA_TASK_ROOT=/var/task
+AWS_LAMBDA_LOG_GROUP_NAME=/aws/lambda/custom_runtime
+LD_LIBRARY_PATH=/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib
+AWS_LAMBDA_RUNTIME_API=127.0.0.1:9001
+AWS_LAMBDA_LOG_STREAM_NAME=2023/12/27/[$LATEST]REDACTED_UUID
+AWS_LAMBDA_FUNCTION_NAME=custom_runtime
+AWS_XRAY_DAEMON_ADDRESS=REDACTED_IPV4_ADDRESS:2000
+PATH=/usr/local/bin:/usr/bin/:/bin:/opt/bin
+AWS_DEFAULT_REGION=us-east-1
+PWD=/var/task
+AWS_SECRET_ACCESS_KEY=REDACTED
+LANG=en_US.UTF-8
+LAMBDA_RUNTIME_DIR=/var/runtime
+AWS_LAMBDA_INITIALIZATION_TYPE=on-demand
+TZ=:UTC
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=REDACTED
+SHLVL=1
+_AWS_XRAY_DAEMON_ADDRESS=REDACTED_IPV4_ADDRESS
+_AWS_XRAY_DAEMON_PORT=2000
+AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
+_HANDLER=hello.handler
+AWS_LAMBDA_FUNCTION_MEMORY_SIZE=128
+_=/usr/bin/env
+```

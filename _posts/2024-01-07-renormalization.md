@@ -150,7 +150,7 @@ If you are completely new to renormalization, I recommend the following resource
 - Tobias Osborne Lecture 8 (Philosophy of Renormalization)
 - Tobias Osborne Lecture 9 (Dimensional Analysis)
 
-#### Counterterms
+#### Counterterms and Renormalization Conditions
 - Lancaster QFT Chap 32 (Renormalization)
 
 #### Mass Renormalization
