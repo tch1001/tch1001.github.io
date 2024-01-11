@@ -13,12 +13,13 @@ One can look for another subspace that is complementary to $VE$, i.e.
 $$TE = VE \oplus HE$$
 The intuition is that vectors in $HE$ point in a direction that leads to **another fiber**, while vectors in $VE$ point in a direction **tangent** to the **current fiber**. I would love to add a diagram showing an example with $\dim M = \dim F = 1$ (the only intuitive diagram one can draw in my opinion).
 
- In the absence of any additional structure, there are many valid choices of $HE$. This is analogous to saying that the vector space of degree 2 polynomials $\text{span} (1,x,x^2)$ can be decomposed in many ways
+ In the absence of any additional structure, there are many valid choices of $HE$, **and our choice of $HE$ affects $\text{ver}(X)$**. This is analogous to saying that the vector space of degree 2 polynomials $\text{span} (1,x,x^2)$ can be decomposed in many ways
 
  $$
  \begin{aligned}
- \text{span} (1,x,x^2) &= \text{span} (1) \oplus \text{span} (x,x^2)\\
- \text{span} (1,x,x^2) &= \text{span} (1) \oplus \text{span} (5x+x^2, 2x^2)
+ \text{analogous to }TE &= VE \oplus HE \\
+ \text{span} (1,x,x^2) &= \text{span} (1) \oplus \text{span} (x,x^2) \quad \quad \Rightarrow \text{ver}(x+1) = 1\\
+ \text{span} (1,x,x^2) &= \text{span} (1) \oplus \text{span} (x+1, x^2) \ \Rightarrow \text{ver}(x+1) =0 \\
  \end{aligned}
  $$
 
@@ -39,7 +40,7 @@ However, it turns out that given a local trivialization $\mathcal{U}\times G$ of
 
 ### Details of Theorem
 The main result is a theorem
-- presented at 21:28 of Schuller Lecture 22 (I follow his notation)
+- presented at [21:28](https://youtu.be/KhagmmNvOvQ?t=21m28s) of Schuller Lecture 22 (I follow his notation)
 - Theorem 10.1 in Nakahara
 - [Wiki](https://en.wikipedia.org/wiki/Connection_(principal_bundle)#Pull_back_via_trivializing_section)
 
